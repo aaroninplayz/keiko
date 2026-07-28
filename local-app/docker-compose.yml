@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # 1. Local Ollama LLM Engine Service (Pre-configured with qwen2.5:7b)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: keiko-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_storage:/root/.ollama
+    # Entrypoint script pulls qwen2.5:7b on container startup if missing
+    entrypoint: >
+      /bin/sh -c "
+      ollama serve &
+      sleep 5;
+      echo 'Downloading qwen2.5:7b parameter model...';
+      ollama pull qwen2.5:7b;
+      echo 'qwen2.5:7b model ready!';
+      tail -f /dev/null
+      "
+    restart: always
+
+  # 2. Keiko Local Web Application & AI Pipeline
+  keiko-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: keiko-web-app
+    ports:
+      - "8000:8000"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_MODEL=qwen2.5:7b
+      - DATABASE_URL=sqlite:///./app.db
+    depends_on:
+      - ollama
+    restart: always
+
+volumes:
+  ollama_storage:
+    driver: local

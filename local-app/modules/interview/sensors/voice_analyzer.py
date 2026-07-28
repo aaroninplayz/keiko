@@ -2,8 +2,14 @@ import logging
 import wave
 import io
 import numpy as np
-import torch
-from transformers import pipeline
+try:
+    import torch
+    from transformers import pipeline
+    HAS_TORCH = True
+except ImportError:
+    torch = None
+    pipeline = None
+    HAS_TORCH = False
 from core.config import settings, MODELS_DIR
 
 logger = logging.getLogger(__name__)
@@ -23,20 +29,26 @@ class VoiceAnalyzer:
     def __init__(self):
         self.provider = settings.STT_PROVIDER.lower()
         self.model_id = settings.WHISPER_MODEL_SIZE
-        self.pipe = None
-        
-        if self.provider == "local":
-            try:
-                device = "cuda" if torch.cuda.is_available() else "cpu"
-                logger.info(f"Initializing local Whisper pipeline with model {self.model_id} on {device}...")
-                self.pipe = pipeline(
-                    "automatic-speech-recognition",
-                    model=self.model_id,
-                    device=0 if device == "cuda" else -1,
-                    model_kwargs={"cache_dir": MODELS_DIR}
-                )
-            except Exception as e:
-                logger.error(f"Local Whisper init failed: {e}. Fallback to API/Mock will be used.")
+        self._pipe = None
+        self._pipe_attempted = False
+
+    @property
+    def pipe(self):
+        if not self._pipe_attempted:
+            self._pipe_attempted = True
+            if self.provider == "local" and HAS_TORCH and torch and pipeline:
+                try:
+                    device = "cuda" if torch.cuda.is_available() else "cpu"
+                    logger.info(f"Initializing local Whisper pipeline with model {self.model_id} on {device}...")
+                    self._pipe = pipeline(
+                        "automatic-speech-recognition",
+                        model=self.model_id,
+                        device=0 if device == "cuda" else -1,
+                        model_kwargs={"cache_dir": MODELS_DIR}
+                    )
+                except Exception as e:
+                    logger.error(f"Local Whisper init failed: {e}. Fallback to API/Mock will be used.")
+        return self._pipe
 
     def transcribe(self, pcm_bytes: bytes) -> dict:
         """
@@ -100,18 +112,97 @@ class VoiceAnalyzer:
 
     async def process_audio(self, audio_chunk: bytes) -> dict:
         """
-        Analyzes audio chunk entirely in memory for tone, pitch, and speech-to-text.
+        Analyzes audio chunk (16-bit PCM 16000Hz mono) in memory for volume, pitch modulation, fluency, and tone using numpy DSP.
         """
-        logger.debug("Processing audio chunk locally...")
-        return {
-            "type": "voice_metric",
-            "pace": "optimal",
-            "tone": "confident"
-        }
+        if not audio_chunk or len(audio_chunk) < 2:
+            return {
+                "type": "voice_metric",
+                "rms": 0.0,
+                "projection": 50.0,
+                "modulation": 50.0,
+                "fluency": 70.0,
+                "silence_ratio": 0.0,
+                "pace": "optimal",
+                "tone": "confident"
+            }
 
-    def analyze_speech(self, text: str, audio_len: float = 5.0) -> dict:
+        try:
+            # Convert 16-bit PCM to float32 normalized samples (-1.0 to 1.0)
+            samples = np.frombuffer(audio_chunk, dtype=np.int16).astype(np.float32) / 32768.0
+            sr = 16000
+
+            # 1. RMS Energy (Volume / Projection Score)
+            rms = float(np.sqrt(np.mean(samples ** 2))) if len(samples) > 0 else 0.0
+            projection_score = max(0.0, min(100.0, rms * 500.0))
+
+            # 2. Zero-Crossing Rate & Modulation
+            frame_size = int(sr * 0.05)  # 50ms frames
+            if len(samples) >= frame_size:
+                n_frames = len(samples) // frame_size
+                zcr_frames = [
+                    float(np.mean(np.abs(np.diff(np.signbit(samples[i * frame_size:(i + 1) * frame_size])))))
+                    for i in range(n_frames)
+                ]
+                zcr_std = float(np.std(zcr_frames)) if len(zcr_frames) > 0 else 0.0
+                modulation_score = max(30.0, min(100.0, 50.0 + zcr_std * 500.0))
+
+                # 3. Silence Gap Detection & Fluency
+                frame_energies = [
+                    float(np.sqrt(np.mean(samples[i * frame_size:(i + 1) * frame_size] ** 2)))
+                    for i in range(n_frames)
+                ]
+                silence_threshold = max(0.005, rms * 0.2)
+                silent_frames = sum(1 for e in frame_energies if e < silence_threshold)
+                silence_ratio = silent_frames / float(len(frame_energies)) if frame_energies else 0.0
+
+                if silence_ratio > 0.5:
+                    fluency_score = max(20.0, 100.0 - (silence_ratio - 0.5) * 160.0)
+                else:
+                    fluency_score = max(50.0, min(100.0, 100.0 - silence_ratio * 30.0))
+            else:
+                modulation_score = 50.0
+                silence_ratio = 0.0
+                fluency_score = 70.0
+
+            # Determine tone and pace classification
+            pace = "optimal"
+            if silence_ratio > 0.45:
+                pace = "hesitant"
+            elif silence_ratio < 0.1 and rms > 0.1:
+                pace = "fast"
+
+            tone = "confident"
+            if projection_score < 30.0:
+                tone = "quiet"
+            elif modulation_score > 75.0:
+                tone = "expressive"
+
+            return {
+                "type": "voice_metric",
+                "rms": round(rms, 4),
+                "projection": round(projection_score, 1),
+                "modulation": round(modulation_score, 1),
+                "fluency": round(fluency_score, 1),
+                "silence_ratio": round(silence_ratio, 2),
+                "pace": pace,
+                "tone": tone
+            }
+        except Exception as e:
+            logger.error(f"Error processing audio DSP: {e}")
+            return {
+                "type": "voice_metric",
+                "rms": 0.0,
+                "projection": 50.0,
+                "modulation": 50.0,
+                "fluency": 70.0,
+                "silence_ratio": 0.0,
+                "pace": "optimal",
+                "tone": "confident"
+            }
+
+    def analyze_speech(self, text: str, audio_len: float = 5.0, pcm_bytes: bytes = None) -> dict:
         """
-        Calculates speaking pace, modulation, clarity, and fluency scores (0-100) based on text transcription.
+        Calculates speaking pace, modulation, clarity, and fluency scores (0-100) combining text transcription and audio DSP.
         """
         words = text.split()
         wpm = (len(words) / audio_len) * 60.0 if audio_len > 0 else 0.0
@@ -123,12 +214,12 @@ class VoiceAnalyzer:
             deviation = abs(wpm - 140.0)
             pace_score = max(0.0, min(100.0, 100.0 - deviation * 0.5))
         
-        # Modulation score
+        # Text-based modulation score
         modulation_score = 80.0
         if len(words) > 1:
             modulation_score = max(30.0, min(100.0, 70.0 + len(set(words)) * 2.0))
             
-        # Clarity score (default high, but we can simulate minor variance)
+        # Clarity score
         clarity_score = 85.0
         
         # Fluency (filler word detection)
@@ -139,6 +230,38 @@ class VoiceAnalyzer:
             fluency_score = max(0.0, min(100.0, 100.0 - ratio * 200.0))
         else:
             fluency_score = 80.0
+
+        # Incorporate DSP metrics if raw PCM audio bytes are available
+        if pcm_bytes and len(pcm_bytes) >= 2:
+            try:
+                samples = np.frombuffer(pcm_bytes, dtype=np.int16).astype(np.float32) / 32768.0
+                rms = float(np.sqrt(np.mean(samples ** 2))) if len(samples) > 0 else 0.0
+                frame_size = int(16000 * 0.05)
+                if len(samples) >= frame_size:
+                    n_frames = len(samples) // frame_size
+                    zcr_frames = [
+                        float(np.mean(np.abs(np.diff(np.signbit(samples[i * frame_size:(i + 1) * frame_size])))))
+                        for i in range(n_frames)
+                    ]
+                    zcr_std = float(np.std(zcr_frames)) if len(zcr_frames) > 0 else 0.0
+                    dsp_modulation = max(30.0, min(100.0, 50.0 + zcr_std * 500.0))
+
+                    frame_energies = [
+                        float(np.sqrt(np.mean(samples[i * frame_size:(i + 1) * frame_size] ** 2)))
+                        for i in range(n_frames)
+                    ]
+                    silence_thresh = max(0.005, rms * 0.2)
+                    silent_count = sum(1 for e in frame_energies if e < silence_thresh)
+                    silence_ratio = silent_count / float(len(frame_energies))
+                    dsp_fluency = max(20.0, min(100.0, 100.0 - silence_ratio * 100.0))
+                else:
+                    dsp_modulation = modulation_score
+                    dsp_fluency = fluency_score
+
+                modulation_score = round(0.5 * modulation_score + 0.5 * dsp_modulation, 1)
+                fluency_score = round(0.5 * fluency_score + 0.5 * dsp_fluency, 1)
+            except Exception as e:
+                logger.error(f"Error incorporating DSP metrics into analyze_speech: {e}")
             
         return {
             "pace": round(pace_score, 1),

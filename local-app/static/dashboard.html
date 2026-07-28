@@ -111,9 +111,47 @@
             color: transparent;
         }
         .bg-accent-gradient { background: linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #14B8A6 100%); }
+        @keyframes fadeUpBox {
+          0% { opacity: 0; transform: translateY(24px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+          animation: fadeUpBox 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
     </style>
 </head>
-<body class="font-body text-body bg-background text-text-primary min-h-screen flex flex-col justify-between">
+<body class="font-body text-body bg-background text-text-primary min-h-screen flex flex-col justify-between relative">
+
+<!-- Linux Kernel Boot & Splash Loader Overlay -->
+<div id="linuxBootSplash" class="fixed inset-0 z-[100] bg-[#000000] flex flex-col justify-between font-mono text-xs select-none overflow-hidden">
+  <!-- Phase 1: Top-Left Linux Terminal Log Container (Crisp White Text) -->
+  <div id="terminalContainer" class="absolute top-6 left-6 max-w-2xl max-h-[75vh] overflow-hidden text-white/90 font-mono text-[11px] leading-snug space-y-0.5 pointer-events-none">
+    <div id="bootLogs" class="flex flex-col justify-end space-y-0.5"></div>
+  </div>
+
+  <!-- Phase 2: Centered Thin Gradient Loading Bar & Digits Percentage -->
+  <div id="gradientLoaderBox" class="opacity-0 transition-opacity duration-500 absolute inset-0 flex flex-col items-center justify-center space-y-3 pointer-events-none">
+    <div class="flex items-center gap-2 text-xs font-mono text-gray-400">
+      <span class="tracking-widest uppercase text-[10px] font-bold text-gray-300">KEIKO</span>
+      <span id="bootProgressPercent" class="text-primary font-bold text-sm">0%</span>
+    </div>
+    <!-- Thin single line with signature gradient -->
+    <div class="w-72 sm:w-96 h-[2px] bg-white/10 rounded-full overflow-hidden">
+      <div id="bootProgressBar" class="h-full rounded-full transition-all duration-75 w-0 bg-accent-gradient shadow-[0_0_12px_rgba(124,58,237,0.8)]"></div>
+    </div>
+  </div>
+
+  <!-- Phase 3: Pure Black Screen with Typing Welcome Animation -->
+  <div id="welcomeTypingContainer" class="opacity-0 transition-opacity duration-500 absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div class="text-center space-y-2 px-4">
+      <h2 class="text-3xl sm:text-4xl md:text-5xl font-display font-bold tracking-tight text-white flex items-center justify-center gap-2 flex-wrap">
+        <span id="welcomeTextPrefix"></span>
+        <span id="welcomeCandidateName" class="bg-gradient-to-r from-[#7C3AED] via-[#a855f7] to-[#14B8A6] bg-clip-text text-transparent"></span>
+        <span id="typingCursor" class="inline-block w-1.5 h-8 sm:h-10 bg-white animate-pulse"></span>
+      </h2>
+    </div>
+  </div>
+</div>
 
 <!-- KEIKO TopNavBar -->
 <nav class="fixed top-0 w-full z-50 bg-[#131314]/85 backdrop-blur-md border-b border-white/10 h-20">
@@ -122,8 +160,7 @@
     <div class="hidden md:flex items-center space-x-8">
       <a id="nav-dashboard" class="text-sm text-primary font-bold transition-colors" href="dashboard.html">Dashboard</a>
       <a id="nav-setup" class="text-sm text-gray-400 hover:text-white transition-colors" href="interview-setup.html">Setup Session</a>
-      <a id="nav-docs" class="text-sm text-gray-400 hover:text-white transition-colors" href="documentation.html">Documentation</a>
-      <a id="nav-admin" class="text-sm text-gray-400 hover:text-white transition-colors" href="admin.html">Admin</a>
+      <a id="nav-settings" class="text-sm text-gray-400 hover:text-white transition-colors" href="settings.html">Settings</a>
     </div>
     <a class="bg-accent-gradient text-white px-6 py-2 rounded-full font-bold text-sm transition-all hover:scale-105 hover:opacity-90 active:scale-95 shadow-lg shadow-purple-500/20" href="interview-setup.html">Start Setup</a>
   </div>
@@ -163,93 +200,66 @@
       <section class="glass-neo-stitch p-8 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div class="relative z-10 space-y-2">
           <div class="inline-flex items-center gap-2 text-xs font-mono text-tertiary uppercase tracking-widest">
-            <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
-            System Status: Active
+            <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+            System Status: Operational
           </div>
-          <h2 class="text-3xl font-bold font-display text-white">Good Morning, <span class="gradient-text">Analyst</span>.</h2>
-          <p class="text-text-secondary text-sm max-w-lg leading-relaxed">
-            Neural telemetry nodes operational. 12 intelligence reports generated in the last 24 hours. System readiness at 99.8%.
+          <h2 class="text-3xl font-bold font-display text-white">Welcome, <span id="welcomeUserName" class="gradient-text">Candidate</span>.</h2>
+          <p id="welcomeSummaryText" class="text-text-secondary text-sm max-w-lg leading-relaxed">
+            Neural telemetry nodes ready. All local sensors & AI pipeline online.
           </p>
         </div>
-        <a href="interview-setup.html" class="relative z-10 bg-accent-gradient text-white px-6 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-2 hover:shadow-[0_0_25px_rgba(124,58,237,0.45)] transition-all hover:scale-105 active:scale-95">
-          <span class="material-symbols-outlined text-base">play_arrow</span>
-          Start New Interview
-        </a>
+        <div class="relative z-10 flex flex-wrap items-center gap-3">
+          <a href="interview-setup.html" class="bg-accent-gradient text-white px-6 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-2 hover:shadow-[0_0_25px_rgba(124,58,237,0.45)] transition-all hover:scale-105 active:scale-95">
+            <span class="material-symbols-outlined text-base">play_arrow</span>
+            Start New Interview
+          </a>
+        </div>
       </section>
 
-      <!-- Stats Row -->
-      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Stats Row (Real Metrics Only) -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div class="glass-neo-stitch p-6 flex flex-col gap-2">
-          <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">COMPLETED</span>
-          <span class="font-mono text-2xl font-bold text-text-primary">1,204</span>
-          <span class="text-xs font-mono text-tertiary">+12% this week</span>
-        </div>
-        <div class="glass-neo-stitch p-6 flex flex-col gap-2">
-          <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">PENDING ANALYSIS</span>
-          <span class="font-mono text-2xl font-bold text-text-primary">34</span>
-          <span class="text-xs font-mono text-text-supporting">Processing...</span>
-        </div>
-        <div class="glass-neo-stitch p-6 flex flex-col gap-2">
-          <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">REPORTS GENERATED</span>
-          <span class="font-mono text-2xl font-bold text-text-primary">892</span>
-          <span class="text-xs font-mono text-tertiary">All nodes active</span>
+          <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">COMPLETED INTERVIEWS</span>
+          <span id="statCompletedCount" class="font-mono text-3xl font-bold text-text-primary">0</span>
+          <span id="statCompletedSub" class="text-xs font-mono text-text-supporting">No sessions completed yet</span>
         </div>
         <div class="glass-neo-stitch p-6 flex flex-col gap-2">
           <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">AVG PERFORMANCE</span>
-          <span class="font-mono text-2xl font-bold text-text-primary">94.2%</span>
-          <span class="text-xs font-mono text-text-supporting">Metric stable</span>
+          <span id="statAvgPerformance" class="font-mono text-3xl font-bold text-text-primary">0.0%</span>
+          <span id="statAvgSub" class="text-xs font-mono text-text-supporting">Metric based on completed evaluations</span>
+        </div>
+        <div class="glass-neo-stitch p-6 flex flex-col gap-2">
+          <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">SAVED PROFILES</span>
+          <span id="statProfilesCount" class="font-mono text-3xl font-bold text-text-primary">0</span>
+          <span id="statProfilesSub" class="text-xs font-mono text-text-supporting">Candidate context profiles</span>
         </div>
       </section>
 
-      <!-- Recent Interviews Table -->
+      <!-- Recent Operations Table -->
       <section class="glass-neo-stitch p-6 space-y-6">
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-bold font-display text-text-primary">Recent Operations</h3>
-          <a href="#" class="text-xs font-mono text-primary hover:underline">View All</a>
+          <span id="sessionsCountBadge" class="text-xs font-mono text-text-supporting">0 sessions recorded</span>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="border-b border-white/10">
-                <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">SUBJECT</th>
-                <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">ROLE/TARGET</th>
-                <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">TIMESTAMP</th>
+                <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">CANDIDATE</th>
+                <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">TARGET ROLE</th>
+                <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">TYPE / MODE</th>
                 <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">STATUS</th>
                 <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider text-right">ACTION</th>
               </tr>
             </thead>
-            <tbody class="text-xs">
-              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td class="py-4 font-medium text-text-primary">E. Ripley</td>
-                <td class="py-4 text-text-supporting">Flight Officer</td>
-                <td class="py-4 font-mono text-text-supporting">2026-07-21 08:12</td>
-                <td class="py-4">
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-tertiary/10 text-tertiary font-mono text-[10px] border border-tertiary/20">COMPLETED</span>
-                </td>
-                <td class="py-4 text-right">
-                  <button class="text-text-supporting hover:text-primary transition-colors"><span class="material-symbols-outlined text-base">description</span></button>
-                </td>
-              </tr>
-              <tr class="border-b border-white/5 hover:bg-white/5 transition-colors">
-                <td class="py-4 font-medium text-text-primary">D. Bowman</td>
-                <td class="py-4 text-text-supporting">Mission Commander</td>
-                <td class="py-4 font-mono text-text-supporting">2026-07-20 14:45</td>
-                <td class="py-4">
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-primary/10 text-primary font-mono text-[10px] border border-primary/20">ANALYZING</span>
-                </td>
-                <td class="py-4 text-right">
-                  <button class="text-text-supporting hover:text-primary transition-colors"><span class="material-symbols-outlined text-base">description</span></button>
-                </td>
-              </tr>
-              <tr class="hover:bg-white/5 transition-colors">
-                <td class="py-4 font-medium text-text-primary">S. Connor</td>
-                <td class="py-4 text-text-supporting">Tactical Lead</td>
-                <td class="py-4 font-mono text-text-supporting">2026-07-19 09:30</td>
-                <td class="py-4">
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-tertiary/10 text-tertiary font-mono text-[10px] border border-tertiary/20">COMPLETED</span>
-                </td>
-                <td class="py-4 text-right">
-                  <button class="text-text-supporting hover:text-primary transition-colors"><span class="material-symbols-outlined text-base">description</span></button>
+            <tbody id="recentSessionsTableBody" class="text-xs">
+              <tr>
+                <td colspan="5" class="py-8 text-center text-text-supporting font-mono">
+                  <div class="flex flex-col items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-3xl text-gray-600">inbox</span>
+                    <span>No completed interview sessions recorded yet.</span>
+                    <a href="interview-setup.html" class="text-primary hover:underline text-xs mt-1">Click here to launch your first session</a>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -259,70 +269,1055 @@
 
     </div>
 
-    <!-- Right System Feed Sidebar (1 Col) -->
+    <!-- Right Sidebar (Candidate Profiles Workspace & Neural Observations) -->
     <aside class="space-y-6">
-      <div class="glass-neo-stitch p-6 space-y-6">
-        <h3 class="text-base font-bold font-display text-text-primary">System Feed</h3>
-        <div class="space-y-6 relative before:absolute before:inset-y-0 before:left-[11px] before:w-[2px] before:bg-white/10">
-          <div class="relative pl-8">
-            <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-[#141416] border-2 border-primary flex items-center justify-center">
-              <div class="w-2 h-2 rounded-full bg-tertiary"></div>
-            </div>
-            <p class="text-xs text-text-primary font-medium">Report Generated: E. Ripley</p>
-            <p class="font-mono text-[10px] text-text-supporting mt-1">10 MINS AGO</p>
+      <div class="glass-neo-stitch p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">badge</span>
+            <h3 class="text-base font-bold font-display text-text-primary">Candidate Profiles</h3>
           </div>
-          <div class="relative pl-8">
-            <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-[#141416] border-2 border-primary flex items-center justify-center">
-              <div class="w-2 h-2 rounded-full bg-primary"></div>
-            </div>
-            <p class="text-xs text-text-primary font-medium">Analysis Started: D. Bowman</p>
-            <p class="font-mono text-[10px] text-text-supporting mt-1">2 HRS AGO</p>
-          </div>
-          <div class="relative pl-8">
-            <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-[#141416] border-2 border-primary flex items-center justify-center">
-              <div class="w-2 h-2 rounded-full bg-gray-500"></div>
-            </div>
-            <p class="text-xs text-text-primary font-medium">Node Synchronization Complete</p>
-            <p class="font-mono text-[10px] text-text-supporting mt-1">04:00 AM</p>
-          </div>
+          <button id="addProfileBtn" class="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold flex items-center gap-1 transition-all">
+            <span class="material-symbols-outlined text-sm">add</span>
+            <span>New Profile</span>
+          </button>
+        </div>
+
+        <!-- Saved Profiles Switcher Container -->
+        <div id="sidebarProfilesList" class="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+          <!-- Dynamically populated profile items -->
         </div>
       </div>
 
-      <div class="glass-neo-stitch p-6 space-y-4">
-        <h4 class="font-mono text-xs text-primary font-bold uppercase tracking-wider flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm">lightbulb</span>
-          INTELLIGENCE TIP
-        </h4>
-        <p class="text-xs text-text-secondary leading-relaxed">
-          Pre-configure 9 telemetry sensor weights during candidate setup to optimize biometric evaluation accuracy.
+      <!-- Neural Observations (Sarcastic & Dark Humoured Insights) -->
+      <div class="glass-neo-stitch p-6 space-y-4 relative overflow-hidden">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <h4 class="font-mono text-xs text-primary font-bold uppercase tracking-wider flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm animate-pulse">psychology</span>
+            NEURAL OBSERVATIONS
+          </h4>
+          <button id="nextTipBtn" class="text-text-supporting hover:text-primary transition-colors flex items-center gap-1 font-mono text-[10px]" title="Next Observation">
+            <span>Refresh</span>
+            <span class="material-symbols-outlined text-xs">refresh</span>
+          </button>
+        </div>
+        <p id="tipTextDisplay" class="text-xs text-text-secondary leading-relaxed min-h-[56px] transition-opacity duration-300 italic">
+          Loading observation...
         </p>
-        <a class="text-xs text-text-primary hover:text-primary transition-colors flex items-center gap-1 font-medium" href="documentation.html">
-          View Documentation <span class="material-symbols-outlined text-xs">arrow_forward</span>
-        </a>
       </div>
     </aside>
 
   </div>
 </main>
 
-<!-- KEIKO Footer -->
-<footer class="bg-[#0A0A0B] border-t border-white/10 w-full py-12">
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-8 max-w-[1440px] mx-auto text-xs text-gray-500">
-    <div>
-      <div class="text-xl text-white mb-2 font-bold tracking-tighter font-display">KEIKO</div>
-      <p class="text-xs text-gray-400">Engineering-grade intelligence for modern technical interviews.</p>
+<!-- Modal: Add New Profile with Comprehensive Candidate Details -->
+<div id="addProfileModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden p-4">
+  <div class="glass-neo-stitch max-w-2xl w-full p-6 space-y-5 bg-[#141416] border border-white/15 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <h3 class="text-lg font-bold font-display text-white flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">person_add</span>
+        Create Candidate Profile
+      </h3>
+      <button id="closeAddProfileModal" class="text-text-supporting hover:text-white transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
     </div>
-    <div class="flex space-x-6 items-center">
-      <a class="hover:text-primary transition-colors" href="dashboard.html">Dashboard</a>
-      <a class="hover:text-primary transition-colors" href="interview-setup.html">Interview Setup</a>
-      <a class="hover:text-primary transition-colors" href="documentation.html">Documentation</a>
-      <a class="hover:text-primary transition-colors" href="admin.html">Admin</a>
+
+    <!-- Option A: Resume Parser Upload Box -->
+    <div class="space-y-2">
+      <label class="block text-xs font-mono uppercase tracking-wider text-tertiary font-semibold flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-sm">cloud_upload</span>
+        Option A: Upload Resume to Auto-Fill Profile Details
+      </label>
+      <div id="modalResumeDropzone" class="border-2 border-dashed border-white/20 hover:border-primary rounded-xl p-4 text-center cursor-pointer transition-colors bg-[#1c1b1c]/50">
+        <span class="material-symbols-outlined text-2xl text-gray-400 mb-1">description</span>
+        <p class="text-xs text-gray-300 font-medium">Click or drop resume file here (PDF, DOCX, TXT)</p>
+        <input id="modalResumeFile" type="file" accept=".pdf,.docx,.txt" class="hidden"/>
+        <span id="modalResumeStatus" class="text-[11px] font-mono text-tertiary mt-1 block hidden"></span>
+      </div>
     </div>
-    <div class="text-right">
-      &copy; 2026 KEIKO AI Platform. All rights reserved.
+
+    <div class="relative flex items-center my-2">
+      <div class="flex-grow border-t border-white/10"></div>
+      <span class="flex-shrink mx-3 text-[10px] font-mono text-text-supporting uppercase">OR REVIEW & MANUALLY ENTER DETAILS</span>
+      <div class="flex-grow border-t border-white/10"></div>
     </div>
+
+    <!-- Comprehensive Candidate Profile Form -->
+    <form id="addProfileForm" class="space-y-4 font-mono text-xs">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-text-secondary uppercase mb-1">Full Name *</label>
+          <input id="modalAddName" required type="text" placeholder="e.g. Sarah Connor" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-text-secondary uppercase mb-1">Email Address *</label>
+          <input id="modalAddEmail" required type="email" placeholder="e.g. sarah@example.com" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary"/>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-text-secondary uppercase mb-1">Phone / Contact Details</label>
+        <input id="modalAddPhone" type="text" placeholder="e.g. +1 (555) 019-2834" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary"/>
+      </div>
+
+      <div>
+        <label class="block text-text-secondary uppercase mb-1">Skills & Technologies</label>
+        <input id="modalAddSkills" type="text" placeholder="e.g. Python, FastAPI, React, PostgreSQL, Docker, PyTorch" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary"/>
+      </div>
+
+      <div>
+        <label class="block text-text-secondary uppercase mb-1">Work Experience & History</label>
+        <textarea id="modalAddExperience" rows="3" placeholder="e.g. Senior Software Engineer at Tech Corp (2022-Present). Lead API team of 6 engineers." class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-none"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-text-secondary uppercase mb-1">Education & Where Studied</label>
+        <textarea id="modalAddEducation" rows="2" placeholder="e.g. B.S. in Computer Science, Stanford University (2018-2022)" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-none"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-text-secondary uppercase mb-1">Key Achievements & Projects</label>
+        <textarea id="modalAddAchievements" rows="2" placeholder="e.g. Built high-frequency trading engine; 1st place in National AI Hackathon" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-none"></textarea>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-white/10">
+        <button type="button" id="cancelAddProfileBtn" class="px-4 py-2 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 transition-colors">Cancel</button>
+        <button type="submit" class="bg-accent-gradient text-white px-5 py-2 rounded-xl font-bold hover:shadow-lg transition-all">Save Candidate Profile</button>
+      </div>
+    </form>
   </div>
-</footer>
+</div>
+
+<!-- Modal: Edit Profile -->
+<div id="editProfileModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden p-4">
+  <div class="glass-neo-stitch max-w-2xl w-full p-6 space-y-5 bg-[#141416] border border-white/15 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-white/10 pb-3">
+      <h3 class="text-lg font-bold font-display text-white flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">edit</span>
+        Edit Candidate Profile
+      </h3>
+      <button id="closeEditProfileModal" class="text-text-supporting hover:text-white transition-colors">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <form id="editProfileForm" class="space-y-4 font-mono text-xs">
+      <input id="modalEditKey" type="hidden"/>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-text-secondary uppercase mb-1">Full Name *</label>
+          <input id="modalEditName" required type="text" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary"/>
+        </div>
+        <div>
+          <label class="block text-text-secondary uppercase mb-1">Email Address *</label>
+          <input id="modalEditEmail" required type="email" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary"/>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-text-secondary uppercase mb-1">Phone / Contact Details</label>
+        <input id="modalEditPhone" type="text" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary"/>
+      </div>
+
+      <div>
+        <label class="block text-text-secondary uppercase mb-1">Skills & Technologies</label>
+        <input id="modalEditSkills" type="text" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary"/>
+      </div>
+
+      <div>
+        <label class="block text-text-secondary uppercase mb-1">Work Experience & History</label>
+        <textarea id="modalEditExperience" rows="2" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-none"></textarea>
+        <div id="modalEditExperienceCards" class="mt-2 space-y-2 max-h-48 overflow-y-auto"></div>
+      </div>
+
+      <div>
+        <label class="block text-text-secondary uppercase mb-1">Education & Where Studied</label>
+        <textarea id="modalEditEducation" rows="2" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-none"></textarea>
+        <div id="modalEditEducationCards" class="mt-2 space-y-2 max-h-48 overflow-y-auto"></div>
+      </div>
+
+      <div>
+        <label class="block text-text-secondary uppercase mb-1">Key Achievements & Projects</label>
+        <textarea id="modalEditAchievements" rows="2" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-none"></textarea>
+        <div id="modalEditAchievementsCards" class="mt-2 space-y-2 max-h-48 overflow-y-auto"></div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-white/10">
+        <button type="button" id="deleteProfileBtn" class="bg-red-500/10 text-red-400 border border-red-500/30 px-3 py-2 rounded-xl hover:bg-red-500/20 transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">delete</span>
+          <span>Delete Profile</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" id="cancelEditProfileBtn" class="px-4 py-2 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 transition-colors">Cancel</button>
+          <button type="submit" class="bg-accent-gradient text-white px-5 py-2 rounded-xl font-bold hover:shadow-lg transition-all">Update Profile</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <!-- Dashboard Dynamic Data Initialization Script -->
+  <script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const welcomeUserName = document.getElementById('welcomeUserName');
+    const welcomeSummaryText = document.getElementById('welcomeSummaryText');
+    const statCompletedCount = document.getElementById('statCompletedCount');
+    const statCompletedSub = document.getElementById('statCompletedSub');
+    const statAvgPerformance = document.getElementById('statAvgPerformance');
+    const statProfilesCount = document.getElementById('statProfilesCount');
+    const tableBody = document.getElementById('recentSessionsTableBody');
+    const sessionsCountBadge = document.getElementById('sessionsCountBadge');
+
+    // Sidebar & Profile Management DOM elements
+    const sidebarProfilesList = document.getElementById('sidebarProfilesList');
+    const addProfileBtn = document.getElementById('addProfileBtn');
+    const addProfileModal = document.getElementById('addProfileModal');
+    const closeAddProfileModal = document.getElementById('closeAddProfileModal');
+    const cancelAddProfileBtn = document.getElementById('cancelAddProfileBtn');
+    const addProfileForm = document.getElementById('addProfileForm');
+
+    const modalResumeDropzone = document.getElementById('modalResumeDropzone');
+    const modalResumeFile = document.getElementById('modalResumeFile');
+    const modalResumeStatus = document.getElementById('modalResumeStatus');
+
+    const editProfileModal = document.getElementById('editProfileModal');
+    const closeEditProfileModal = document.getElementById('closeEditProfileModal');
+    const cancelEditProfileBtn = document.getElementById('cancelEditProfileBtn');
+    const editProfileForm = document.getElementById('editProfileForm');
+    const deleteProfileBtn = document.getElementById('deleteProfileBtn');
+
+    // ── 100 Curated Sarcastic & Dark Humoured Observations ────────
+    const SYSTEM_OBSERVATIONS = [
+      // 10 Extremely Dark Humoured Observations
+      "Code written at 3 AM either saves the company infrastructure or triggers a multi-agency federal investigation.",
+      "Deleting production databases on Friday builds character, tests backups, and permanently clears your weekend schedule.",
+      "Our neural sensors monitor your pulse during technical questions. Absence of a pulse indicates senior architect status.",
+      "If the interview panel goes completely silent, they aren't evaluating your solution; they're contemplating career changes.",
+      "An infinite loop in C++ isn't a performance bug—it is a lifelong commitment to running until the heat death of the universe.",
+      "We record facial expressions during coding tests to train deep neural networks on the physical geometry of human despair.",
+      "If your resume claims 10+ years of Rust experience, our systems flag your application for temporal anomaly investigation.",
+      "Pushing untested code directly to main is the fastest way to discover if your organization actually has an incident response team.",
+      "In a high-stakes technical interview, crying is completely acceptable as long as liquid does not drop onto the mechanical keyboard.",
+      "Legacy codebases are digital archeological sites where former engineers buried their worst decisions and left without leaving a map.",
+
+      // 90 Dry, Sarcastic Observations
+      "Listing 'passionate problem solver' on your resume usually implies a talent for creating the initial problems yourself.",
+      "Declaring yourself an expert in regular expressions means you now have two problems instead of one.",
+      "If you encounter a question you cannot answer, explain it using quantum computing terminology. Nobody will interrupt.",
+      "Nodding enthusiastically during a system design question adds a +15% illusion of complete comprehension.",
+      "Rebranding legacy code as 'historical architecture' immediately doubles your estimated refactoring budget.",
+      "When an interviewer asks 'Are you sure about that approach?', the correct answer is almost never 'Yes'.",
+      "Replacing your entire frontend framework every six months is officially categorized as a career advancement strategy.",
+      "Stating 'It works on my machine' is a fully certified deployment strategy for desktop software released in 1997.",
+      "The safest place to hide confidential data is on page 2 of Google search results or inside an unmaintained repository README.",
+      "Listing 25 programming languages on your profile suggests you successfully executed 'Hello World' in 24 of them.",
+      "Writing code comments is like leaving breadcrumbs for people who don't know how to inspect the map.",
+      "A 100% unit test coverage metric guarantees that your tests pass, not that your application actually functions.",
+      "When pressed on database architecture under load, mention 'horizontal sharding' and stare thoughtfully into the distance.",
+      "Classifying a critical production crash as 'documented edge behavior' represents the pinnacle of engineering diplomacy.",
+      "If your code compiles on the first attempt, verify your network connection; you probably executed the wrong file.",
+      "Agile methodology ensures that your team experiences the joy of failing every two weeks instead of once per year.",
+      "Answering any complex system design trade-off with 'It depends' buys precisely 45 seconds of organoid thinking time.",
+      "When a recruiter calls your role 'fast-paced and dynamic', prepare for 80-hour workweeks with zero documentation.",
+      "Direct camera eye contact projects confidence; unblinking eye contact projects artificial intelligence overload.",
+      "The most efficient method for resolving technical debt is accepting a higher offer at another company before release.",
+      "Microservices architecture converts a single monolith bug into a distributed network of mysterious network timeouts.",
+      "If you cannot convince the panel with elegant architecture, confuse them with excessive architectural acronyms.",
+      "Estimating a task will take 'two days' is universally understood as two weeks of coding followed by two months of debugging.",
+      "Adding 'AI-Powered' to your product description instantly increases your seed round valuation by $5 million.",
+      "A developer who claims their code has no bugs simply hasn't allowed users to touch the application yet.",
+      "Pair programming doubles your code review throughput while halving the time it takes to lose your patience.",
+      "The primary difference between a junior and senior engineer is the confidence with which they say 'I have no idea'.",
+      "Object-oriented programming was created so developers could spend four hours naming classes instead of writing logic.",
+      "Documentation is like a love letter to your future self, written in a language you will forget in three weeks.",
+      "If your server CPU usage sits at 100%, congratulations—you are utilizing 100% of the hardware you paid for.",
+      "Refactoring code without automated tests is the software engineering equivalent of skydiving with a backpack full of rocks.",
+      "A deployment without a rollback plan is not a release—it is a high-stakes team-building exercise.",
+      "The most durable component of any software system is the temporary workaround implemented three years ago.",
+      "When an interviewer asks for your biggest weakness, never say 'I care too much'; say 'I over-index on premature optimization'.",
+      "Git rebase is a miraculous command designed to rewrite history and erase all evidence of your poor decision making.",
+      "If your API documentation is completely up to date, it means nobody is currently using your API.",
+      "Containers solved the problem of 'it works on my machine' by allowing us to ship your machine directly to production.",
+      "A senior engineer's primary superpower is knowing exactly which StackOverflow answer to copy without breaking build scripts.",
+      "Asking 'Why don't we just rewrite it in Rust?' is the fastest way to derail an architecture sync meeting.",
+      "Dark mode does not make your code run faster, but it makes your failures look significantly more cinematic.",
+      "If a meeting lasts longer than 45 minutes, the probability of actual code being written drops to zero.",
+      "The term 'Full Stack Developer' usually means someone who is equally uncomfortable in both frontend and database layers.",
+      "Code reviews exist so your teammates can critique your indentation while ignoring a massive memory leak on line 42.",
+      "Premature optimization is the root of all evil, but late optimization is why your mobile app takes 12 seconds to launch.",
+      "When your pipeline fails on linting rules, remember that formatting trailing commas is far more important than shipping features.",
+      "A database index is like a magic spell: it speeds up reads instantly while silently consuming all remaining storage space.",
+      "If your algorithm has O(n!) time complexity, it is not slow—it is simply operating on a geological time scale.",
+      "Staring silently at a terminal screen for twenty minutes is an essential phase of senior technical analysis.",
+      "The best code is no code at all, which makes unemployed developers the most productive engineers on earth.",
+      "When asked about testing strategies, always mention 'End-to-End integration tests' with a serious, unblinking expression.",
+      "Serverless computing means the servers still exist; you just get billed by the millisecond for someone else's server failure.",
+      "If your pull request contains 4,000 changed lines, your teammates will approve it in 30 seconds without reading a single word.",
+      "If your pull request contains 4 changed lines, your teammates will leave 35 inline comments debating variable nomenclature.",
+      "A technical interview whiteboard is designed specifically to test how straight you can draw a binary tree under duress.",
+      "The term 'Scalable Architecture' means your system can handle 10 million concurrent users, even though you currently have 4.",
+      "Calling a function `doEverything()` is an honest naming convention that more developers should adopt.",
+      "If your application has no error handling, it will never crash—it will simply enter an undefined state of quiet contemplation.",
+      "When an interviewer asks about your favorite design pattern, say 'Dependency Injection' and nod with profound authority.",
+      "Software architecture is the art of deciding which problems you want to struggle with three months from now.",
+      "A quick database patch applied directly in production is called 'live-action database administration'.",
+      "If your log files exceed 50 gigabytes, you haven't built an audit trail—you've created a novel nobody will ever read.",
+      "The most dangerous phrase in software development is 'This should only take five minutes'.",
+      "When your code breaks, blame the third-party API dependency first, the framework second, and your own logic never.",
+      "Computer science is the study of turning caffeine and logical confusion into functioning user interfaces.",
+      "If your background blur is set to 100%, the interviewer assumes your home office is either a mess or a secret bunker.",
+      "A senior architect is someone who leaves before the system they designed actually goes into production.",
+      "When asked to estimate a project, multiply your initial thought by two, change the unit to the next size up, and add a buffer.",
+      "The best way to learn a new framework is to build a project, abandon it halfway through, and start another one.",
+      "If your test suite takes 45 minutes to execute, it isn't thorough—it is an excuse to take an extended coffee break.",
+      "A 'Clean Code' advocate will spend three days refactoring a 10-line function into 14 decoupled interface abstractions.",
+      "When the interviewer asks 'Do you have any questions for us?', asking 'When does the production server usually crash?' is bold.",
+      "A software bug is just an undocumented feature waiting for marketing to write a press release.",
+      "If your API returns HTTP 200 OK with `{ status: 'error', message: 'Failed' }`, you belong in engineering prison.",
+      "A technical resume is a work of speculative fiction written in the past tense.",
+      "When your microphone is on mute, your most brilliant technical explanation will go completely unappreciated by humanity.",
+      "If you don't use version control, every save operation is a high-stakes gamble with your career.",
+      "A good developer knows how to fix an error; a great developer knows how to blame the compiler.",
+      "When in doubt, clear your browser cache, delete `node_modules`, restart the server, and pretend nothing happened.",
+      "If your application requires a 40-page user manual, your UI designer has failed at a fundamental level.",
+      "Software engineering is 10% writing code and 90% figuring out why the code you wrote 10 minutes ago isn't working.",
+      "A 'Simple Fix' PR is the leading cause of emergency weekend incident response calls.",
+      "If your code has no comments and works perfectly, do not touch it, do not look at it, and do not breathe near it.",
+      "When an interviewer asks about your salary expectations, state a number high enough to cover your future therapy bills.",
+      "A distributed system is one in which the failure of a computer you didn't even know existed can render your site unusable.",
+      "If your team uses five different task management tools, you aren't organized—you are operating a multi-platform distraction engine.",
+      "A 'Hotfix' is a patch deployed so quickly that even the developer who wrote it doesn't fully understand what it does.",
+      "When your build breaks, the first step of troubleshooting is checking if anyone else on Slack is complaining.",
+      "If your code looks clean, elegant, and readable, you probably haven't accounted for real-world edge cases yet.",
+      "A technical lead is someone who spends 90% of their day in meetings explaining why the developers are taking so long.",
+      "Remember: in software development, perfection is not when there is nothing more to add, but when there is nothing left to break."
+    ];
+
+    // Observation Display Controller (Manual refresh on button click only, no badge, no timer)
+    const tipTextDisplay = document.getElementById('tipTextDisplay');
+    const nextTipBtn = document.getElementById('nextTipBtn');
+
+    function showRandomObservation() {
+      if (!tipTextDisplay) return;
+      const idx = Math.floor(Math.random() * SYSTEM_OBSERVATIONS.length);
+      tipTextDisplay.style.opacity = 0;
+      setTimeout(() => {
+        tipTextDisplay.textContent = `"${SYSTEM_OBSERVATIONS[idx]}"`;
+        tipTextDisplay.style.opacity = 1;
+      }, 200);
+    }
+
+    if (nextTipBtn) {
+      nextTipBtn.addEventListener('click', showRandomObservation);
+    }
+    showRandomObservation(); // Show once on page load only
+
+    // Helper functions for profiles storage
+    function getSavedProfiles() {
+      try {
+        const stored = JSON.parse(localStorage.getItem('keiko_saved_profiles') || '{}');
+        return stored;
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveProfilesToStorage(profs) {
+      localStorage.setItem('keiko_saved_profiles', JSON.stringify(profs));
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Render Profiles in Right Sidebar
+    function renderSidebarProfiles() {
+      const profs = getSavedProfiles();
+      const keys = Object.keys(profs);
+      statProfilesCount.textContent = keys.length;
+
+      const activeName = localStorage.getItem('keiko_last_user_name') || '';
+      if (activeName && activeName.trim()) {
+        welcomeUserName.textContent = activeName.trim();
+      } else if (keys.length > 0) {
+        welcomeUserName.textContent = profs[keys[0]].name || keys[0];
+      } else {
+        welcomeUserName.textContent = 'Candidate';
+      }
+
+      if (keys.length === 0) {
+        sidebarProfilesList.innerHTML = `
+          <div class="p-4 rounded-xl bg-white/5 border border-white/5 text-center text-xs font-mono text-text-supporting space-y-2">
+            <span class="material-symbols-outlined text-2xl text-gray-600 block">account_box</span>
+            <p>No saved candidate profiles yet.</p>
+            <p class="text-[10px] text-gray-500">Click "+ New Profile" to add candidate details.</p>
+          </div>`;
+        return;
+      }
+
+      sidebarProfilesList.innerHTML = '';
+      keys.forEach(pKey => {
+        const prof = profs[pKey];
+        const isActive = (activeName === (prof.name || pKey));
+        
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl bg-white/5 border ${isActive ? 'border-primary/60 bg-primary/10 shadow-[0_0_15px_rgba(210,187,255,0.15)]' : 'border-white/10 hover:border-white/20'} transition-all space-y-2 cursor-pointer profile-card-item`;
+        card.dataset.key = pKey;
+        
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 truncate">
+              <span class="material-symbols-outlined text-sm ${isActive ? 'text-tertiary' : 'text-primary'}">account_circle</span>
+              <span class="font-bold text-white text-xs truncate">${escapeHtml(prof.name || pKey)}</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <button class="edit-prof-btn p-1 text-text-supporting hover:text-white transition-colors" data-key="${escapeHtml(pKey)}" title="Edit Profile">
+                <span class="material-symbols-outlined text-xs">edit</span>
+              </button>
+              <a href="interview-setup.html?profile=${encodeURIComponent(pKey)}" class="p-1 text-primary hover:text-tertiary transition-colors setup-link-btn" title="Setup Session with this Profile">
+                <span class="material-symbols-outlined text-xs">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+          <div class="text-[11px] text-text-supporting font-mono truncate">
+            ${escapeHtml(prof.email || 'No email specified')}
+          </div>
+          <div class="flex items-center justify-between pt-1 font-mono text-[10px]">
+            <span class="text-text-supporting truncate">${escapeHtml(prof.phone || 'No phone recorded')}</span>
+            <span class="font-mono font-bold px-2 py-0.5 rounded transition-all ${isActive ? 'bg-tertiary/20 text-tertiary border border-tertiary/30' : 'bg-white/10 text-gray-300'}">
+              ${isActive ? 'Active' : 'Select'}
+            </span>
+          </div>`;
+        
+        sidebarProfilesList.appendChild(card);
+      });
+
+      // Attach card click event to select profile as active
+      document.querySelectorAll('.profile-card-item').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.edit-prof-btn') || e.target.closest('.setup-link-btn')) {
+            return; // Let edit or setup link handle click
+          }
+          const key = card.dataset.key;
+          const p = profs[key];
+          if (p) {
+            localStorage.setItem('keiko_last_user_name', p.name || key);
+            if (p.email) localStorage.setItem('keiko_last_user_email', p.email);
+            renderSidebarProfiles();
+          }
+        });
+      });
+
+      // Attach edit profile event listeners
+      document.querySelectorAll('.edit-prof-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const key = e.currentTarget.dataset.key;
+          const p = profs[key];
+          if (p) {
+            document.getElementById('modalEditKey').value = key;
+            document.getElementById('modalEditName').value = p.name || key;
+            document.getElementById('modalEditEmail').value = p.email || '';
+            document.getElementById('modalEditPhone').value = p.phone || '';
+            document.getElementById('modalEditSkills').value = p.skills || '';
+            document.getElementById('modalEditExperience').value = p.experience || '';
+            document.getElementById('modalEditEducation').value = p.education || '';
+            document.getElementById('modalEditAchievements').value = p.achievements || '';
+            renderModalEditCards();
+            editProfileModal.classList.remove('hidden');
+          }
+        });
+      });
+    }
+
+    // Initial Sidebar Profiles Render
+    renderSidebarProfiles();
+
+    window.addEventListener('storage', renderSidebarProfiles);
+    window.addEventListener('focus', renderSidebarProfiles);
+
+    // Modal Add Profile Controls & Lenient Resume Auto-parsing
+    addProfileBtn.addEventListener('click', () => addProfileModal.classList.remove('hidden'));
+    closeAddProfileModal.addEventListener('click', () => addProfileModal.classList.add('hidden'));
+    cancelAddProfileBtn.addEventListener('click', () => addProfileModal.classList.add('hidden'));
+
+    if (modalResumeDropzone && modalResumeFile) {
+      modalResumeDropzone.addEventListener('click', () => modalResumeFile.click());
+      modalResumeDropzone.addEventListener('dragover', (e) => { e.preventDefault(); modalResumeDropzone.classList.add('border-primary'); });
+      modalResumeDropzone.addEventListener('dragleave', () => modalResumeDropzone.classList.remove('border-primary'));
+      modalResumeDropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        modalResumeDropzone.classList.remove('border-primary');
+        if (e.dataTransfer.files.length > 0) {
+          modalResumeFile.files = e.dataTransfer.files;
+          handleModalResumeParse();
+        }
+      });
+      modalResumeFile.addEventListener('change', handleModalResumeParse);
+    }
+
+    async function handleModalResumeParse() {
+      if (!modalResumeFile || modalResumeFile.files.length === 0) return;
+      const file = modalResumeFile.files[0];
+      modalResumeStatus.textContent = `Parsing ${file.name}...`;
+      modalResumeStatus.classList.remove('hidden');
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/v1/interview/parse_preview', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const prev = data.preview || {};
+          const cand = prev.candidate_profile || {};
+          
+          if (cand.full_name) document.getElementById('modalAddName').value = cand.full_name;
+          if (cand.email) document.getElementById('modalAddEmail').value = cand.email;
+          if (cand.phone) document.getElementById('modalAddPhone').value = cand.phone;
+          
+          // Extracted Skills
+          const skillsObj = cand.skills || {};
+          const getSkillNames = (arr) => (arr || []).map(s => typeof s === 'object' ? s.name : s);
+          const allSkills = [
+            ...getSkillNames(skillsObj.programming_languages),
+            ...getSkillNames(skillsObj.frameworks),
+            ...getSkillNames(skillsObj.tools_databases),
+            ...getSkillNames(skillsObj.design_and_ai)
+          ];
+          if (allSkills.length > 0) {
+            document.getElementById('modalAddSkills').value = allSkills.join(', ');
+          }
+
+          // Extracted Work Experience
+          if (cand.work_history && cand.work_history.length > 0) {
+            document.getElementById('modalAddExperience').value = cand.work_history.join('\n');
+          }
+
+          // Extracted Education & Where Studied
+          if (cand.education && cand.education.length > 0) {
+            document.getElementById('modalAddEducation').value = cand.education.join('\n');
+          }
+
+          // Extracted Achievements & Projects
+          const achList = [];
+          if (cand.achievements && cand.achievements.length > 0) {
+            achList.push(...cand.achievements);
+          }
+          if (cand.projects && cand.projects.length > 0) {
+            cand.projects.forEach(pr => achList.push(typeof pr === 'object' ? `${pr.name}: ${pr.description}` : pr));
+          }
+          if (achList.length > 0) {
+            document.getElementById('modalAddAchievements').value = achList.join('\n');
+          }
+
+          modalResumeStatus.textContent = `Parsed details from ${file.name}! Review and edit fields below before saving.`;
+        } else {
+          modalResumeStatus.textContent = `Selected: ${file.name}`;
+        }
+      } catch (err) {
+        console.warn("Modal resume parsing error:", err);
+        modalResumeStatus.textContent = `Selected: ${file.name}`;
+      }
+    }
+
+    addProfileForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('modalAddName').value.trim();
+      const email = document.getElementById('modalAddEmail').value.trim();
+      const phone = document.getElementById('modalAddPhone').value.trim();
+      const skills = document.getElementById('modalAddSkills').value.trim();
+      const experience = document.getElementById('modalAddExperience').value.trim();
+      const education = document.getElementById('modalAddEducation').value.trim();
+      const achievements = document.getElementById('modalAddAchievements').value.trim();
+
+      if (!name || !email) {
+        alert("Please provide candidate full name and email address.");
+        return;
+      }
+
+      const profs = getSavedProfiles();
+      profs[name] = {
+        name,
+        email,
+        phone,
+        skills,
+        experience,
+        education,
+        achievements,
+        savedAt: new Date().toISOString()
+      };
+
+      saveProfilesToStorage(profs);
+      localStorage.setItem('keiko_last_user_name', name);
+      localStorage.setItem('keiko_last_user_email', email);
+
+      addProfileForm.reset();
+      modalResumeStatus.classList.add('hidden');
+      addProfileModal.classList.add('hidden');
+      renderSidebarProfiles();
+    });
+
+    // Modal Edit Profile Controls
+    function splitTextIntoDiscreteBlocks(text) {
+      if (!text) return [];
+
+      let cleanText = text.replace(/<<<KEIKO_SECTION_START:[^>]+>>>/gi, '').replace(/<<<KEIKO_SECTION_END:[^>]+>>>/gi, '').trim();
+      if (!cleanText) return [];
+
+      if (cleanText.includes('<<<KEIKO_ITEM_BREAK>>>')) {
+        return cleanText.split(/<<<KEIKO_ITEM_BREAK>>>/i).map(b => b.trim()).filter(b => b.length > 0);
+      }
+
+      const finalBlocks = [];
+      const rawParagraphs = cleanText.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+
+      rawParagraphs.forEach(para => {
+        const lines = para.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length === 0) return;
+
+        let currentBlock = [];
+
+        lines.forEach((line) => {
+          let isNewEntryHeader = false;
+
+          if (currentBlock.length > 0) {
+            const colonMatch = line.match(/^([^:\n]+):\s+(.*)$/);
+            if (colonMatch && colonMatch[1].length <= 65 && !line.match(/^[-•*–—]\s+/)) {
+              isNewEntryHeader = true;
+            } else if (line.match(/\b(20\d{2}|19\d{2})\s*[-–—]\s*(Present|Current|20\d{2}|19\d{2})\b/i)) {
+              isNewEntryHeader = true;
+            } else if (line.match(/\b(?:at|@|\|)\b/i) || line.match(/^[A-Z][A-Za-z0-9\s,\-\.]{3,50}\s*[-–—]\s*[A-Z][A-Za-z0-9\s,\-\.]{3,50}/)) {
+              if (!line.match(/^[-•*–—]\s+/)) {
+                isNewEntryHeader = true;
+              }
+            } else if (line.match(/^(?:\d+[\.\)]|\[\d+\]|Item\s+\d+|Project\s+\d+)\s+/i)) {
+              isNewEntryHeader = true;
+            }
+          }
+
+          if (isNewEntryHeader && currentBlock.length > 0) {
+            finalBlocks.push(currentBlock.join('\n'));
+            currentBlock = [line];
+          } else {
+            currentBlock.push(line);
+          }
+        });
+
+        if (currentBlock.length > 0) {
+          finalBlocks.push(currentBlock.join('\n'));
+        }
+      });
+
+      return finalBlocks;
+    }
+
+    function renderModalEditCards() {
+      const expVal = document.getElementById('modalEditExperience')?.value || '';
+      const eduVal = document.getElementById('modalEditEducation')?.value || '';
+      const achVal = document.getElementById('modalEditAchievements')?.value || '';
+
+      const expContainer = document.getElementById('modalEditExperienceCards');
+      const eduContainer = document.getElementById('modalEditEducationCards');
+      const achContainer = document.getElementById('modalEditAchievementsCards');
+
+      if (expContainer) {
+        expContainer.innerHTML = '';
+        expContainer.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2.5';
+        splitTextIntoDiscreteBlocks(expVal).forEach(block => {
+          const div = document.createElement('div');
+          div.className = 'p-2.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-mono space-y-1 h-full flex flex-col justify-between';
+          const lines = block.split('\n');
+          div.innerHTML = `<div class="font-bold text-tertiary flex items-center gap-1.5"><span class="material-symbols-outlined text-xs">work</span>${escapeHtml(lines[0])}</div>` +
+            (lines.length > 1 ? `<div class="text-text-secondary text-[10px] space-y-0.5">${lines.slice(1).map(l => `<p>• ${escapeHtml(l.replace(/^[-•*–—\d+\.]\s*/, ''))}</p>`).join('')}</div>` : '');
+          expContainer.appendChild(div);
+        });
+      }
+
+      if (eduContainer) {
+        eduContainer.innerHTML = '';
+        eduContainer.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2.5';
+        splitTextIntoDiscreteBlocks(eduVal).forEach(block => {
+          const div = document.createElement('div');
+          div.className = 'p-2.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-mono space-y-1 h-full flex flex-col justify-between';
+          const lines = block.split('\n');
+          div.innerHTML = `<div class="font-bold text-primary flex items-center gap-1.5"><span class="material-symbols-outlined text-xs">school</span>${escapeHtml(lines[0])}</div>` +
+            (lines.length > 1 ? `<div class="text-text-secondary text-[10px] space-y-0.5">${lines.slice(1).map(l => `<p>• ${escapeHtml(l.replace(/^[-•*–—\d+\.]\s*/, ''))}</p>`).join('')}</div>` : '');
+          eduContainer.appendChild(div);
+        });
+      }
+
+      if (achContainer) {
+        achContainer.innerHTML = '';
+        achContainer.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2.5';
+        splitTextIntoDiscreteBlocks(achVal).forEach(block => {
+          const div = document.createElement('div');
+          div.className = 'p-2.5 rounded-lg bg-white/5 border border-white/10 text-[11px] font-mono space-y-1 h-full flex flex-col justify-between';
+          const lines = block.split('\n');
+          div.innerHTML = `<div class="font-bold text-amber-400 flex items-center gap-1.5"><span class="material-symbols-outlined text-xs">emoji_events</span>${escapeHtml(lines[0])}</div>` +
+            (lines.length > 1 ? `<div class="text-text-secondary text-[10px] space-y-0.5">${lines.slice(1).map(l => `<p>• ${escapeHtml(l.replace(/^[-•*–—\d+\.]\s*/, ''))}</p>`).join('')}</div>` : '');
+          achContainer.appendChild(div);
+        });
+      }
+    }
+
+    function setupModalCtrlEnterShortcut(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+          e.preventDefault();
+          const start = el.selectionStart;
+          const end = el.selectionEnd;
+          const val = el.value;
+          const insertion = '\n\n<<<KEIKO_ITEM_BREAK>>>\n\n';
+          el.value = val.substring(0, start) + insertion + val.substring(end);
+          el.selectionStart = el.selectionEnd = start + insertion.length;
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+    }
+
+    setupModalCtrlEnterShortcut('modalEditExperience');
+    setupModalCtrlEnterShortcut('modalEditEducation');
+    setupModalCtrlEnterShortcut('modalEditAchievements');
+
+    document.getElementById('modalEditExperience')?.addEventListener('input', renderModalEditCards);
+    document.getElementById('modalEditEducation')?.addEventListener('input', renderModalEditCards);
+    document.getElementById('modalEditAchievements')?.addEventListener('input', renderModalEditCards);
+
+    closeEditProfileModal.addEventListener('click', () => editProfileModal.classList.add('hidden'));
+    cancelEditProfileBtn.addEventListener('click', () => editProfileModal.classList.add('hidden'));
+
+    editProfileForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const origKey = document.getElementById('modalEditKey').value;
+      const name = document.getElementById('modalEditName').value.trim();
+      const email = document.getElementById('modalEditEmail').value.trim();
+      const phone = document.getElementById('modalEditPhone').value.trim();
+      const skills = document.getElementById('modalEditSkills').value.trim();
+      const experience = document.getElementById('modalEditExperience').value.trim();
+      const education = document.getElementById('modalEditEducation').value.trim();
+      const achievements = document.getElementById('modalEditAchievements').value.trim();
+
+      if (!name || !email) {
+        alert("Name and Email are required.");
+        return;
+      }
+
+      const profs = getSavedProfiles();
+      if (origKey && origKey !== name) {
+        delete profs[origKey];
+      }
+      profs[name] = {
+        name,
+        email,
+        phone,
+        skills,
+        experience,
+        education,
+        achievements,
+        savedAt: new Date().toISOString()
+      };
+
+      saveProfilesToStorage(profs);
+      localStorage.setItem('keiko_last_user_name', name);
+      localStorage.setItem('keiko_last_user_email', email);
+
+      editProfileModal.classList.add('hidden');
+      renderSidebarProfiles();
+    });
+
+    deleteProfileBtn.addEventListener('click', () => {
+      const origKey = document.getElementById('modalEditKey').value;
+      if (!origKey) return;
+      if (confirm(`Are you sure you want to delete profile "${origKey}"?`)) {
+        const profs = getSavedProfiles();
+        delete profs[origKey];
+        saveProfilesToStorage(profs);
+        if (localStorage.getItem('keiko_last_user_name') === origKey) {
+          localStorage.removeItem('keiko_last_user_name');
+          localStorage.removeItem('keiko_last_user_email');
+        }
+        editProfileModal.classList.add('hidden');
+        renderSidebarProfiles();
+      }
+    });
+
+    // Fetch Real Sessions from Backend API
+    async function loadSessions() {
+      try {
+        const res = await fetch('/api/v1/interview/sessions');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        
+        const completed = data.completed_count || 0;
+        statCompletedCount.textContent = completed;
+        statAvgPerformance.textContent = data.average_performance || "0.0%";
+
+        if (completed > 0) {
+          welcomeSummaryText.textContent = `Telemetry operational. ${completed} completed interview evaluations recorded in system.`;
+          statCompletedSub.textContent = `${completed} evaluated sessions`;
+        } else {
+          welcomeSummaryText.textContent = "Telemetry nodes operational. Ready to initialize your first candidate session.";
+          statCompletedSub.textContent = "No sessions completed yet";
+        }
+
+        const sessions = data.sessions || [];
+        sessionsCountBadge.textContent = `${sessions.length} sessions recorded`;
+
+        if (sessions.length === 0) {
+          tableBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="py-8 text-center text-text-supporting font-mono">
+                <div class="flex flex-col items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-3xl text-gray-600">inbox</span>
+                  <span>No completed interview sessions recorded yet.</span>
+                  <a href="interview-setup.html" class="text-primary hover:underline text-xs mt-1">Click here to launch your first session</a>
+                </div>
+              </td>
+            </tr>`;
+        } else {
+          tableBody.innerHTML = '';
+          sessions.forEach(sess => {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-white/5 hover:bg-white/5 transition-colors';
+            
+            const isComp = (sess.status === 'COMPLETED' || sess.overall_score !== null || sess.evaluation_report !== null);
+            const scoreVal = (sess.overall_score !== null && sess.overall_score !== undefined) ? sess.overall_score : null;
+
+            let statusBadge = '';
+            if (isComp) {
+              const sc = (scoreVal !== null) ? scoreVal : 75;
+              if (sc >= 85) {
+                statusBadge = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-bold border border-emerald-500/30 shadow-sm"><span class="material-symbols-outlined text-xs">verified</span> HIGH HIRE LIKELIHOOD (${sc}%)</span>`;
+              } else if (sc >= 70) {
+                statusBadge = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-mono text-[10px] font-bold border border-amber-500/30 shadow-sm"><span class="material-symbols-outlined text-xs">check_circle</span> MODERATE HIRE (${sc}%)</span>`;
+              } else {
+                statusBadge = `<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 font-mono text-[10px] font-bold border border-rose-500/30 shadow-sm"><span class="material-symbols-outlined text-xs">warning</span> LOW HIRE LIKELIHOOD (${sc}%)</span>`;
+              }
+            } else {
+              statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 font-mono text-[10px] font-bold border border-blue-500/30"><span class="material-symbols-outlined text-xs animate-spin">sync</span> ACTIVE SESSION</span>`;
+            }
+
+            tr.innerHTML = `
+              <td class="py-4 font-medium text-text-primary flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-sm">person</span>
+                <span>${escapeHtml(sess.candidate_name)}</span>
+              </td>
+              <td class="py-4 text-text-supporting">${escapeHtml(sess.target_role)}</td>
+              <td class="py-4 font-mono text-text-supporting">${escapeHtml(sess.interview_type)} (${escapeHtml(sess.difficulty_mode)})</td>
+              <td class="py-4">${statusBadge}</td>
+              <td class="py-4 text-right">
+                <a href="evaluation-report.html?session_id=${encodeURIComponent(sess.session_id)}" class="inline-flex items-center gap-1 text-primary hover:underline text-xs font-mono">
+                  <span>View Report</span>
+                  <span class="material-symbols-outlined text-sm">description</span>
+                </a>
+              </td>`;
+            tableBody.appendChild(tr);
+          });
+        }
+      } catch (err) {
+        console.warn("Failed to load sessions:", err);
+        statCompletedCount.textContent = "0";
+        statAvgPerformance.textContent = "0.0%";
+      }
+    }
+
+    await loadSessions();
+  });
+
+  // Linux Kernel Boot & Gradient Line Loader Animation Lifecycle
+  (function initLinuxBootSequence() {
+    const splash = document.getElementById('linuxBootSplash');
+    if (!splash) return;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const isResetFlag = urlParams.get('reset') === 'true';
+
+    const terminalContainer = document.getElementById('terminalContainer');
+    const bootLogs = document.getElementById('bootLogs');
+    const gradientLoaderBox = document.getElementById('gradientLoaderBox');
+    const progressBar = document.getElementById('bootProgressBar');
+    const progressPercent = document.getElementById('bootProgressPercent');
+    const welcomeTypingContainer = document.getElementById('welcomeTypingContainer');
+    const welcomeTextPrefix = document.getElementById('welcomeTextPrefix');
+    const welcomeCandidateName = document.getElementById('welcomeCandidateName');
+    const typingCursor = document.getElementById('typingCursor');
+
+    const kernelLogs = [
+      "[  0.000000] Linux version 6.8.0-keiko-x86_64 (build@keiko-lab) (gcc 13.2.0) #1 SMP PREEMPT_DYNAMIC",
+      "[  0.012401] Command line: BOOT_IMAGE=/vmlinuz-6.8.0-keiko root=UUID=7f8a92b0-keiko ro quiet splash",
+      "[  0.038102] x86/fpu: Supporting XSAVE feature 0x001: 'FP'",
+      "[  0.052094] x86/fpu: Supporting XSAVE feature 0x002: 'SSE'",
+      "[  0.071200] BIOS-provided physical RAM map:",
+      "[  0.089400] BIOS-e820: [mem 0x0000000000000000-0x000000000009ffff] usable",
+      "[  0.112044] [OK] Initializing CPU Topology: 16 Logical Cores Online",
+      "[  0.148092] [OK] Memory Subsystem: 16384 MB Allocated (NUMA Node 0)",
+      "[  0.184102] [OK] ACPI: LAPIC (acpi_id[0x01] lapic_id[0x00] enabled)",
+      "[  0.221094] [OK] PCI: Probing PCI hardware bus (00:00.0)",
+      "[  0.264102] [OK] nvme nvme0: 1/0/0 default/read/poll queues",
+      "[  0.318492] [OK] Initializing KEIKO Local AI Engine (qwen2.5:7b) [100% Offline Mode]",
+      "[  0.372100] [OK] Loading Vision Telemetry Sensors (Posture, Eye Contact, Attire, Confidence)",
+      "[  0.428903] [OK] Initializing Audio Spectrum & Voice Dynamics Sensor Subsystem",
+      "[  0.485120] [OK] Mounting Candidate Profile Database (app.db)",
+      "[  0.541209] [OK] Hyperlink-Aware PDF/DOCX Parser Engine Ready",
+      "[  0.601290] [OK] Starting systemd-journald.service - Journal Service...",
+      "[  0.664102] [OK] Started systemd-udevd.service - Device Node Manager...",
+      "[  0.728903] [OK] Started keiko-analytics.service - Telemetry Weight Matrix...",
+      "[  0.792011] [OK] Started keiko-llm-router.service - Offline LLM Conversation Manager...",
+      "[  0.854102] [OK] Reached target Multi-User System.",
+      "[  0.912401] [OK] Reached target Graphical Interface.",
+      "[  0.984210] [OK] Starting KEIKO FastAPI Web Server on port 8000...",
+      "[  1.052094] [OK] All subsystems initialized cleanly.",
+      "[  1.124000] [OK] Switching display target to KEIKO Dashboard Interface..."
+    ];
+
+    function runWelcomeTypingAnimation(candidateName, callback) {
+      if (welcomeTypingContainer) welcomeTypingContainer.classList.remove('opacity-0');
+      const prefixText = "Welcome, ";
+      let pIdx = 0;
+      let cIdx = 0;
+
+      const typeInterval = setInterval(() => {
+        if (pIdx < prefixText.length) {
+          if (welcomeTextPrefix) welcomeTextPrefix.textContent += prefixText[pIdx];
+          pIdx++;
+        } else if (cIdx < candidateName.length) {
+          if (welcomeCandidateName) welcomeCandidateName.textContent += candidateName[cIdx];
+          cIdx++;
+        } else {
+          clearInterval(typeInterval);
+          setTimeout(() => {
+            if (typingCursor) typingCursor.style.display = 'none';
+            if (callback) callback();
+          }, 1100);
+        }
+      }, 70);
+    }
+
+    function startBootAnimation() {
+      splash.style.display = 'flex';
+      splash.style.opacity = '1';
+      terminalContainer.style.display = 'block';
+      terminalContainer.style.opacity = '1';
+      gradientLoaderBox.classList.add('opacity-0');
+      if (welcomeTypingContainer) welcomeTypingContainer.classList.add('opacity-0');
+      bootLogs.innerHTML = '';
+      progressBar.style.width = '0%';
+      progressPercent.textContent = '0%';
+      if (welcomeTextPrefix) welcomeTextPrefix.textContent = '';
+      if (welcomeCandidateName) welcomeCandidateName.textContent = '';
+
+      let logIdx = 0;
+      // Step 1: Top-Left White Monospace Terminal Logs (~2.8 seconds)
+      const logInterval = setInterval(() => {
+        if (logIdx < kernelLogs.length) {
+          const div = document.createElement('div');
+          div.className = 'text-white/90 font-mono text-[11px] leading-relaxed';
+          div.textContent = kernelLogs[logIdx];
+          bootLogs.appendChild(div);
+          terminalContainer.scrollTop = terminalContainer.scrollHeight;
+          logIdx++;
+        }
+      }, 105);
+
+      // Step 2: Transition to pure black screen + centered thin gradient line (~3.5 seconds)
+      setTimeout(() => {
+        clearInterval(logInterval);
+        terminalContainer.style.transition = 'opacity 0.4s ease';
+        terminalContainer.style.opacity = '0';
+
+        setTimeout(() => {
+          terminalContainer.style.display = 'none';
+          gradientLoaderBox.classList.remove('opacity-0');
+
+          let progress = 0;
+          const progressInterval = setInterval(() => {
+            progress += Math.floor(Math.random() * 3) + 1;
+            if (progress > 100) progress = 100;
+
+            progressBar.style.width = progress + '%';
+            progressPercent.textContent = progress + '%';
+
+            if (progress >= 100) {
+              clearInterval(progressInterval);
+
+              // Step 3: Pure Black Screen + Typing Welcome Animation
+              setTimeout(() => {
+                gradientLoaderBox.style.transition = 'opacity 0.4s ease';
+                gradientLoaderBox.style.opacity = '0';
+
+                setTimeout(() => {
+                  gradientLoaderBox.style.display = 'none';
+                  
+                  // Retrieve last saved candidate name or fallback to "Candidate"
+                  const savedName = localStorage.getItem('keiko_last_user_name') || 'Candidate';
+
+                  runWelcomeTypingAnimation(savedName, () => {
+                    splash.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
+                    splash.style.opacity = '0';
+
+                    const mainBox = document.querySelector('main');
+                    if (mainBox) mainBox.classList.add('animate-fade-up');
+
+                    setTimeout(() => {
+                      splash.style.display = 'none';
+                    }, 700);
+                  });
+                }, 400);
+              }, 300);
+            }
+          }, 70);
+        }, 400);
+      }, 2700);
+    }
+
+    // Synchronous check: if NOT a reset launch AND animation already played in this session -> HIDE INSTANTLY
+    if (!isResetFlag && sessionStorage.getItem('keiko_boot_done_for_session') === 'true') {
+      splash.style.display = 'none';
+      const mainBox = document.querySelector('main');
+      if (mainBox) mainBox.classList.add('animate-fade-up');
+      return;
+    }
+
+    // Immediately clean up ?reset=true from address bar so reset becomes false for all future refreshes
+    if (isResetFlag) {
+      try {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch(e) {}
+    }
+
+    // Mark session as booted
+    sessionStorage.setItem('keiko_boot_done_for_session', 'true');
+
+    // Server Boot Verification & Animation Trigger
+    fetch('/api/v1/interview/system/settings')
+      .then(res => res.json())
+      .then(data => {
+        const serverBootId = (data.system && data.system.boot_id) ? String(data.system.boot_id) : null;
+        const playedBootId = sessionStorage.getItem('keiko_boot_played_id');
+
+        if (!isResetFlag && serverBootId && playedBootId === serverBootId) {
+          splash.style.display = 'none';
+          const mainBox = document.querySelector('main');
+          if (mainBox) mainBox.classList.add('animate-fade-up');
+          return;
+        }
+
+        if (serverBootId) {
+          sessionStorage.setItem('keiko_boot_played_id', serverBootId);
+        }
+        startBootAnimation();
+      })
+      .catch(() => {
+        startBootAnimation();
+      });
+  })();
+  </script>
 
 </body>
 </html>

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>System Settings & Parameters — KEIKO</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-low": "#1c1b1c",
+            "primary-fixed": "#eaddff",
+            "secondary": "#adc6ff",
+            "outline-variant": "#4a4455",
+            "background": "#131314",
+            "surface-base": "#0A0A0B",
+            "text-supporting": "#71717A",
+            "surface": "#131314",
+            "tertiary": "#4fdbc8",
+            "danger": "#EF4444",
+            "surface-container": "#201f20",
+            "primary": "#d2bbff",
+            "text-primary": "#F4F4F5",
+            "on-surface-variant": "#ccc3d8",
+            "accent-gradient": "linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #14B8A6 100%)",
+            "text-secondary": "#A1A1AA"
+          },
+          fontFamily: {
+            "display": ["Space Grotesk", "sans-serif"],
+            "body": ["Inter", "sans-serif"],
+            "mono": ["IBM Plex Mono", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #131314; color: #F4F4F5; font-family: 'Inter', sans-serif; }
+    .glass-neo-stitch {
+      background: rgba(20, 20, 22, 0.65);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 
+        inset 1px 1px 2px rgba(255, 255, 255, 0.12),
+        inset -1px -1px 2px rgba(0, 0, 0, 0.8),
+        0 15px 35px rgba(0, 0, 0, 0.6);
+      border-radius: 20px;
+      outline: 1.5px dashed rgba(210, 187, 255, 0.15);
+      outline-offset: -8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-neo-stitch:hover {
+      outline-color: rgba(113, 248, 228, 0.35);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: 
+        inset 1px 1px 2px rgba(255, 255, 255, 0.18),
+        inset -1px -1px 2px rgba(0, 0, 0, 0.8),
+        0 25px 45px rgba(0, 0, 0, 0.7);
+    }
+    .gradient-text {
+      background-image: linear-gradient(135deg, #d2bbff 0%, #adc6ff 50%, #71f8e4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+    .bg-accent-gradient { background: linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #14B8A6 100%); }
+  </style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%237c3aed'/><text x='16' y='22' text-anchor='middle' font-size='18' fill='white' font-family='sans-serif'>K</text></svg>" />
+</head>
+<body class="font-body text-body bg-background text-text-primary min-h-screen flex flex-col justify-between">
+
+  <!-- KEIKO TopNavBar -->
+  <nav class="fixed top-0 w-full z-50 bg-[#131314]/85 backdrop-blur-md border-b border-white/10 h-20">
+    <div class="flex justify-between items-center h-full px-8 max-w-[1440px] mx-auto w-full">
+      <a href="dashboard.html" class="text-2xl md:text-3xl font-bold text-white tracking-tighter hover:opacity-90 transition-opacity font-display">KEIKO</a>
+      <div class="hidden md:flex items-center space-x-8">
+        <a id="nav-dashboard" class="text-sm text-gray-400 hover:text-white transition-colors" href="dashboard.html">Dashboard</a>
+        <a id="nav-setup" class="text-sm text-gray-400 hover:text-white transition-colors" href="interview-setup.html">Setup Session</a>
+        <a id="nav-settings" class="text-sm text-primary font-bold transition-colors" href="settings.html">Settings</a>
+      </div>
+      <a class="bg-accent-gradient text-white px-6 py-2 rounded-full font-bold text-sm transition-all hover:scale-105 hover:opacity-90 active:scale-95 shadow-lg shadow-purple-500/20" href="interview-setup.html">Start Setup</a>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow pt-24 pb-12 px-8 max-w-[1440px] mx-auto w-full space-y-8">
+
+    <!-- Header Breadcrumb & Status -->
+    <header class="py-4 border-b border-white/10 flex items-center justify-between z-30">
+      <div class="flex items-center gap-3 text-text-supporting font-mono text-xs uppercase tracking-wider">
+        <span class="text-primary font-bold">KEIKO SYSTEM</span>
+        <span class="material-symbols-outlined text-sm">chevron_right</span>
+        <span class="text-text-primary">SETTINGS & CONFIGURATION</span>
+      </div>
+      <div class="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/30 px-4 py-1.5 rounded-full">
+        <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+        <span class="text-xs font-mono text-emerald-300 font-semibold uppercase">100% Offline Mode Active</span>
+      </div>
+    </header>
+
+    <!-- Title Section -->
+    <div class="space-y-2">
+      <h1 class="text-3xl font-bold tracking-tight text-white font-display">
+        System Settings & <span class="gradient-text">Parameters</span>
+      </h1>
+      <p class="text-text-secondary text-sm">
+        Configure interview modes, telemetry sensor weights, data reset controls, and local backend server lifecycle.
+      </p>
+    </div>
+
+    <!-- Toast Alert Container -->
+    <div id="toastAlert" class="hidden p-4 rounded-xl text-sm font-mono transition-all"></div>
+
+    <!-- Section 1: Interview Parameters & Mode Configuration -->
+    <section class="glass-neo-stitch p-6 space-y-6">
+      <div class="flex items-center justify-between border-b border-white/10 pb-4">
+        <h2 class="text-lg font-semibold text-white flex items-center gap-2 font-display">
+          <span class="material-symbols-outlined text-primary">settings_suggest</span>
+          Interview Parameters & Mode Configuration
+        </h2>
+        <span class="text-xs font-mono text-tertiary bg-tertiary/10 px-2.5 py-1 rounded border border-tertiary/20 font-semibold">Global Parameters</span>
+      </div>
+
+      <!-- a) Interview Type Selector -->
+      <div class="space-y-2 font-mono text-xs">
+        <label class="block uppercase tracking-wider text-text-secondary">a) Interview Type / Category</label>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <input type="radio" name="interviewType" value="Tech" id="type_tech" checked class="hidden peer/tech"/>
+            <label for="type_tech" class="cursor-pointer p-3.5 rounded-xl border border-white/10 bg-[#1c1b1c] text-xs font-mono text-center flex flex-col items-center gap-1.5 peer-checked/tech:border-primary peer-checked/tech:bg-primary/10 peer-checked/tech:text-primary transition-all">
+              <span class="material-symbols-outlined text-lg">code</span>
+              <span class="font-bold text-white">Technical (Tech)</span>
+              <span class="text-[10px] text-text-secondary">Code, Architecture & System Design</span>
+            </label>
+          </div>
+          <div>
+            <input type="radio" name="interviewType" value="HR" id="type_hr" class="hidden peer/hr"/>
+            <label for="type_hr" class="cursor-pointer p-3.5 rounded-xl border border-white/10 bg-[#1c1b1c] text-xs font-mono text-center flex flex-col items-center gap-1.5 peer-checked/hr:border-primary peer-checked/hr:bg-primary/10 peer-checked/hr:text-primary transition-all">
+              <span class="material-symbols-outlined text-lg">groups</span>
+              <span class="font-bold text-white">Human Resources (HR)</span>
+              <span class="text-[10px] text-text-secondary">Behavioral, Culture Fit & Mindset</span>
+            </label>
+          </div>
+          <div>
+            <input type="radio" name="interviewType" value="Situational" id="type_sit" class="hidden peer/sit"/>
+            <label for="type_sit" class="cursor-pointer p-3.5 rounded-xl border border-white/10 bg-[#1c1b1c] text-xs font-mono text-center flex flex-col items-center gap-1.5 peer-checked/sit:border-primary peer-checked/sit:bg-primary/10 peer-checked/sit:text-primary transition-all">
+              <span class="material-symbols-outlined text-lg">psychology_alt</span>
+              <span class="font-bold text-white">Situational</span>
+              <span class="text-[10px] text-text-secondary">Scenario, Decision-Making & Conflict</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- b) Difficulty Mode Selector -->
+      <div class="space-y-2 font-mono text-xs">
+        <label class="block uppercase tracking-wider text-text-secondary">b) Difficulty Level Mode</label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div>
+            <input type="radio" name="difficultyMode" value="Beginner" id="diff_beg" class="hidden peer/beg"/>
+            <label for="diff_beg" class="cursor-pointer p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-xs font-mono text-center flex flex-col items-center gap-1 peer-checked/beg:border-emerald-400 peer-checked/beg:bg-emerald-400/10 peer-checked/beg:text-emerald-300 transition-all">
+              <span class="font-bold">Beginner</span>
+              <span class="text-[10px] opacity-70">Fundamentals</span>
+            </label>
+          </div>
+          <div>
+            <input type="radio" name="difficultyMode" value="Intermediate" id="diff_int" class="hidden peer/int"/>
+            <label for="diff_int" class="cursor-pointer p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-xs font-mono text-center flex flex-col items-center gap-1 peer-checked/int:border-sky-400 peer-checked/int:bg-sky-400/10 peer-checked/int:text-sky-300 transition-all">
+              <span class="font-bold">Intermediate</span>
+              <span class="text-[10px] opacity-70">Standard Role</span>
+            </label>
+          </div>
+          <div>
+            <input type="radio" name="difficultyMode" value="Advanced" id="diff_adv" class="hidden peer/adv"/>
+            <label for="diff_adv" class="cursor-pointer p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-xs font-mono text-center flex flex-col items-center gap-1 peer-checked/adv:border-amber-400 peer-checked/adv:bg-amber-400/10 peer-checked/adv:text-amber-300 transition-all">
+              <span class="font-bold">Advanced</span>
+              <span class="text-[10px] opacity-70">Senior & Lead</span>
+            </label>
+          </div>
+          <div>
+            <input type="radio" name="difficultyMode" value="Adaptive" id="diff_adapt" checked class="hidden peer/adapt"/>
+            <label for="diff_adapt" class="cursor-pointer p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-xs font-mono text-center flex flex-col items-center gap-1 peer-checked/adapt:border-tertiary peer-checked/adapt:bg-tertiary/10 peer-checked/adapt:text-tertiary transition-all">
+              <span class="font-bold">Adaptive</span>
+              <span class="text-[10px] opacity-70">Dynamic AI</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- c) Interview Length & Insane Mode -->
+      <div class="space-y-4 font-mono text-xs">
+        <div class="flex items-center justify-between p-4 rounded-xl bg-purple-900/20 border border-purple-500/30">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-400 text-lg">bolt</span>
+              <span class="font-bold text-sm text-white font-display">Insane Mode (Unlimited)</span>
+              <span class="text-[10px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-bold uppercase">Dynamic AI</span>
+            </div>
+            <p class="text-xs text-text-secondary font-mono leading-relaxed">
+              The interview continues dynamically until the candidate has been fully evaluated or manually concludes.
+            </p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer flex-shrink-0 ml-4">
+            <input type="checkbox" id="insaneModeToggle" class="sr-only peer">
+            <div class="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+          </label>
+        </div>
+
+        <div id="questionCountContainer" class="space-y-3 pt-1">
+          <label class="block uppercase tracking-wider text-text-secondary">c) Interview Length (Question Count)</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div>
+              <input type="radio" name="lengthPreset" value="5" id="len_5" class="hidden peer/len5"/>
+              <label for="len_5" class="cursor-pointer p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-xs font-mono text-center flex flex-col items-center gap-0.5 peer-checked/len5:border-primary peer-checked/len5:bg-primary/10 peer-checked/len5:text-primary transition-all">
+                <span class="font-bold block">Quick</span>
+                <span class="text-[10px] opacity-70">5 Questions</span>
+              </label>
+            </div>
+            <div>
+              <input type="radio" name="lengthPreset" value="10" checked id="len_10" class="hidden peer/len10"/>
+              <label for="len_10" class="cursor-pointer p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-xs font-mono text-center flex flex-col items-center gap-0.5 peer-checked/len10:border-primary peer-checked/len10:bg-primary/10 peer-checked/len10:text-primary transition-all">
+                <span class="font-bold block">Standard</span>
+                <span class="text-[10px] opacity-70">10 Questions</span>
+              </label>
+            </div>
+            <div>
+              <input type="radio" name="lengthPreset" value="20" id="len_20" class="hidden peer/len20"/>
+              <label for="len_20" class="cursor-pointer p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-xs font-mono text-center flex flex-col items-center gap-0.5 peer-checked/len20:border-primary peer-checked/len20:bg-primary/10 peer-checked/len20:text-primary transition-all">
+                <span class="font-bold block">Deep</span>
+                <span class="text-[10px] opacity-70">20 Questions</span>
+              </label>
+            </div>
+            <div>
+              <input type="radio" name="lengthPreset" value="custom" id="len_custom" class="hidden peer/lenCust"/>
+              <label for="len_custom" class="cursor-pointer p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-xs font-mono text-center flex flex-col items-center gap-0.5 peer-checked/lenCust:border-tertiary peer-checked/lenCust:bg-tertiary/10 peer-checked/lenCust:text-tertiary transition-all">
+                <span class="font-bold block">Custom</span>
+                <span class="text-[10px] opacity-70">Specify Count</span>
+              </label>
+            </div>
+          </div>
+          <div id="customCountBox" class="hidden pt-2">
+            <div class="flex items-center gap-3 bg-[#1c1b1c] p-3 rounded-xl border border-white/10 max-w-xs">
+              <label for="customQuestionCount" class="text-xs font-mono text-text-secondary whitespace-nowrap">Number of Questions:</label>
+              <input type="number" id="customQuestionCount" min="1" max="100" value="10" class="w-full bg-background border border-white/10 rounded-lg px-3 py-1.5 text-xs font-mono text-white focus:border-tertiary focus:outline-none"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Telemetry Sensor Weights (9 Sensors) -->
+    <section class="glass-neo-stitch p-6 space-y-6">
+      <div class="flex items-center justify-between border-b border-white/10 pb-4">
+        <h2 class="text-lg font-semibold text-white flex items-center gap-2 font-display">
+          <span class="material-symbols-outlined text-primary">tune</span>
+          Telemetry Sensor Weight Matrix (9 Sensors)
+        </h2>
+        <span id="totalWeightBadge" class="text-xs font-mono bg-primary/20 text-primary px-3 py-1 rounded-full border border-primary/30 font-semibold">Sum: 100%</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs">
+        <div>
+          <div class="flex justify-between mb-1"><span class="text-gray-300">Posture</span><span id="valPosture" class="text-primary font-bold">15%</span></div>
+          <input id="slidePosture" type="range" min="0" max="100" value="15" class="w-full accent-primary bg-bg h-2 rounded-lg cursor-pointer" oninput="updateWeightsUI()"/>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="text-gray-300">Eye Contact</span><span id="valEyeContact" class="text-primary font-bold">15%</span></div>
+          <input id="slideEyeContact" type="range" min="0" max="100" value="15" class="w-full accent-primary bg-bg h-2 rounded-lg cursor-pointer" oninput="updateWeightsUI()"/>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="text-gray-300">Body Language</span><span id="valBodyLanguage" class="text-primary font-bold">15%</span></div>
+          <input id="slideBodyLanguage" type="range" min="0" max="100" value="15" class="w-full accent-primary bg-bg h-2 rounded-lg cursor-pointer" oninput="updateWeightsUI()"/>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="text-gray-300">Attire</span><span id="valAttire" class="text-primary font-bold">10%</span></div>
+          <input id="slideAttire" type="range" min="0" max="100" value="10" class="w-full accent-primary bg-bg h-2 rounded-lg cursor-pointer" oninput="updateWeightsUI()"/>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="text-gray-300">Confidence</span><span id="valConfidence" class="text-primary font-bold">10%</span></div>
+          <input id="slideConfidence" type="range" min="0" max="100" value="10" class="w-full accent-primary bg-bg h-2 rounded-lg cursor-pointer" oninput="updateWeightsUI()"/>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="text-gray-300">Facial Expression</span><span id="valFacial" class="text-primary font-bold">10%</span></div>
+          <input id="slideFacial" type="range" min="0" max="100" value="10" class="w-full accent-primary bg-bg h-2 rounded-lg cursor-pointer" oninput="updateWeightsUI()"/>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="text-gray-300">Voice Dynamics</span><span id="valVoice" class="text-primary font-bold">15%</span></div>
+          <input id="slideVoice" type="range" min="0" max="100" value="15" class="w-full accent-primary bg-bg h-2 rounded-lg cursor-pointer" oninput="updateWeightsUI()"/>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="text-gray-300">Engagement</span><span id="valEngagement" class="text-primary font-bold">5%</span></div>
+          <input id="slideEngagement" type="range" min="0" max="100" value="5" class="w-full accent-primary bg-bg h-2 rounded-lg cursor-pointer" oninput="updateWeightsUI()"/>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="text-gray-300">Professional Presence</span><span id="valPresence" class="text-primary font-bold">5%</span></div>
+          <input id="slidePresence" type="range" min="0" max="100" value="5" class="w-full accent-primary bg-bg h-2 rounded-lg cursor-pointer" oninput="updateWeightsUI()"/>
+        </div>
+      </div>
+
+      <button id="saveSettingsBtn" onclick="saveSettings()" class="w-full py-3 rounded-xl bg-accent-gradient text-white font-bold text-sm transition-all hover:scale-[1.01] active:scale-95 shadow-lg shadow-purple-500/20">
+        Save Settings
+      </button>
+    </section>
+
+    <!-- Section 3: Danger Zone & System Management -->
+    <section class="glass-neo-stitch p-6 space-y-6 border-red-500/30">
+      <div class="flex items-center justify-between border-b border-red-500/20 pb-4">
+        <h2 class="text-lg font-semibold text-red-400 flex items-center gap-2 font-display">
+          <span class="material-symbols-outlined text-red-400">warning</span>
+          Danger Zone & System Management
+        </h2>
+        <span class="text-xs font-mono bg-red-500/20 text-red-300 px-2.5 py-1 rounded border border-red-500/30 font-semibold">Irreversible Actions</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-xs">
+        <!-- Erase All Candidate Data -->
+        <div class="p-5 rounded-xl bg-red-500/5 border border-red-500/20 space-y-3 flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-2">
+              <span class="material-symbols-outlined text-red-400">delete_forever</span>
+              Erase All Candidate Data
+            </h3>
+            <p class="text-text-secondary leading-relaxed">
+              Permanently deletes all candidate profiles, interview session logs, evaluation reports, and uploaded resumes.
+            </p>
+          </div>
+          <button onclick="confirmClearData()" class="w-full py-2.5 rounded-xl bg-danger hover:bg-red-600 text-white font-bold transition-all shadow-lg shadow-red-500/20">
+            Erase Every Record
+          </button>
+        </div>
+
+        <!-- Restart KEIKO Server -->
+        <div class="p-5 rounded-xl bg-primary/5 border border-primary/20 space-y-3 flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-2">
+              <span class="material-symbols-outlined text-primary">restart_alt</span>
+              Restart KEIKO Local Server
+            </h3>
+            <p class="text-text-secondary leading-relaxed">
+              Triggers a graceful process restart of the local KEIKO backend engine directly from the web browser.
+            </p>
+          </div>
+          <button onclick="restartServer()" id="btnRestartServer" class="w-full py-2.5 rounded-xl bg-primary/20 hover:bg-primary/30 border border-primary/40 text-primary font-bold transition-all">
+            Restart Server Now
+          </button>
+        </div>
+
+        <!-- Shutdown KEIKO Server -->
+        <div class="p-5 rounded-xl bg-red-500/5 border border-red-500/30 space-y-3 flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2 mb-2">
+              <span class="material-symbols-outlined text-red-400">power_settings_new</span>
+              Shutdown KEIKO Server
+            </h3>
+            <p class="text-text-secondary leading-relaxed">
+              Gracefully terminates the local KEIKO server backend process directly from the web interface.
+            </p>
+          </div>
+          <button onclick="shutdownServer()" id="btnShutdownServer" class="w-full py-2.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-400 font-bold transition-all">
+            Shutdown Server Now
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Clear Confirmation Modal -->
+  <div id="clearModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-[#17151a] border border-white/10 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <h3 class="text-lg font-bold text-white font-display">Confirm Permanent Data Erasure</h3>
+      <p class="text-xs text-text-secondary font-mono leading-relaxed">
+        Are you sure you want to permanently erase ALL candidate records, session logs, and resume uploads? This action cannot be undone.
+      </p>
+      <div class="flex items-center gap-3 pt-2 font-mono text-xs">
+        <button onclick="hideClearModal()" class="flex-1 py-2.5 rounded-xl bg-white/10 text-white font-medium hover:bg-white/15">Cancel</button>
+        <button onclick="executeClearData()" class="flex-1 py-2.5 rounded-xl bg-danger text-white font-bold hover:bg-red-600 shadow-lg shadow-red-500/20">Yes, Erase Everything</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="py-6 border-t border-white/10 text-center text-xs text-text-supporting font-mono">
+    KEIKO Local Lab — Modular Neural Architecture (100% Offline Engine)
+  </footer>
+
+  <script>
+    function updateWeightsUI() {
+      const sliders = [
+        { id: 'slidePosture', valId: 'valPosture' },
+        { id: 'slideEyeContact', valId: 'valEyeContact' },
+        { id: 'slideBodyLanguage', valId: 'valBodyLanguage' },
+        { id: 'slideAttire', valId: 'valAttire' },
+        { id: 'slideConfidence', valId: 'valConfidence' },
+        { id: 'slideFacial', valId: 'valFacial' },
+        { id: 'slideVoice', valId: 'valVoice' },
+        { id: 'slideEngagement', valId: 'valEngagement' },
+        { id: 'slidePresence', valId: 'valPresence' }
+      ];
+
+      let total = 0;
+      sliders.forEach(item => {
+        const el = document.getElementById(item.id);
+        const valEl = document.getElementById(item.valId);
+        if (el && valEl) {
+          const val = parseInt(el.value, 10) || 0;
+          valEl.textContent = val + '%';
+          total += val;
+        }
+      });
+
+      const badge = document.getElementById('totalWeightBadge');
+      if (badge) {
+        badge.textContent = `Sum: ${total}%`;
+        if (total === 100) {
+          badge.className = "text-xs font-mono bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/30 font-semibold";
+        } else {
+          badge.className = "text-xs font-mono bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full border border-amber-500/30 font-semibold";
+        }
+      }
+    }
+
+    function initEventListeners() {
+      const presetRadios = document.querySelectorAll('input[name="lengthPreset"]');
+      const customBox = document.getElementById('customCountBox');
+      const customInput = document.getElementById('customQuestionCount');
+      const insaneToggle = document.getElementById('insaneModeToggle');
+      const qContainer = document.getElementById('questionCountContainer');
+
+      presetRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+          if (customBox) {
+            if (radio.value === 'custom' && radio.checked) {
+              customBox.classList.remove('hidden');
+            } else {
+              customBox.classList.add('hidden');
+            }
+          }
+        });
+      });
+
+      if (customInput) {
+        customInput.addEventListener('input', () => {
+          if (parseInt(customInput.value, 10) < 1) customInput.value = 1;
+        });
+      }
+
+      if (insaneToggle && qContainer) {
+        insaneToggle.addEventListener('change', () => {
+          if (insaneToggle.checked) {
+            qContainer.classList.add('opacity-50', 'pointer-events-none');
+          } else {
+            qContainer.classList.remove('opacity-50', 'pointer-events-none');
+          }
+        });
+      }
+    }
+
+    async function loadSettings() {
+      try {
+        let res = await fetch('/api/settings');
+        if (!res.ok) {
+          res = await fetch('/api/v1/interview/system/settings');
+        }
+        if (res.ok) {
+          const data = await res.json();
+          if (data.telemetry_weights) {
+            const w = data.telemetry_weights;
+            if (w.posture !== undefined) document.getElementById('slidePosture').value = Math.round(w.posture * 100);
+            if (w.eye_contact !== undefined) document.getElementById('slideEyeContact').value = Math.round(w.eye_contact * 100);
+            if (w.body_language !== undefined) document.getElementById('slideBodyLanguage').value = Math.round(w.body_language * 100);
+            if (w.attire !== undefined) document.getElementById('slideAttire').value = Math.round(w.attire * 100);
+            if (w.confidence !== undefined) document.getElementById('slideConfidence').value = Math.round(w.confidence * 100);
+            if (w.facial_expression !== undefined) document.getElementById('slideFacial').value = Math.round(w.facial_expression * 100);
+            const voiceVal = w.voice_dynamics !== undefined ? w.voice_dynamics : w.voice;
+            if (voiceVal !== undefined) document.getElementById('slideVoice').value = Math.round(voiceVal * 100);
+            if (w.engagement !== undefined) document.getElementById('slideEngagement').value = Math.round(w.engagement * 100);
+            if (w.professional_presence !== undefined) document.getElementById('slidePresence').value = Math.round(w.professional_presence * 100);
+          }
+
+          if (data.interview_defaults) {
+            const defs = data.interview_defaults;
+            if (defs.interview_type) {
+              const rad = document.querySelector(`input[name="interviewType"][value="${defs.interview_type}"]`);
+              if (rad) rad.checked = true;
+            }
+            if (defs.difficulty_mode) {
+              const rad = document.querySelector(`input[name="difficultyMode"][value="${defs.difficulty_mode}"]`);
+              if (rad) rad.checked = true;
+            }
+            if (defs.insane_mode !== undefined) {
+              const chk = document.getElementById('insaneModeToggle');
+              if (chk) chk.checked = !!defs.insane_mode;
+              if (chk && chk.checked) {
+                const qContainer = document.getElementById('questionCountContainer');
+                if (qContainer) qContainer.classList.add('opacity-50', 'pointer-events-none');
+              }
+            }
+            if (defs.question_count !== undefined) {
+              const radCount = document.querySelector(`input[name="lengthPreset"][value="${defs.question_count}"]`);
+              if (radCount) {
+                radCount.checked = true;
+              } else if (defs.question_count) {
+                const customRad = document.getElementById('len_custom');
+                if (customRad) customRad.checked = true;
+                const custInput = document.getElementById('customQuestionCount');
+                if (custInput) custInput.value = defs.question_count;
+                const custBox = document.getElementById('customCountBox');
+                if (custBox) custBox.classList.remove('hidden');
+              }
+            }
+          }
+        }
+      } catch(e) {
+        console.error("Failed to load settings:", e);
+      }
+      updateWeightsUI();
+    }
+
+    function getSelectedRadioValue(name) {
+      const el = document.querySelector(`input[name="${name}"]:checked`);
+      return el ? el.value : null;
+    }
+
+    async function saveSettings() {
+      const getNormalized = (id) => parseInt(document.getElementById(id).value, 10) / 100;
+      const type = getSelectedRadioValue('interviewType') || 'Tech';
+      const difficulty = getSelectedRadioValue('difficultyMode') || 'Adaptive';
+      const insaneMode = document.getElementById('insaneModeToggle') ? document.getElementById('insaneModeToggle').checked : false;
+
+      let qCount = 10;
+      const lengthPreset = getSelectedRadioValue('lengthPreset');
+      if (insaneMode) {
+        qCount = 999;
+      } else if (lengthPreset === 'custom') {
+        const custVal = parseInt(document.getElementById('customQuestionCount').value, 10);
+        qCount = isNaN(custVal) ? 10 : custVal;
+      } else if (lengthPreset) {
+        qCount = parseInt(lengthPreset, 10);
+      }
+
+      const voiceVal = getNormalized('slideVoice');
+
+      const payload = {
+        telemetry_weights: {
+          posture: getNormalized('slidePosture'),
+          eye_contact: getNormalized('slideEyeContact'),
+          body_language: getNormalized('slideBodyLanguage'),
+          attire: getNormalized('slideAttire'),
+          confidence: getNormalized('slideConfidence'),
+          facial_expression: getNormalized('slideFacial'),
+          voice_dynamics: voiceVal,
+          voice: voiceVal,
+          engagement: getNormalized('slideEngagement'),
+          professional_presence: getNormalized('slidePresence')
+        },
+        interview_defaults: {
+          interview_type: type,
+          difficulty_mode: difficulty,
+          insane_mode: insaneMode,
+          question_count: qCount
+        }
+      };
+
+      try {
+        let res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          res = await fetch('/api/v1/interview/system/settings', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+          });
+        }
+        if (res.ok) {
+          showToast('Global settings & telemetry weights saved successfully!', 'success');
+        } else {
+          showToast('Failed to save settings.', 'error');
+        }
+      } catch(err) {
+        showToast('Error connecting to server', 'error');
+      }
+    }
+
+    const saveTelemetryWeights = saveSettings;
+
+    function confirmClearData() {
+      const modal = document.getElementById('clearModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function hideClearModal() {
+      const modal = document.getElementById('clearModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function executeClearData() {
+      hideClearModal();
+      try {
+        const res = await fetch('/api/v1/interview/system/clear_data', { method: 'DELETE' });
+        if (res.ok) {
+          showToast('All candidate records and session files erased!', 'success');
+        } else {
+          showToast('Failed to erase candidate data.', 'error');
+        }
+      } catch(err) {
+        showToast('Error executing data erase', 'error');
+      }
+    }
+
+    async function restartServer() {
+      const btn = document.getElementById('btnRestartServer');
+      btn.disabled = true;
+      btn.textContent = 'Initiating Server Restart...';
+
+      try {
+        const res = await fetch('/api/v1/interview/system/restart', { method: 'POST' });
+        if (res.ok) {
+          showToast('Server restart initiated! Reloading in 4 seconds...', 'success');
+          setTimeout(() => { window.location.reload(); }, 4000);
+        } else {
+          showToast('Failed to trigger server restart.', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Restart Server Now';
+        }
+      } catch(err) {
+        showToast('Server is restarting... Reloading shortly.', 'success');
+        setTimeout(() => { window.location.reload(); }, 4000);
+      }
+    }
+
+    async function shutdownServer() {
+      const btn = document.getElementById('btnShutdownServer');
+      btn.disabled = true;
+      btn.textContent = 'Shutting Down...';
+
+      try {
+        const res = await fetch('/api/v1/interview/system/shutdown', { method: 'POST' });
+        if (res.ok) {
+          showToast('KEIKO Server process shutdown successfully.', 'success');
+          btn.textContent = 'Server Offline';
+        } else {
+          showToast('Failed to trigger server shutdown.', 'error');
+          btn.disabled = false;
+          btn.textContent = 'Shutdown Server Now';
+        }
+      } catch(err) {
+        showToast('KEIKO Server process is now offline.', 'success');
+        btn.textContent = 'Server Offline';
+      }
+    }
+
+    function showToast(msg, type) {
+      const t = document.getElementById('toastAlert');
+      t.textContent = msg;
+      t.className = 'p-4 rounded-xl text-sm font-mono transition-all ' + 
+        (type === 'success' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-red-500/20 text-red-300 border border-red-500/30');
+      t.classList.remove('hidden');
+      setTimeout(() => { t.classList.add('hidden'); }, 5000);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initEventListeners();
+      loadSettings();
+    });
+  </script>
+</body>
+</html>

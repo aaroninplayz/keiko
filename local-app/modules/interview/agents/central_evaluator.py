@@ -203,9 +203,18 @@ class CentralEvaluator:
                 behavioral_score_base -= 5.0
             behavioral_assessment_score = round(max(10.0, min(100.0, behavioral_score_base)), 1)
 
+        # Helper to extract scores when nested in dicts (common in tests/raw updates)
+        def extract_score(metrics, key, default=70.0):
+            if not metrics:
+                return default
+            val = metrics.get(key, default)
+            if isinstance(val, dict):
+                return val.get("score", default)
+            return val
+
         # Compute local heuristics for learning potential and cultural fit if not populated by LLM
         if learning_potential_score is None:
-            learning_potential_score = current_metrics.get("learning_potential")
+            learning_potential_score = extract_score(current_metrics, "learning_potential", None)
         if learning_potential_score is None:
             word_count = len(answer.split())
             lp_score_base = 75.0
@@ -226,7 +235,7 @@ class CentralEvaluator:
             learning_potential_score = round(max(0.0, min(100.0, lp_score_base)), 1)
 
         if cultural_fit_score is None:
-            cultural_fit_score = current_metrics.get("cultural_fit")
+            cultural_fit_score = extract_score(current_metrics, "cultural_fit", None)
         if cultural_fit_score is None:
             cf_score_base = 75.0
             cf_keywords = ["culture", "value", "team", "collaborate", "align", "mission", "passion", "excited", "grow", "work ethic", "transparency"]
@@ -234,15 +243,6 @@ class CentralEvaluator:
             cf_score_base += min(20.0, cf_matches * 4.0)
             
             cultural_fit_score = round(max(0.0, min(100.0, cf_score_base)), 1)
-
-        # Helper to extract scores when nested in dicts (common in tests/raw updates)
-        def extract_score(metrics, key, default=70.0):
-            if not metrics:
-                return default
-            val = metrics.get(key, default)
-            if isinstance(val, dict):
-                return val.get("score", default)
-            return val
 
         # Integrate Sensor Metrics
         emotions = current_metrics.get("emotions", ["neutral"])

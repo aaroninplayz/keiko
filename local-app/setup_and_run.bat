@@ -1,45 +1,93 @@
 @echo off
+setlocal enabledelayedexpansion
+
 :: ============================================================
-:: Keiko Local App - Setup & Run Script
-:: ============================================================
-:: Searches for a virtual environment in this order:
-::   1. ./venv       (local venv in project dir)
-::   2. ../venv      (parent directory venv)
-::   3. System python (fallback)
+:: KEIKO Local Lab - Setup & Run Script (Windows Batch)
 :: ============================================================
 
 set "SCRIPT_DIR=%~dp0"
 cd /d "%SCRIPT_DIR%"
 
-:: Find virtual environment
 set "PYTHON_EXE="
-if exist "%SCRIPT_DIR%venv\Scripts\python.exe" (
-    set "PYTHON_EXE=%SCRIPT_DIR%venv\Scripts\python.exe"
-    set "VENV_DIR=%SCRIPT_DIR%venv"
-    echo Found local venv.
-) else if exist "%SCRIPT_DIR%..\venv\Scripts\python.exe" (
-    set "PYTHON_EXE=%SCRIPT_DIR%..\venv\Scripts\python.exe"
-    set "VENV_DIR=%SCRIPT_DIR%..\venv"
-    echo Found parent venv.
-) else (
-    echo No virtual environment found. Creating one...
-    python -m venv "%SCRIPT_DIR%venv"
-    if %ERRORLEVEL% neq 0 (
-        echo ERROR: Could not create virtual environment. Is Python installed?
-        pause
-        exit /b 1
-    )
-    set "PYTHON_EXE=%SCRIPT_DIR%venv\Scripts\python.exe"
-    set "VENV_DIR=%SCRIPT_DIR%venv"
-    echo Installing dependencies...
-    "%SCRIPT_DIR%venv\Scripts\pip.exe" install -r requirements.txt
+
+if defined KEIKO_VENV if exist "%KEIKO_VENV%\Scripts\python.exe" (
+    set "PYTHON_EXE=%KEIKO_VENV%\Scripts\python.exe"
+    goto :found_python
 )
 
+if exist "P:\Dependencies\keiko_venv\Scripts\python.exe" (
+    set "PYTHON_EXE=P:\Dependencies\keiko_venv\Scripts\python.exe"
+    goto :found_python
+)
+
+if defined VIRTUAL_ENV if exist "%VIRTUAL_ENV%\Scripts\python.exe" (
+    set "PYTHON_EXE=%VIRTUAL_ENV%\Scripts\python.exe"
+    goto :found_python
+)
+
+if exist "%SCRIPT_DIR%venv\Scripts\python.exe" (
+    set "PYTHON_EXE=%SCRIPT_DIR%venv\Scripts\python.exe"
+    goto :found_python
+)
+
+if exist "%SCRIPT_DIR%..\venv\Scripts\python.exe" (
+    set "PYTHON_EXE=%SCRIPT_DIR%..\venv\Scripts\python.exe"
+    goto :found_python
+)
+
+where python >nul 2>nul
+if %ERRORLEVEL% equ 0 (
+    set "PYTHON_EXE=python"
+    goto :found_python
+)
+
+echo ERROR: No Python installation or virtual environment found.
+pause
+exit /b 1
+
+:found_python
+echo Using Python: !PYTHON_EXE!
+
+set "PYTHONPATH=%SCRIPT_DIR%;%SCRIPT_DIR%.."
+set "HF_HUB_OFFLINE=1"
+set "TRANSFORMERS_OFFLINE=1"
+set "HF_DATASETS_OFFLINE=1"
+
+if "%~1"=="--restart" goto :start_server
+
+:menu
 echo.
-echo Starting the application...
-echo Dashboard:       http://localhost:8000/static/dashboard.html
-echo Interview Setup: http://localhost:8000/static/interview-setup.html
-echo Admin Panel:     http://localhost:8000/static/admin.html
+echo ============================================================
+echo               KEIKO LOCAL LAB CONTROL MENU
+echo ============================================================
+echo  [1] Launch Server
+echo  [2] Restart Server
+echo  [3] Run Diagnostics Check
+echo  [4] Exit
+echo ============================================================
+set /p CHOICE="Select an option (1-4): "
+
+if "%CHOICE%"=="1" goto :start_server
+if "%CHOICE%"=="2" goto :start_server
+if "%CHOICE%"=="3" goto :run_check
+if "%CHOICE%"=="4" exit /b 0
+
+echo Invalid choice.
+goto :menu
+
+:run_check
+"!PYTHON_EXE!" "%SCRIPT_DIR%run.py" --check
+goto :menu
+
+:start_server
+echo Launching KEIKO server...
+"!PYTHON_EXE!" "%SCRIPT_DIR%run.py" %*
+if %ERRORLEVEL% neq 0 (
+    echo.
+    echo Keiko launcher exited with status code %ERRORLEVEL%.
+)
 echo.
-"%PYTHON_EXE%" main.py
+echo Server stopped or restarted.
+set /p RESTART_CHOICE="Restart server now? (y/n): "
+if /i "%RESTART_CHOICE%"=="y" goto :start_server
 pause

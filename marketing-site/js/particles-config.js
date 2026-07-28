@@ -23,26 +23,26 @@ const PARTICLE_CONFIG = {
     transitionDuration: 180,             // How long the morphing animation takes (3 seconds)
     shapeDuration: 600,                   // How long a shape stays formed on screen (10.0 seconds)
 
-    // Allowed Geometric Shapes (removes cylinders, hearts, cones, etc.)
+    // Allowed Star Systems & Constellations
     shapeList: [
-        'sphere',
-        'cube',
-        'torus',
-        'tesseract',
-        'mobius',
-        'helix',
-        'infinity'
+        'orion',          // Orion (The Hunter & Belt)
+        'big_dipper',     // Ursa Major / Big Dipper
+        'cassiopeia',     // Cassiopeia (Celestial W)
+        'scorpius',       // Scorpius (Scorpion & Antares)
+        'cygnus',         // Cygnus (Northern Cross Swan)
+        'pleiades',       // Pleiades (Seven Sisters Star Cluster)
+        'galaxy_spiral'   // Galactic Spiral Star System
     ],
 
-    // Shape Sizes (Scale multipliers relative to base calculations)
+    // Constellation Scale Multipliers
     shapes: {
-        sphere: { R: 165 },               // Sphere radius
-        cube: { halfSize: 110 },          // Cube half-side length
-        torus: { R_torus: 150, r_tube: 35 }, // Torus ring and tube radii
-        tesseract: { scale: 170 },        // Tesseract scale factor
-        mobius: { scale: 130, tube: 50 },  // Mobius strip size
-        helix: { R: 80, length: 220 },     // DNA helix radius and length
-        infinity: { scale: 160 }          // Infinity loop size
+        orion: { scale: 190 },
+        big_dipper: { scale: 185 },
+        cassiopeia: { scale: 175 },
+        scorpius: { scale: 180 },
+        cygnus: { scale: 195 },
+        pleiades: { scale: 170 },
+        galaxy_spiral: { scale: 200 }
     }
 };
 

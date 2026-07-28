@@ -34,7 +34,9 @@ class ContextAnalyzer:
 
     def get_session_profile(self, session_id: str) -> Dict[str, Any]:
         """
-        Loads the candidate profile, role profile, and match results for a session if they exist.
+        Loads the candidate profile, role profile, match results, and candidate context
+        for a session if they exist. Merges candidate_context.json contact info into
+        the candidate profile for complete metadata availability.
         """
         sess_path = os.path.join(SESSIONS_DIR, session_id)
         
@@ -43,6 +45,7 @@ class ContextAnalyzer:
         cand_path = os.path.join(sess_path, "resume_profile.json")
         role_path = os.path.join(sess_path, "jd_profile.json")
         match_path = os.path.join(sess_path, "match_results.json")
+        context_path = os.path.join(sess_path, "candidate_context.json")
 
         cand_profile = None
         role_profile = None
@@ -55,6 +58,21 @@ class ContextAnalyzer:
             with open(cand_path, "r", encoding="utf-8") as f:
                 cand_profile = json.load(f)
         
+        # Merge candidate_context.json contact info into the candidate profile
+        # This ensures name, email, phone are available even without a resume file
+        if os.path.exists(context_path):
+            try:
+                with open(context_path, "r", encoding="utf-8") as f:
+                    candidate_context = json.load(f)
+                if cand_profile is None:
+                    cand_profile = {}
+                # Overlay contact fields from candidate_context (these come from the setup form)
+                for key in ("full_name", "email", "phone", "target_role"):
+                    if candidate_context.get(key):
+                        cand_profile[key] = candidate_context[key]
+            except Exception as e:
+                logger.warning(f"Could not load candidate_context.json for {session_id}: {e}")
+
         if os.path.exists(role_path):
             with open(role_path, "r", encoding="utf-8") as f:
                 role_profile = json.load(f)
@@ -172,3 +190,58 @@ class ContextAnalyzer:
 
         logger.info(f"Compiled and saved normalized Candidate Profile for session {session_id}")
         return match_results
+
+    def parse_preview(self, resume_text: str = "", resume_file_path: Optional[str] = None, jd_text: str = "") -> Dict[str, Any]:
+        """
+        Parses resume and job description on-the-fly to return a preview of extracted skills,
+        requirements, matched alignment, and skill gaps before a session is formally started.
+        """
+        cand_text = resume_text
+        if resume_file_path and os.path.exists(resume_file_path):
+            cand_text = self.resume_agent.parse_file(resume_file_path)
+            
+        cand_profile = self.resume_agent.extract_profile(cand_text) if cand_text else {
+            "skills": {}, "experience_years": 0, "education": [], "projects": []
+        }
+        
+        role_text = self.jd_agent.sanitize_text(jd_text) if jd_text else ""
+        role_profile = self.jd_agent.extract_role_profile(role_text) if role_text else {
+            "role_title": "Technical Role", "required_skills": [], "responsibilities": []
+        }
+        
+        match_results = self.matching_engine.align_profiles(cand_profile, role_profile) if (cand_text or role_text) else {}
+        
+        cand_exp = cand_profile.get("experience_years", 0)
+        if cand_exp < 2:
+            career_level = "Junior / Entry-level"
+        elif cand_exp <= 5:
+            career_level = "Mid-level"
+        else:
+            career_level = "Senior / Lead"
+            
+        alignment = match_results.get("role_alignment_score")
+        if alignment is None:
+            alignment = match_results.get("overall_alignment_score", 0.0)
+        if 0 < alignment <= 1.0:
+            alignment = round(alignment * 100.0, 1)
+
+        return {
+            "candidate_profile": {
+                "full_name": cand_profile.get("full_name", ""),
+                "email": cand_profile.get("email", ""),
+                "phone": cand_profile.get("phone", ""),
+                "skills": cand_profile.get("skills", {}),
+                "experience_years": cand_exp,
+                "career_level": career_level,
+                "education": cand_profile.get("education", []),
+                "projects": cand_profile.get("projects", []),
+                "work_history": cand_profile.get("work_history", []),
+                "achievements": cand_profile.get("achievements", []),
+                "domain_expertise": cand_profile.get("domain_expertise", [])
+            },
+            "role_profile": role_profile,
+            "match_results": match_results,
+            "skill_gaps": match_results.get("skill_gap", []),
+            "strengths": match_results.get("strengths", []),
+            "alignment_score": round(float(alignment), 1)
+        }

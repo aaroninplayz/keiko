@@ -2,7 +2,7 @@ import logging
 import os
 import threading
 import webbrowser
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from core.config import settings
@@ -12,11 +12,29 @@ from core.database import Base, engine
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+import time
+
+SERVER_BOOT_ID = str(int(time.time()))
+
 def _open_dashboard_browser():
-    target_url = "http://localhost:8000/static/dashboard.html"
-    logger.info(f"Opening browser to {target_url}...")
+    target_url = "http://localhost:8000/static/dashboard.html?reset=true"
+    logger.info(f"Opening browser (Firefox preferred) to {target_url} in fullscreen mode...")
     try:
-        webbrowser.open(target_url)
+        import subprocess, sys
+        if sys.platform == "win32":
+            # Try Firefox kiosk/fullscreen mode first, then default fallback
+            try:
+                subprocess.Popen(f'start firefox -kiosk "{target_url}"', shell=True)
+            except Exception:
+                try:
+                    subprocess.Popen(f'start firefox -url "{target_url}"', shell=True)
+                except Exception:
+                    webbrowser.open(target_url)
+        else:
+            try:
+                subprocess.Popen(["firefox", "-kiosk", target_url])
+            except Exception:
+                webbrowser.open(target_url)
     except Exception as e:
         logger.warning(f"Failed to open browser automatically: {e}")
 
@@ -26,6 +44,7 @@ def create_app() -> FastAPI:
         version=settings.VERSION,
         openapi_url=f"{settings.API_V1_STR}/openapi.json"
     )
+    app.state.boot_id = SERVER_BOOT_ID
 
     # CORS for local development
     app.add_middleware(
@@ -55,20 +74,33 @@ def create_app() -> FastAPI:
     else:
         logger.warning(f"Static directory not found at: {static_dir}")
 
+    @app.get("/", tags=["System"])
+    def root_redirect():
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url="/static/dashboard.html")
+
     @app.get("/health", tags=["System"])
     def health_check():
-        return {"status": "ok", "version": settings.VERSION}
+        return {"status": "ok", "version": settings.VERSION, "boot_id": SERVER_BOOT_ID}
+
+    @app.get("/api/settings", tags=["System"])
+    async def get_settings_alias():
+        from modules.interview.router import get_system_settings
+        return await get_system_settings()
+
+    @app.post("/api/settings", tags=["System"])
+    async def update_settings_alias(payload: dict = Body(...)):
+        from modules.interview.router import update_system_settings
+        return await update_system_settings(payload)
 
     @app.on_event("startup")
     def startup_event():
         auto_open_env = os.environ.get("KEIKO_AUTO_OPEN", "true").lower()
         should_auto_open = auto_open_env not in ("false", "0", "no", "off")
-        already_opened = os.environ.get("KEIKO_BROWSER_OPENED") == "true"
 
-        if should_auto_open and not already_opened:
-            os.environ["KEIKO_BROWSER_OPENED"] = "true"
+        if should_auto_open:
             threading.Timer(1.0, _open_dashboard_browser).start()
-            logger.info("Auto browser open scheduled for dashboard.html")
+            logger.info("Auto browser open scheduled for dashboard.html on server start/reset")
 
     return app
 

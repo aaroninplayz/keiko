@@ -5,7 +5,7 @@ from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 
-# List of common security/injection phrases to sanitize (just in case candidates/users try injection in JD)
+# List of common security/injection phrases to sanitize
 INJECTION_PATTERNS = [
     r"(?i)ignore\s+(?:all\s+)?previous\s+instructions",
     r"(?i)system\s+prompt\s+override",
@@ -19,23 +19,26 @@ class JobDescriptionIntelligenceAgent:
     """
 
     def __init__(self):
-        # Known technologies to map from job descriptions
+        # Known technical keywords
         self.tech_keywords = [
-            "python", "javascript", "typescript", "go", "golang", "java", "c++", "c#", "ruby", "rust", 
+            "python", "javascript", "typescript", "go", "golang", "java", "c++", "c#", "c", "ruby", "rust", 
             "fastapi", "django", "flask", "react", "angular", "vue", "next.js", "express", 
-            "docker", "kubernetes", "git", "aws", "gcp", "azure", "postgresql", "mysql", "mongodb", "redis",
-            "sql", "html", "css", "machine learning", "pytorch", "tensorflow", "ci/cd", "rest api", "graphql"
+            "docker", "kubernetes", "git", "github", "aws", "gcp", "azure", "postgresql", "mysql", "mongodb", "redis",
+            "sql", "html", "css", "html/css", "vanilla css", "tailwind", "tailwind css", "pytorch", "opencv",
+            "machine learning", "tensorflow", "ci/cd", "rest api", "graphql", "ui/ux", "ui/ux design"
         ]
 
     def sanitize_text(self, text: str) -> str:
+        """Cleans text while preserving line breaks."""
         if not text:
             return ""
         clean = re.sub(r"<[^>]*>", " ", text)
         for pattern in INJECTION_PATTERNS:
             clean = re.sub(pattern, "[Sanitized Malicious Intent Phrase]", clean)
         clean = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", "", clean)
-        clean = re.sub(r"\s+", " ", clean)
-        return clean.strip()
+        lines = [re.sub(r"[ \t]+", " ", line).strip() for line in clean.splitlines()]
+        clean_text = "\n".join([l for l in lines if l])
+        return clean_text.strip()
 
     def parse_file(self, file_path: str) -> str:
         """Parses text from PDF, DOCX, or TXT format safely."""
@@ -76,11 +79,24 @@ class JobDescriptionIntelligenceAgent:
         """
         Extracts expected minimum years of experience.
         """
-        # Matches e.g., "5+ years of experience", "minimum 3 years", "8 years", "5-7 years"
         match = re.search(r"(?:minimum|min|at least|required)?\s*(\d+)\+?\s*(?:-\s*\d+)?\s*years?(?:\s+of)?\s*(?:relevant)?\s*experience", text, re.IGNORECASE)
         if match:
             return int(match.group(1))
-        return 2  # default baseline if unspecified
+        return 1
+
+    def extract_role_title(self, text: str) -> str:
+        """Extracts target role title cleanly."""
+        roles_regex = r"(?i)\b(Python Developer|Python Backend Engineer|Backend Engineer|Full Stack Engineer|Full Stack Developer|Frontend Engineer|Frontend Developer|Software Engineer|AI/ML Engineer|Data Scientist|DevOps Engineer|Mobile Developer|QA Engineer|System Architect)\b"
+        m = re.search(roles_regex, text)
+        if m:
+            return m.group(1).title()
+        
+        lines = [l.strip() for l in text.splitlines() if l.strip()]
+        for line in lines[:3]:
+            cleaned = re.sub(r"(?i)^(we are looking for a|job title:|role:|position:)\s*", "", line).strip()
+            if len(cleaned) < 50 and any(term in cleaned.lower() for term in ["developer", "engineer", "intern", "architect", "lead", "designer", "analyst"]):
+                return cleaned.title()
+        return "Software Engineer"
 
     def extract_role_profile(self, text: str) -> Dict[str, Any]:
         """
@@ -88,29 +104,32 @@ class JobDescriptionIntelligenceAgent:
         """
         sanitized = self.sanitize_text(text)
         profile = {
+            "role_title": self.extract_role_title(sanitized),
             "required_skills": [],
-            "required_experience_years": 2,
+            "required_experience_years": 1,
             "responsibilities": [],
             "preferred_qualifications": [],
             "soft_skills": [],
             "industry_domain": "Software Development",
         }
 
-        # 1. Required Experience
         profile["required_experience_years"] = self.extract_required_experience(sanitized)
 
-        # 2. Required Skills (Word matching from technical dictionary)
+        # 2. Required Skills
         for skill in self.tech_keywords:
             pattern = rf"(?i)\b{re.escape(skill)}\b"
             if re.search(pattern, sanitized):
                 name = skill.replace("\\", "").title()
-                if name.lower() == "gcp": name = "GCP"
-                elif name.lower() == "aws": name = "AWS"
-                elif name.lower() == "html": name = "HTML"
-                elif name.lower() == "css": name = "CSS"
-                elif name.lower() == "sql": name = "SQL"
-                elif name.lower() == "ci/cd": name = "CI/CD"
-                elif name.lower() == "rest api": name = "REST API"
+                if name.lower() in ["gcp", "aws", "html", "css", "sql", "ci/cd", "rest api"]:
+                    name = name.upper()
+                elif name.lower() == "fastapi":
+                    name = "FastAPI"
+                elif name.lower() == "pytorch":
+                    name = "PyTorch"
+                elif name.lower() == "opencv":
+                    name = "OpenCV"
+                elif name.lower() == "ui/ux":
+                    name = "UI/UX Design"
                 profile["required_skills"].append(name)
 
         # 3. Soft Skills
@@ -120,7 +139,7 @@ class JobDescriptionIntelligenceAgent:
                 profile["soft_skills"].append(skill.title())
 
         # 4. Parsing Responsibilities & Qualifications from text sections
-        lines = text.split("\n")
+        lines = sanitized.splitlines()
         current_section = None
         buffers = {
             "responsibilities": [],
@@ -137,11 +156,10 @@ class JobDescriptionIntelligenceAgent:
                 current_section = "responsibilities"
                 continue
             elif any(k in lower_line for k in ["preferred", "nice to have", "plus", "bonus", "qualifications", "requirements"]):
-                # if section contains qualifications, but if it has preferred/plus/bonus we classify it as preferred
                 if any(p in lower_line for p in ["preferred", "nice to have", "plus", "bonus"]):
                     current_section = "preferred"
                 else:
-                    current_section = "requirements" # general requirements section
+                    current_section = "requirements"
                 continue
 
             if current_section == "responsibilities" and len(buffers["responsibilities"]) < 10:
@@ -149,31 +167,21 @@ class JobDescriptionIntelligenceAgent:
             elif current_section == "preferred" and len(buffers["preferred"]) < 8:
                 buffers["preferred"].append(line_str)
 
-        # Populate responsibilities
         for line in buffers["responsibilities"]:
-            if line.startswith(("-", "*", "•")) or len(line) < 120:
-                profile["responsibilities"].append(line.lstrip("-*• ").strip())
+            profile["responsibilities"].append(line.lstrip("-*• ").strip())
 
-        # Populate preferred qualifications
         for line in buffers["preferred"]:
-            if line.startswith(("-", "*", "•")) or len(line) < 120:
-                profile["preferred_qualifications"].append(line.lstrip("-*• ").strip())
+            profile["preferred_qualifications"].append(line.lstrip("-*• ").strip())
 
-        # If buffers are empty, extract lines with action verbs as default responsibilities
         if not profile["responsibilities"]:
             action_verbs = ["design", "develop", "maintain", "build", "collaborate", "lead", "manage", "optimize", "write"]
             for line in lines[:30]:
                 if any(line.strip().lower().startswith(v) for v in action_verbs):
                     profile["responsibilities"].append(line.strip())
 
-        # Determine Industry Domain
-        if any(w in sanitized.lower() for w in ["ai", "machine learning", "pytorch", "model"]):
+        if any(w in sanitized.lower() for w in ["ai", "machine learning", "pytorch", "model", "opencv"]):
             profile["industry_domain"] = "Artificial Intelligence"
         elif any(w in sanitized.lower() for w in ["cloud", "devops", "aws", "kubernetes"]):
             profile["industry_domain"] = "Cloud & Infrastructure"
-        elif any(w in sanitized.lower() for w in ["finance", "banking", "payment", "ledger"]):
-            profile["industry_domain"] = "FinTech"
-        elif any(w in sanitized.lower() for w in ["healthcare", "medical", "patient", "clinical"]):
-            profile["industry_domain"] = "HealthTech"
 
         return profile

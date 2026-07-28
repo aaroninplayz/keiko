@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html class="dark" lang="en">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Interview Setup — KEIKO Intelligence</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1"
+    rel="stylesheet" />
   <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -30,14 +37,24 @@
     }
   </script>
   <style>
-    body { background-color: #131314; color: #F4F4F5; font-family: 'Inter', sans-serif; }
-    .glass-panel { background: rgba(20, 20, 22, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(74, 68, 85, 0.2); }
+    body {
+      background-color: #131314;
+      color: #F4F4F5;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .glass-panel {
+      background: rgba(20, 20, 22, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(74, 68, 85, 0.2);
+    }
+
     .glass-neo-stitch {
       background: rgba(20, 20, 22, 0.65);
       backdrop-filter: blur(24px);
       -webkit-backdrop-filter: blur(24px);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 
+      box-shadow:
         inset 1px 1px 2px rgba(255, 255, 255, 0.12),
         inset -1px -1px 2px rgba(0, 0, 0, 0.8),
         0 15px 35px rgba(0, 0, 0, 0.6);
@@ -46,6 +63,7 @@
       outline-offset: -8px;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
     .gradient-text {
       background-image: linear-gradient(135deg, #d2bbff 0%, #adc6ff 50%, #71f8e4 100%);
       -webkit-background-clip: text;
@@ -53,9 +71,25 @@
       background-clip: text;
       color: transparent;
     }
-    .bg-accent-gradient { background: linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #14B8A6 100%); }
+
+    .bg-accent-gradient {
+      background: linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #14B8A6 100%);
+    }
+
+    .resume-data-card {
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .resume-data-card .card-details {
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease-in-out, margin-top 0.25s ease-in-out;
+    }
+
+    .resume-data-card .card-chevron {
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
   </style>
 </head>
+
 <body class="min-h-screen flex flex-col bg-[#131314] text-[#F4F4F5]">
 
   <!-- KEIKO Navigation Bar -->
@@ -65,10 +99,10 @@
       <div class="hidden md:flex items-center space-x-8">
         <a class="text-sm text-gray-400 hover:text-white transition-colors" href="dashboard.html">Dashboard</a>
         <a class="text-sm text-primary font-bold transition-colors" href="interview-setup.html">Setup Session</a>
-        <a class="text-sm text-gray-400 hover:text-white transition-colors" href="documentation.html">Documentation</a>
-        <a class="text-sm text-gray-400 hover:text-white transition-colors" href="admin.html">Admin</a>
+        <a class="text-sm text-gray-400 hover:text-white transition-colors" href="settings.html">Settings</a>
       </div>
-      <a class="bg-[#7c3aed] text-white px-6 py-2 rounded-full font-bold text-sm hover:scale-105 transition-all" href="dashboard.html">Return to Portal</a>
+      <a class="bg-[#7c3aed] text-white px-6 py-2 rounded-full font-bold text-sm hover:scale-105 transition-all"
+        href="dashboard.html">Return to Portal</a>
     </div>
   </nav>
 
@@ -76,324 +110,1564 @@
   <main class="flex-1 mt-24 max-w-4xl mx-auto w-full px-6 py-8">
     <div class="mb-8 space-y-2">
       <div class="inline-flex items-center gap-2 text-xs font-mono text-primary uppercase tracking-widest">
-        <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+        <span class="w-2 h-2 rounded-full bg-primary"></span>
         Interview Initialization
       </div>
       <h1 class="text-3xl font-bold tracking-tight text-white font-display">
         Interview Session <span class="gradient-text">Configuration</span>
       </h1>
       <p class="text-text-secondary text-sm">
-        Configure candidate details, job description, resume context, and 9 telemetry sensor weights in a single setup matrix.
+        Select a saved profile or enter candidate details, target job description, resume context, and 9 telemetry
+        sensor weights.
       </p>
     </div>
 
     <form id="setupForm" class="space-y-8">
-      
-      <!-- 1. Candidate Information -->
-      <section class="glass-neo-stitch p-6 space-y-4">
-        <h2 class="text-lg font-semibold text-white flex items-center gap-2 font-display">
-          <span class="material-symbols-outlined text-primary">person</span>
-          1. Candidate Details
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-mono uppercase tracking-wider text-text-secondary mb-1">Full Name *</label>
-            <input id="candidateName" required type="text" placeholder="e.g. Alex Mercer" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary transition-colors"/>
+
+      <!-- Section 1 (Option A): Resume Context & Neural Profile Parser (TOP) -->
+      <section class="glass-neo-stitch p-6 space-y-6">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+          <h2 class="text-lg font-semibold text-white flex items-center gap-2 font-display">
+            <span class="material-symbols-outlined text-primary">cloud_upload</span>
+            1. Option A: Resume Upload & Neural Profile Parser
+          </h2>
+          <span
+            class="text-xs font-mono text-tertiary bg-tertiary/10 px-2.5 py-1 rounded border border-tertiary/20 font-semibold">Recommended</span>
+        </div>
+
+        <label id="resumeDropzone" for="resumeFile"
+          class="block border-2 border-dashed border-white/20 hover:border-primary rounded-xl p-6 text-center cursor-pointer transition-colors bg-[#1c1b1c]/50">
+          <span class="material-symbols-outlined text-3xl text-gray-400 mb-2 block">description</span>
+          <p class="text-sm text-gray-300 font-medium">Drag & drop candidate resume file here, or click to browse</p>
+          <p class="text-xs text-gray-500 mt-1">Supports PDF, DOCX, TXT (Auto-parses Name, Email, Skills, Experience,
+            Education & Achievements)</p>
+          <div id="resumeFileInfo" class="mt-3 hidden items-center justify-center gap-2 p-2 rounded-lg bg-tertiary/10 border border-tertiary/30 text-tertiary text-xs font-mono">
+            <span class="material-symbols-outlined text-sm">task</span>
+            <span id="resumeFileNameDisplay" class="font-bold"></span>
+            <button id="clearResumeFileBtn" type="button" class="ml-2 text-text-secondary hover:text-red-400 transition-colors font-bold" title="Remove File">&times;</button>
           </div>
-          <div>
-            <label class="block text-xs font-mono uppercase tracking-wider text-text-secondary mb-1">Email Address *</label>
-            <input id="candidateEmail" required type="email" placeholder="alex.mercer@example.com" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary transition-colors"/>
+          <input id="resumeFile" type="file" accept=".pdf,.docx,.txt" class="sr-only" />
+        </label>
+
+        <div class="flex items-center justify-between pt-2">
+          <button id="analyzeProfileBtn" type="button"
+            class="bg-purple-600/20 border border-purple-500/40 text-primary px-5 py-2.5 rounded-xl text-xs font-mono font-semibold flex items-center gap-2 hover:bg-purple-600/30 transition-all">
+            <span class="material-symbols-outlined text-base">psychology</span>
+            <span>Parse & Populate Candidate Context</span>
+          </button>
+          <span id="parsingStatus" class="text-xs font-mono text-text-supporting"></span>
+        </div>
+
+        <!-- Parsed Intelligence Card -->
+        <div id="parsedProfilePreview"
+          class="hidden space-y-4 p-4 rounded-xl bg-white/5 border border-white/10 font-mono text-xs">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <span class="text-tertiary font-bold uppercase tracking-wider">Parsed Candidate Profile Intelligence</span>
+            <span id="previewAlignmentBadge"
+              class="px-2.5 py-1 rounded bg-tertiary/20 text-tertiary text-[10px] font-bold">Match: 0%</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <span class="text-text-supporting block mb-1">Career Experience Level:</span>
+              <input id="previewCareerLevel" type="text"
+                class="w-full bg-[#141416] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-primary" />
+            </div>
+            <div>
+              <span class="text-text-supporting block mb-1">Identified Extracted Skills:</span>
+              <div id="previewSkillTags" class="flex flex-wrap gap-1.5 pt-1"></div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <span class="text-text-supporting block mb-1">Matched Strengths:</span>
+              <ul id="previewStrengths" class="list-disc list-inside text-text-secondary text-[11px] space-y-1"></ul>
+            </div>
+            <div>
+              <span class="text-text-supporting block mb-1">Identified Skill Gaps (Probing Topics):</span>
+              <ul id="previewGaps" class="list-disc list-inside text-amber-400/90 text-[11px] space-y-1"></ul>
+            </div>
+          </div>
+
+          <!-- Save Profile Action Bar -->
+          <div class="flex items-center justify-between border-t border-white/10 pt-3 mt-2">
+            <div class="flex items-center gap-2">
+              <input id="saveProfileNameInput" type="text" placeholder="Profile Name (e.g. Senior Backend Candidate)"
+                class="bg-[#141416] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-primary" />
+              <button id="saveCandidateProfileBtn" type="button"
+                class="bg-tertiary/20 text-tertiary border border-tertiary/30 px-3 py-1.5 rounded-lg text-xs hover:bg-tertiary/30 transition-colors font-semibold">
+                Save Profile
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- 2. Target Role & Job Description -->
+      <!-- Section 2: Saved Profiles Workspace Selector -->
+      <section class="glass-neo-stitch p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+          <h2 class="text-lg font-semibold text-white flex items-center gap-2 font-display">
+            <span class="material-symbols-outlined text-primary">badge</span>
+            2. Select Saved Candidate Profile
+          </h2>
+          <span class="text-xs font-mono text-text-secondary">Click any profile card to select</span>
+        </div>
+
+        <!-- Rich Saved Profiles Card Selector Grid -->
+        <div id="savedProfilesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <!-- Dynamically populated rich profile selector cards -->
+        </div>
+
+        <select id="savedProfileSelect" class="hidden">
+          <option value="">-- Create New Candidate Profile --</option>
+        </select>
+      </section>
+
+      <!-- Section 3: Candidate Profile & Structured Context Cards -->
+      <section class="glass-neo-stitch p-6 space-y-6">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+          <h2 class="text-lg font-semibold text-white flex items-center gap-2 font-display">
+            <span class="material-symbols-outlined text-primary">person</span>
+            3. Candidate Context & Interactive Cards
+          </h2>
+          <button id="toggleProfileEditBtn" type="button"
+            class="bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-mono text-primary flex items-center gap-1.5 transition-colors">
+            <span class="material-symbols-outlined text-sm">edit_note</span>
+            <span id="toggleProfileEditLabel">Toggle Edit Form</span>
+          </button>
+        </div>
+
+        <!-- Basic Contact Information -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
+          <div>
+            <label class="block uppercase tracking-wider text-text-secondary mb-1">Full Name *</label>
+            <input id="candidateName" required type="text" placeholder="e.g. Candidate Name"
+              class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary transition-colors" />
+          </div>
+          <div>
+            <label class="block uppercase tracking-wider text-text-secondary mb-1">Email Address *</label>
+            <input id="candidateEmail" required type="email" placeholder="e.g. user@domain.com"
+              class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary transition-colors" />
+          </div>
+          <div>
+            <label class="block uppercase tracking-wider text-text-secondary mb-1">Phone / Contact Details</label>
+            <input id="candidatePhone" type="text" placeholder="e.g. +1 (555) 019-2834"
+              class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary transition-colors" />
+          </div>
+        </div>
+
+        <!-- Interactive Skills Tags Component -->
+        <div class="space-y-2 font-mono text-xs">
+          <label class="block uppercase tracking-wider text-text-secondary">Skills & Technologies (Tag Pills)</label>
+          <div class="p-3 rounded-xl bg-[#1c1b1c] border border-white/10 space-y-3">
+            <div id="skillsTagsContainer" class="flex flex-wrap gap-2 min-h-[28px]">
+              <span class="text-xs text-text-supporting italic">No skills added yet. Type below or parse a
+                resume.</span>
+            </div>
+            <div class="flex items-center gap-2 pt-2 border-t border-white/10">
+              <input id="newSkillInput" type="text"
+                placeholder="Add skill and press Enter or comma (e.g. Python, Docker)..."
+                class="flex-grow bg-[#131314] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-primary" />
+              <button id="addSkillBtn" type="button"
+                class="bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">Add
+                Tag</button>
+            </div>
+          </div>
+          <input id="candidateSkills" type="hidden" />
+        </div>
+
+        <!-- Work Experience Company Cards -->
+        <div class="space-y-3 font-mono text-xs">
+          <div class="flex items-center justify-between">
+            <label class="block uppercase tracking-wider text-text-secondary">Work Experience & Company Cards</label>
+            <span class="text-[10px] text-text-supporting">Parsed by Company & Period</span>
+          </div>
+          <div id="workExperienceCardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="col-span-full p-4 rounded-xl bg-white/5 border border-white/5 text-text-supporting text-xs">
+              No work experience added yet. Type in the edit box below or upload a resume to generate cards.
+            </div>
+          </div>
+          <div id="workExperienceEditArea" class="space-y-1">
+            <textarea id="candidateExperience" rows="3"
+              placeholder="<<<KEIKO_SECTION_START:EXPERIENCE>>>&#10;&#10;Senior Software Engineer at Tech Corp (2022-Present)&#10;- Lead API & Infrastructure engineering team...&#10;&#10;<<<KEIKO_SECTION_END:EXPERIENCE>>>"
+              class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-y transition-colors"></textarea>
+            <p class="text-[10px] text-text-supporting font-mono">Tip: Press <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-primary border border-white/10 font-bold">Ctrl</kbd> + <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-primary border border-white/10 font-bold">Enter</kbd> to separate into a new card.</p>
+          </div>
+        </div>
+
+        <!-- Education Institution Cards -->
+        <div class="space-y-3 font-mono text-xs">
+          <div class="flex items-center justify-between">
+            <label class="block uppercase tracking-wider text-text-secondary">Education & Institution Cards</label>
+            <span class="text-[10px] text-text-supporting">Parsed by Degree & Institution</span>
+          </div>
+          <div id="educationCardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="col-span-full p-4 rounded-xl bg-white/5 border border-white/5 text-text-supporting text-xs">
+              No education history added yet. Type in the edit box below or upload a resume to generate cards.
+            </div>
+          </div>
+          <div id="educationEditArea" class="space-y-1">
+            <textarea id="candidateEducation" rows="2"
+              placeholder="<<<KEIKO_SECTION_START:EDUCATION>>>&#10;&#10;B.S. in Computer Science, Stanford University (2018-2022)&#10;&#10;<<<KEIKO_SECTION_END:EDUCATION>>>"
+              class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-y transition-colors"></textarea>
+            <p class="text-[10px] text-text-supporting font-mono">Tip: Press <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-primary border border-white/10 font-bold">Ctrl</kbd> + <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-primary border border-white/10 font-bold">Enter</kbd> to separate into a new card.</p>
+          </div>
+        </div>
+
+        <!-- Achievements & Projects Cards -->
+        <div class="space-y-3 font-mono text-xs">
+          <div class="flex items-center justify-between">
+            <label class="block uppercase tracking-wider text-text-secondary">Achievements & Project Cards</label>
+            <span class="text-[10px] text-text-supporting">Parsed by Project Title</span>
+          </div>
+          <div id="achievementsCardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="col-span-full p-4 rounded-xl bg-white/5 border border-white/5 text-text-supporting text-xs">
+              No projects or achievements added yet. Type in the edit box below or upload a resume to generate cards.
+            </div>
+          </div>
+          <div id="achievementsEditArea" class="space-y-1">
+            <textarea id="candidateAchievements" rows="2"
+              placeholder="<<<KEIKO_SECTION_START:PROJECTS>>>&#10;&#10;High-Frequency Engine: Built C++ trading engine with <1ms latency&#10;&#10;<<<KEIKO_SECTION_END:PROJECTS>>>"
+              class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-y transition-colors"></textarea>
+            <p class="text-[10px] text-text-supporting font-mono">Tip: Press <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-primary border border-white/10 font-bold">Ctrl</kbd> + <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-primary border border-white/10 font-bold">Enter</kbd> to separate into a new card.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Target Job Description -->
       <section class="glass-neo-stitch p-6 space-y-4">
         <h2 class="text-lg font-semibold text-white flex items-center gap-2 font-display">
           <span class="material-symbols-outlined text-primary">work</span>
-          2. Role & Job Description
+          4. Target Job Description
         </h2>
         <div class="space-y-4">
           <div>
-            <label class="block text-xs font-mono uppercase tracking-wider text-text-secondary mb-1">Target Role</label>
-            <select id="targetRole" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary">
-              <option value="JavaScript Developer" selected>JavaScript Developer</option>
-              <option value="Python Backend Engineer">Python Backend Engineer</option>
-              <option value="Full Stack Developer">Full Stack Developer</option>
-              <option value="AI/ML Engineer">AI/ML Engineer</option>
-              <option value="DevOps Engineer">DevOps Engineer</option>
-              <option value="Custom Role">Custom / Other</option>
-            </select>
+            <label class="block text-xs font-mono uppercase tracking-wider text-text-secondary mb-1">Target Position /
+              Role Title</label>
+            <input id="targetRole" type="text" placeholder="e.g. Senior Full Stack Engineer"
+              class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary transition-colors" />
           </div>
           <div>
-            <label class="block text-xs font-mono uppercase tracking-wider text-text-secondary mb-1">Job Description Requirements</label>
-            <textarea id="jdText" rows="4" placeholder="Paste target position requirements, tech stack, and key qualifications..." class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary resize-none"></textarea>
+            <label class="block text-xs font-mono uppercase tracking-wider text-text-secondary mb-1">Full Job
+              Description Requirements</label>
+            <textarea id="jdText" rows="5"
+              placeholder="Paste the complete job description, required technical stack, responsibilities, and qualifications here..."
+              class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary resize-none font-mono text-xs leading-relaxed"></textarea>
           </div>
         </div>
       </section>
 
-      <!-- 3. Resume Upload -->
-      <section class="glass-neo-stitch p-6 space-y-4">
-        <h2 class="text-lg font-semibold text-white flex items-center gap-2 font-display">
-          <span class="material-symbols-outlined text-primary">description</span>
-          3. Resume Upload
-        </h2>
-        <div id="resumeDropzone" class="border-2 border-dashed border-white/20 hover:border-primary rounded-xl p-6 text-center cursor-pointer transition-colors bg-[#1c1b1c]/50">
-          <span class="material-symbols-outlined text-3xl text-gray-400 mb-2">cloud_upload</span>
-          <p class="text-sm text-gray-300 font-medium">Drag & drop candidate resume file here, or click to browse</p>
-          <p class="text-xs text-gray-500 mt-1">Supports PDF, DOCX, TXT</p>
-          <input id="resumeFile" type="file" accept=".pdf,.docx,.txt" class="hidden"/>
-          <p id="resumeFileName" class="text-xs text-tertiary mt-2 font-mono hidden"></p>
-        </div>
-      </section>
-
-      <!-- 4. 9 Sensor Telemetry Weight Matrix -->
+      <!-- Section 5: Interview Configuration (Type, Role/Domain, Question Count & Difficulty) -->
       <section class="glass-neo-stitch p-6 space-y-6">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
           <h2 class="text-lg font-semibold text-white flex items-center gap-2 font-display">
             <span class="material-symbols-outlined text-primary">tune</span>
-            4. Telemetry Sensor Weights (9 Sensors)
+            5. Interview Configuration Parameters
           </h2>
-          <span id="totalWeightBadge" class="text-xs font-mono bg-[#7c3aed]/20 text-primary px-3 py-1 rounded-full border border-[#7c3aed]/30 font-semibold">Sum: 100%</span>
+          <span class="text-xs font-mono text-tertiary bg-tertiary/10 px-2.5 py-1 rounded border border-tertiary/20 font-semibold">Active Session Config</span>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Posture -->
-          <div>
-            <div class="flex justify-between text-xs font-mono mb-1">
-              <span class="text-gray-300">Posture</span>
-              <span id="postureVal" class="text-primary font-semibold">15%</span>
-            </div>
-            <input id="w_posture" type="range" min="0" max="100" value="15" class="w-full accent-[#7c3aed] cursor-pointer"/>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-mono text-xs">
+          <!-- Interview Type Selector -->
+          <div class="space-y-2">
+            <label for="interviewType" class="block uppercase tracking-wider text-text-secondary font-semibold">Interview Type *</label>
+            <select id="interviewType" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-primary transition-colors">
+              <option value="Tech" selected>Tech (Technical Architecture & Coding)</option>
+              <option value="HR">HR (Behavioral & Cultural Alignment)</option>
+              <option value="Situational">Situational (Problem Solving & Case Study)</option>
+            </select>
           </div>
 
-          <!-- Eye Contact -->
-          <div>
-            <div class="flex justify-between text-xs font-mono mb-1">
-              <span class="text-gray-300">Eye Contact</span>
-              <span id="eyeVal" class="text-primary font-semibold">15%</span>
-            </div>
-            <input id="w_eye_contact" type="range" min="0" max="100" value="15" class="w-full accent-[#7c3aed] cursor-pointer"/>
+          <!-- Role / Domain Input -->
+          <div class="space-y-2">
+            <label for="roleDomain" class="block uppercase tracking-wider text-text-secondary font-semibold">Role / Domain *</label>
+            <input id="roleDomain" type="text" placeholder="e.g. Senior Backend Engineer" value="Software Engineer"
+              class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-primary transition-colors" />
           </div>
 
-          <!-- Body Language -->
-          <div>
-            <div class="flex justify-between text-xs font-mono mb-1">
-              <span class="text-gray-300">Body Language</span>
-              <span id="bodyVal" class="text-primary font-semibold">15%</span>
+          <!-- Question Count Selection & Custom Input -->
+          <div class="space-y-2 md:col-span-2">
+            <label class="block uppercase tracking-wider text-text-secondary font-semibold">Question Count *</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <label class="cursor-pointer">
+                <input type="radio" name="questionCountOption" value="5" class="sr-only peer" />
+                <div class="p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-center peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary transition-all font-bold">
+                  5 Questions
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="questionCountOption" value="10" checked class="sr-only peer" />
+                <div class="p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-center peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary transition-all font-bold">
+                  10 Questions
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="questionCountOption" value="15" class="sr-only peer" />
+                <div class="p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-center peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary transition-all font-bold">
+                  15 Questions
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" name="questionCountOption" value="custom" class="sr-only peer" />
+                <div class="p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-center peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary transition-all font-bold">
+                  Custom Count
+                </div>
+              </label>
             </div>
-            <input id="w_body_language" type="range" min="0" max="100" value="15" class="w-full accent-[#7c3aed] cursor-pointer"/>
+
+            <!-- Custom Question Count Numerical Input Field -->
+            <div class="pt-2">
+              <label for="customQuestionCount" class="block text-[11px] text-text-secondary mb-1">Custom Question Count (Enabled when "Custom Count" is selected)</label>
+              <input id="customQuestionCount" type="number" min="1" max="50" placeholder="Enter custom count (e.g. 8)" disabled
+                class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed" />
+            </div>
           </div>
 
-          <!-- Attire -->
-          <div>
-            <div class="flex justify-between text-xs font-mono mb-1">
-              <span class="text-gray-300">Attire</span>
-              <span id="attireVal" class="text-primary font-semibold">10%</span>
-            </div>
-            <input id="w_attire" type="range" min="0" max="100" value="10" class="w-full accent-[#7c3aed] cursor-pointer"/>
-          </div>
-
-          <!-- Confidence -->
-          <div>
-            <div class="flex justify-between text-xs font-mono mb-1">
-              <span class="text-gray-300">Confidence</span>
-              <span id="confidenceVal" class="text-primary font-semibold">10%</span>
-            </div>
-            <input id="w_confidence" type="range" min="0" max="100" value="10" class="w-full accent-[#7c3aed] cursor-pointer"/>
-          </div>
-
-          <!-- Facial Expression -->
-          <div>
-            <div class="flex justify-between text-xs font-mono mb-1">
-              <span class="text-gray-300">Facial Expression</span>
-              <span id="facialVal" class="text-primary font-semibold">10%</span>
-            </div>
-            <input id="w_facial_expression" type="range" min="0" max="100" value="10" class="w-full accent-[#7c3aed] cursor-pointer"/>
-          </div>
-
-          <!-- Voice -->
-          <div>
-            <div class="flex justify-between text-xs font-mono mb-1">
-              <span class="text-gray-300">Voice Dynamics</span>
-              <span id="voiceVal" class="text-primary font-semibold">15%</span>
-            </div>
-            <input id="w_voice" type="range" min="0" max="100" value="15" class="w-full accent-[#7c3aed] cursor-pointer"/>
-          </div>
-
-          <!-- Engagement -->
-          <div>
-            <div class="flex justify-between text-xs font-mono mb-1">
-              <span class="text-gray-300">Engagement</span>
-              <span id="engagementVal" class="text-primary font-semibold">5%</span>
-            </div>
-            <input id="w_engagement" type="range" min="0" max="100" value="5" class="w-full accent-[#7c3aed] cursor-pointer"/>
-          </div>
-
-          <!-- Professional Presence -->
-          <div>
-            <div class="flex justify-between text-xs font-mono mb-1">
-              <span class="text-gray-300">Prof. Presence</span>
-              <span id="presenceVal" class="text-primary font-semibold">5%</span>
-            </div>
-            <input id="w_professional_presence" type="range" min="0" max="100" value="5" class="w-full accent-[#7c3aed] cursor-pointer"/>
+          <!-- Difficulty Mode Selector -->
+          <div class="space-y-2 md:col-span-2">
+            <label for="difficultyMode" class="block uppercase tracking-wider text-text-secondary font-semibold">Difficulty Level *</label>
+            <select id="difficultyMode" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-primary transition-colors">
+              <option value="Adaptive" selected>Adaptive (Dynamic Difficulty Scaling)</option>
+              <option value="Beginner">Beginner (Foundational)</option>
+              <option value="Intermediate">Intermediate (Mid-Level)</option>
+              <option value="Advanced">Advanced (Senior / Architect)</option>
+            </select>
           </div>
         </div>
       </section>
 
-      <!-- Action Bar -->
-      <div class="flex items-center justify-end gap-4 pt-4">
-        <a href="dashboard.html" class="px-6 py-3 rounded-xl border border-white/10 text-sm text-gray-300 hover:bg-white/5 transition-colors">Cancel</a>
-        <button id="submitBtn" type="submit" class="bg-accent-gradient text-white px-8 py-3 rounded-xl font-medium text-sm flex items-center gap-2 hover:shadow-[0_0_25px_rgba(124,58,237,0.4)] transition-all">
-          <span>Start Interview</span>
+      <!-- Action Bar: Guest vs Save & Start -->
+      <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-white/10">
+        <a href="dashboard.html"
+          class="px-5 py-3 rounded-xl border border-white/10 text-sm text-gray-300 hover:bg-white/5 transition-colors">Cancel</a>
+
+        <button id="startGuestBtn" type="button"
+          class="px-5 py-3 rounded-xl border border-tertiary/40 text-tertiary hover:bg-tertiary/10 font-semibold text-sm flex items-center gap-2 transition-all">
+          <span class="material-symbols-outlined text-base">person_off</span>
+          <span>Start Interview (Guest Session)</span>
+        </button>
+
+        <button id="saveAndStartBtn" type="button"
+          class="bg-accent-gradient text-white px-7 py-3 rounded-xl font-bold text-sm flex items-center gap-2 hover:shadow-[0_0_25px_rgba(124,58,237,0.45)] transition-all hover:scale-105">
+          <span class="material-symbols-outlined text-base">save</span>
+          <span>Save Profile & Start Interview</span>
           <span class="material-symbols-outlined text-sm">arrow_forward</span>
         </button>
       </div>
     </form>
   </main>
-
   <!-- Form Submission & Weight Handling JS Script -->
   <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // 9 Telemetry Sensors mapping
-    const sensors = [
-      { id: 'w_posture', display: 'postureVal' },
-      { id: 'w_eye_contact', display: 'eyeVal' },
-      { id: 'w_body_language', display: 'bodyVal' },
-      { id: 'w_attire', display: 'attireVal' },
-      { id: 'w_confidence', display: 'confidenceVal' },
-      { id: 'w_facial_expression', display: 'facialVal' },
-      { id: 'w_voice', display: 'voiceVal' },
-      { id: 'w_engagement', display: 'engagementVal' },
-      { id: 'w_professional_presence', display: 'presenceVal' }
-    ];
+    function initSetupSession() {
+      // 9 Telemetry Sensors mapping
+      const sensors = [
+        { id: 'w_posture', display: 'postureVal' },
+        { id: 'w_eye_contact', display: 'eyeVal' },
+        { id: 'w_body_language', display: 'bodyVal' },
+        { id: 'w_attire', display: 'attireVal' },
+        { id: 'w_confidence', display: 'confidenceVal' },
+        { id: 'w_facial_expression', display: 'facialVal' },
+        { id: 'w_voice', display: 'voiceVal' },
+        { id: 'w_engagement', display: 'engagementVal' },
+        { id: 'w_professional_presence', display: 'presenceVal' }
+      ];
 
-    function updateSum() {
-      let total = 0;
+      function updateSum() {
+        let total = 0;
+        sensors.forEach(s => {
+          const el = document.getElementById(s.id);
+          const disp = document.getElementById(s.display);
+          if (el && disp) {
+            const val = parseInt(el.value, 10) || 0;
+            disp.textContent = val + '%';
+            total += val;
+          }
+        });
+        const badge = document.getElementById('totalWeightBadge');
+        if (badge) badge.textContent = `Sum: ${total}%`;
+      }
+
       sensors.forEach(s => {
         const el = document.getElementById(s.id);
-        const val = parseInt(el.value, 10) || 0;
-        document.getElementById(s.display).textContent = val + '%';
-        total += val;
+        if (el) el.addEventListener('input', updateSum);
       });
-      document.getElementById('totalWeightBadge').textContent = `Sum: ${total}%`;
-    }
 
-    sensors.forEach(s => {
-      document.getElementById(s.id).addEventListener('input', updateSum);
-    });
+      // Insane Mode & Custom Question Count Toggle Handlers
+      const insaneToggle = document.getElementById('insaneModeToggle');
+      const qCountContainer = document.getElementById('questionCountContainer');
+      const lengthRadios = document.querySelectorAll('input[name="lengthPreset"]');
+      const customBox = document.getElementById('customCountBox');
 
-    // Drag and drop resume handling
-    const dropzone = document.getElementById('resumeDropzone');
-    const fileInput = document.getElementById('resumeFile');
-    const fileNameDisplay = document.getElementById('resumeFileName');
-
-    dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('border-primary'); });
-    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('border-primary'));
-    dropzone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropzone.classList.remove('border-primary');
-      if (e.dataTransfer.files.length > 0) {
-        fileInput.files = e.dataTransfer.files;
-        fileNameDisplay.textContent = 'Selected: ' + e.dataTransfer.files[0].name;
-        fileNameDisplay.classList.remove('hidden');
-      }
-    });
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files.length > 0) {
-        fileNameDisplay.textContent = 'Selected: ' + fileInput.files[0].name;
-        fileNameDisplay.classList.remove('hidden');
-      }
-    });
-
-    // Form Submission Logic
-    const form = document.getElementById('setupForm');
-    const submitBtn = document.getElementById('submitBtn');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<span>Initializing Session...</span>`;
-
-      try {
-        // Step 1: Start Session
-        const startRes = await fetch('/api/v1/interview/start', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            interview_type: 'Tech',
-            difficulty_mode: 'Adaptive',
-            duration_type: 'questions',
-            duration_value: 5
-          })
+      if (insaneToggle && qCountContainer) {
+        insaneToggle.addEventListener('change', () => {
+          if (insaneToggle.checked) {
+            qCountContainer.classList.add('hidden');
+          } else {
+            qCountContainer.classList.remove('hidden');
+          }
         });
-        
-        if (!startRes.ok) {
-          throw new Error(`Failed to start session (HTTP ${startRes.status})`);
+      }
+
+      if (lengthRadios && customBox) {
+        lengthRadios.forEach(radio => {
+          radio.addEventListener('change', () => {
+            if (radio.value === 'custom' && radio.checked) {
+              customBox.classList.remove('hidden');
+            } else {
+              customBox.classList.add('hidden');
+            }
+          });
+        });
+      }
+
+      // Elements
+      const nameInput = document.getElementById('candidateName');
+      const emailInput = document.getElementById('candidateEmail');
+      const phoneInput = document.getElementById('candidatePhone');
+      const skillsInput = document.getElementById('candidateSkills');
+      const expInput = document.getElementById('candidateExperience');
+      const eduInput = document.getElementById('candidateEducation');
+      const achInput = document.getElementById('candidateAchievements');
+      const savedProfileSelect = document.getElementById('savedProfileSelect');
+      const savedProfilesGrid = document.getElementById('savedProfilesGrid');
+
+      function getSavedProfiles() {
+        try {
+          const stored = JSON.parse(localStorage.getItem('keiko_saved_profiles') || '{}');
+          return stored;
+        } catch (e) {
+          return {};
         }
+      }
 
-        const startData = await startRes.json();
-        const sessionId = startData.session_id;
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
 
-        if (!sessionId) throw new Error("Failed to obtain session_id from backend response.");
+      // ── Rich Saved Profiles Grid Selector ─────────────────────
+      function renderSavedProfilesGrid() {
+        const profiles = getSavedProfiles();
+        const keys = Object.keys(profiles);
+        const activeName = localStorage.getItem('keiko_last_user_name') || '';
 
-        // Step 2: Upload Job Description & Candidate Metadata
-        const targetRole = document.getElementById('targetRole').value;
-        const jdText = document.getElementById('jdText').value.trim();
-        const candName = document.getElementById('candidateName').value.trim();
-        const candEmail = document.getElementById('candidateEmail').value.trim();
-
-        const combinedJd = `Candidate Name: ${candName}\nCandidate Email: ${candEmail}\nTarget Role: ${targetRole}\n\nJob Description:\n${jdText}`;
-
-        const jdFormData = new FormData();
-        jdFormData.append('jd_text', combinedJd);
-        await fetch(`/api/v1/interview/upload/jd/${sessionId}`, {
-          method: 'POST',
-          body: jdFormData
-        });
-
-        // Step 3: Upload Resume if selected
-        if (fileInput.files.length > 0) {
-          const formData = new FormData();
-          formData.append('file', fileInput.files[0]);
-          await fetch(`/api/v1/interview/upload/resume/${sessionId}`, {
-            method: 'POST',
-            body: formData
+        if (savedProfileSelect) {
+          savedProfileSelect.innerHTML = '<option value="">-- Create New Candidate Profile --</option>';
+          keys.forEach(k => {
+            const opt = document.createElement('option');
+            opt.value = k;
+            opt.textContent = k;
+            savedProfileSelect.appendChild(opt);
           });
         }
 
-        // Step 4: Save 9 Telemetry Sensor Weights
-        const weights = {
-          posture: parseFloat(document.getElementById('w_posture').value) / 100,
-          eye_contact: parseFloat(document.getElementById('w_eye_contact').value) / 100,
-          body_language: parseFloat(document.getElementById('w_body_language').value) / 100,
-          attire: parseFloat(document.getElementById('w_attire').value) / 100,
-          confidence: parseFloat(document.getElementById('w_confidence').value) / 100,
-          facial_expression: parseFloat(document.getElementById('w_facial_expression').value) / 100,
-          voice: parseFloat(document.getElementById('w_voice').value) / 100,
-          engagement: parseFloat(document.getElementById('w_engagement').value) / 100,
-          professional_presence: parseFloat(document.getElementById('w_professional_presence').value) / 100
-        };
+        if (!savedProfilesGrid) return;
+        savedProfilesGrid.innerHTML = '';
 
-        await fetch(`/api/v1/interview/config/weights/${sessionId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(weights)
+        // Option 0: Create New Candidate Profile Card
+        const isNewActive = !activeName || !profiles[activeName];
+        const newCard = document.createElement('div');
+        newCard.className = `p-4 rounded-xl border ${isNewActive ? 'border-tertiary/80 bg-tertiary/10 shadow-[0_0_20px_rgba(113,248,228,0.15)]' : 'border-dashed border-white/20 hover:border-white/40 bg-white/5'} transition-all space-y-2 cursor-pointer setup-prof-card`;
+        newCard.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 truncate">
+              <span class="material-symbols-outlined text-base ${isNewActive ? 'text-tertiary' : 'text-gray-400'}">person_add</span>
+              <span class="font-bold text-white text-xs truncate">New Candidate Profile</span>
+            </div>
+            <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded ${isNewActive ? 'bg-tertiary/20 text-tertiary border border-tertiary/30' : 'bg-white/10 text-gray-400'}">
+              ${isNewActive ? 'Active' : 'Select'}
+            </span>
+          </div>
+          <div class="text-[11px] text-text-supporting font-mono truncate">
+            Click to clear form & start fresh
+          </div>
+          <div class="text-[10px] font-mono text-gray-500 pt-1 border-t border-white/5">
+            Manual Entry or Resume Parsing
+          </div>`;
+
+        newCard.addEventListener('click', () => {
+          localStorage.removeItem('keiko_last_user_name');
+          if (savedProfileSelect) savedProfileSelect.value = '';
+          populateFormFields({});
+          renderSavedProfilesGrid();
         });
 
-        // Step 5: Redirect to Interview Chamber with session_id query parameter
-        window.location.href = `interview.html?session_id=${encodeURIComponent(sessionId)}`;
+        savedProfilesGrid.appendChild(newCard);
 
-      } catch (err) {
-        console.error("Session setup error:", err);
-        alert("Error initializing interview session: " + err.message);
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `<span>Start Interview</span><span class="material-symbols-outlined text-sm">arrow_forward</span>`;
+        keys.forEach(pName => {
+          const prof = profiles[pName];
+          const isActive = (activeName === (prof.name || pName));
+          const skillCount = prof.skills ? prof.skills.split(',').length : 0;
+
+          const card = document.createElement('div');
+          card.className = `p-4 rounded-xl bg-white/5 border ${isActive ? 'border-primary/80 bg-primary/10 shadow-[0_0_20px_rgba(210,187,255,0.15)]' : 'border-white/10 hover:border-white/20'} transition-all space-y-2 cursor-pointer setup-prof-card`;
+          card.dataset.key = pName;
+
+          card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2 truncate">
+              <span class="material-symbols-outlined text-base ${isActive ? 'text-tertiary' : 'text-primary'}">account_circle</span>
+              <span class="font-bold text-white text-xs truncate">${escapeHtml(prof.name || pName)}</span>
+            </div>
+            <span class="font-mono text-[10px] font-bold px-2 py-0.5 rounded ${isActive ? 'bg-tertiary/20 text-tertiary border border-tertiary/30' : 'bg-white/10 text-gray-400'}">
+              ${isActive ? 'Active' : 'Select'}
+            </span>
+          </div>
+          <div class="text-[11px] text-text-supporting font-mono truncate">
+            ${escapeHtml(prof.email || 'No email')}
+          </div>
+          <div class="flex items-center justify-between text-[10px] font-mono text-gray-400 pt-1 border-t border-white/5">
+            <span>${escapeHtml(prof.phone || 'No phone')}</span>
+            <span class="text-tertiary font-bold">${skillCount} Skills</span>
+          </div>`;
+
+          card.addEventListener('click', () => {
+            localStorage.setItem('keiko_last_user_name', prof.name || pName);
+            if (prof.email) localStorage.setItem('keiko_last_user_email', prof.email);
+            if (savedProfileSelect) savedProfileSelect.value = pName;
+            populateFormFields(prof);
+            renderSavedProfilesGrid();
+          });
+
+          savedProfilesGrid.appendChild(card);
+        });
+
+        // ── Toggle Action Buttons state based on Active Profile ──
+        const startGuestBtn = document.getElementById('startGuestBtn');
+        const saveAndStartBtn = document.getElementById('saveAndStartBtn');
+        
+        if (isNewActive) {
+          if (startGuestBtn) {
+            startGuestBtn.classList.remove('hidden');
+            startGuestBtn.innerHTML = `<span class="material-symbols-outlined text-base">person_off</span><span>Start Interview (Guest)</span>`;
+          }
+          if (saveAndStartBtn) {
+            saveAndStartBtn.innerHTML = `<span class="material-symbols-outlined text-base">save</span><span>Start Interview & Save Profile</span><span class="material-symbols-outlined text-sm">arrow_forward</span>`;
+          }
+        } else {
+          if (startGuestBtn) {
+            startGuestBtn.classList.add('hidden');
+          }
+          if (saveAndStartBtn) {
+            saveAndStartBtn.innerHTML = `<span class="material-symbols-outlined text-base">play_arrow</span><span>Start Interview</span><span class="material-symbols-outlined text-sm">arrow_forward</span>`;
+          }
+        }
       }
-    });
-  });
+
+      // ── Interactive Skills Tags Manager ───────────────────────
+      let activeSkills = [];
+
+      function renderSkillsTags() {
+        const container = document.getElementById('skillsTagsContainer');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (activeSkills.length === 0) {
+          container.innerHTML = `<span class="text-xs text-text-supporting italic">No skills added yet. Type below or parse a resume.</span>`;
+          return;
+        }
+
+        activeSkills.forEach((sk, idx) => {
+          const tag = document.createElement('span');
+          tag.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-purple-500/20 text-primary border border-purple-500/30 font-mono text-xs shadow-sm';
+          tag.innerHTML = `
+          <span>${escapeHtml(sk)}</span>
+          <button type="button" class="hover:text-red-400 font-bold ml-1 transition-colors" data-idx="${idx}">&times;</button>
+        `;
+          tag.querySelector('button').addEventListener('click', () => {
+            activeSkills.splice(idx, 1);
+            renderSkillsTags();
+            syncSkillsInput();
+          });
+          container.appendChild(tag);
+        });
+      }
+
+      function setSkillsFromText(text) {
+        if (!text) { activeSkills = []; }
+        else {
+          activeSkills = text.split(/[,;\n]+/).map(s => s.trim()).filter(s => s.length > 0);
+        }
+        renderSkillsTags();
+        syncSkillsInput();
+      }
+
+      function syncSkillsInput() {
+        if (skillsInput) skillsInput.value = activeSkills.join(', ');
+      }
+
+      const newSkillInput = document.getElementById('newSkillInput');
+      const addSkillBtn = document.getElementById('addSkillBtn');
+
+      function handleAddSkill() {
+        if (!newSkillInput) return;
+        const val = newSkillInput.value.trim();
+        if (!val) return;
+        const newItems = val.split(/[,;\n]+/).map(s => s.trim()).filter(s => s.length > 0);
+        newItems.forEach(item => {
+          if (!activeSkills.includes(item)) activeSkills.push(item);
+        });
+        newSkillInput.value = '';
+        renderSkillsTags();
+        syncSkillsInput();
+      }
+
+      if (addSkillBtn) addSkillBtn.addEventListener('click', handleAddSkill);
+      if (newSkillInput) {
+        newSkillInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            handleAddSkill();
+          }
+        });
+      }
+
+      // ── Shared Discrete Block Splitter Helper ─────────────────
+      function splitTextIntoDiscreteBlocks(text) {
+        if (!text) return [];
+
+        // Strip section start/end tags if present
+        let cleanText = text.replace(/<<<KEIKO_SECTION_START:[^>]+>>>/gi, '').replace(/<<<KEIKO_SECTION_END:[^>]+>>>/gi, '').trim();
+        if (!cleanText) return [];
+
+        // Stage 1: Primary split on explicit delimiter if present
+        if (cleanText.includes('<<<KEIKO_ITEM_BREAK>>>')) {
+          return cleanText.split(/<<<KEIKO_ITEM_BREAK>>>/i).map(b => b.trim()).filter(b => b.length > 0);
+        }
+
+        const finalBlocks = [];
+
+        // Stage 2: Fallback structural parsing if no explicit delimiter present
+        const rawParagraphs = cleanText.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+
+        rawParagraphs.forEach(para => {
+          const lines = para.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+          if (lines.length === 0) return;
+
+          let currentBlock = [];
+
+          lines.forEach((line) => {
+            let isNewEntryHeader = false;
+
+            if (currentBlock.length > 0) {
+              const colonMatch = line.match(/^([^:\n]+):\s+(.*)$/);
+              if (colonMatch && colonMatch[1].length <= 65 && !line.match(/^[-•*–—]\s+/)) {
+                isNewEntryHeader = true;
+              } else if (line.match(/\b(20\d{2}|19\d{2})\s*[-–—]\s*(Present|Current|20\d{2}|19\d{2})\b/i)) {
+                isNewEntryHeader = true;
+              } else if (line.match(/\b(?:at|@|\|)\b/i) || line.match(/^[A-Z][A-Za-z0-9\s,\-\.]{3,50}\s*[-–—]\s*[A-Z][A-Za-z0-9\s,\-\.]{3,50}/)) {
+                if (!line.match(/^[-•*–—]\s+/)) {
+                  isNewEntryHeader = true;
+                }
+              } else if (line.match(/^(?:\d+[\.\)]|\[\d+\]|Item\s+\d+|Project\s+\d+)\s+/i)) {
+                isNewEntryHeader = true;
+              }
+            }
+
+            if (isNewEntryHeader && currentBlock.length > 0) {
+              finalBlocks.push(currentBlock.join('\n'));
+              currentBlock = [line];
+            } else {
+              currentBlock.push(line);
+            }
+          });
+
+          if (currentBlock.length > 0) {
+            finalBlocks.push(currentBlock.join('\n'));
+          }
+        });
+
+        return finalBlocks;
+      }
+
+      // Helper to handle card expand/collapse toggle click
+      function attachCardExpandListener(card) {
+        card.addEventListener('click', (e) => {
+          if (window.getSelection().toString().length > 0) return;
+
+          const details = card.querySelector('.card-details');
+          const chevron = card.querySelector('.card-chevron');
+          const isExpanded = card.getAttribute('data-expanded') === 'true';
+
+          if (isExpanded) {
+            card.setAttribute('data-expanded', 'false');
+            if (details) {
+              details.style.maxHeight = '0px';
+              details.style.opacity = '0';
+              details.style.marginTop = '0px';
+            }
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+          } else {
+            card.setAttribute('data-expanded', 'true');
+            if (details) {
+              details.style.maxHeight = '300px';
+              details.style.opacity = '1';
+              details.style.marginTop = '0.5rem';
+            }
+            if (chevron) chevron.style.transform = 'rotate(180deg)';
+          }
+        });
+      }
+
+      // ── Structured Cards Renderers (Experience, Education, Projects/Achievements) ─────
+      function parseWorkHeader(headerLine) {
+        const dateMatch = headerLine.match(/\b(20\d{2}|19\d{2}|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b.*?\b(Present|Current|20\d{2}|19\d{2})\b/i) || headerLine.match(/\b(20\d{2}|19\d{2})\b/);
+        const period = dateMatch ? dateMatch[0] : 'Date Range N/A';
+        let cleanHdr = dateMatch ? headerLine.replace(dateMatch[0], '').replace(/[()]/g, '').trim() : headerLine;
+        cleanHdr = cleanHdr.replace(/^[-•*–—\s]+|[-•*–—\s]+$/g, '').trim();
+
+        let role = cleanHdr;
+        let company = "Company / Organization";
+
+        const atMatch = cleanHdr.match(/^(.*?)\s+(?:at|@|\|)\s+(.*)$/i);
+        if (atMatch) {
+          role = atMatch[1].trim();
+          company = atMatch[2].trim();
+        } else {
+          const hyphenSplitRegex = /\s+-\s+/g;
+          let match;
+          let splitIdx = -1;
+          const TECH_TERMS = new Set(["AI", "ML", "UI", "UX", "API", "QA", "IT", "SRE", "DEVOPS", "CLOUD", "FULL-STACK", "FRONTEND", "BACKEND", "IOS", "ANDROID"]);
+
+          while ((match = hyphenSplitRegex.exec(cleanHdr)) !== null) {
+            const rightPart = cleanHdr.substring(match.index + match[0].length).trim();
+            const firstWord = rightPart.split(/\s+/)[0];
+            const cleanWord = firstWord.replace(/[^a-zA-Z]/g, '');
+            const isUpper = cleanWord.length > 0 && cleanWord[0] === cleanWord[0].toUpperCase() && cleanWord[0] !== cleanWord[0].toLowerCase();
+            const isTechTerm = TECH_TERMS.has(cleanWord.toUpperCase());
+
+            if (isUpper && !isTechTerm) {
+              splitIdx = match.index;
+              break;
+            }
+          }
+
+          if (splitIdx !== -1) {
+            role = cleanHdr.substring(0, splitIdx).trim();
+            company = cleanHdr.substring(splitIdx + 3).trim();
+          }
+        }
+
+        if (!role) role = headerLine;
+        return { role, company, period };
+      }
+
+      function renderWorkExperienceCards() {
+        const container = document.getElementById('workExperienceCardsContainer');
+        if (!container) return;
+        const text = expInput ? expInput.value.trim() : '';
+
+        if (!text) {
+          container.innerHTML = `<div class="col-span-full p-4 rounded-xl bg-white/5 border border-white/5 text-text-supporting text-xs font-mono">No work experience added yet. Upload a resume or type in edit form.</div>`;
+          return;
+        }
+
+        const rawBlocks = splitTextIntoDiscreteBlocks(text);
+        container.innerHTML = '';
+
+        rawBlocks.forEach((blockText) => {
+          const lines = blockText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+          if (lines.length === 0) return;
+
+          const headerLine = lines[0];
+          const bulletLines = lines.slice(1);
+
+          const { role, company, period } = parseWorkHeader(headerLine);
+
+          let bulletsHtml = '';
+          if (bulletLines.length > 0) {
+            bulletsHtml = `<ul class="space-y-1.5 text-xs text-text-secondary leading-relaxed">
+          ${bulletLines.map(b => `<li class="flex items-start gap-2"><span class="text-tertiary font-bold mt-0.5">•</span><span>${escapeHtml(b.replace(/^[-•*–—\d+\.]\s*/, ''))}</span></li>`).join('')}
+        </ul>`;
+          } else if (headerLine.trim() !== role.trim() && headerLine.trim() !== `${role} at ${company}`.trim()) {
+            bulletsHtml = `<p class="text-xs text-text-secondary leading-relaxed">${escapeHtml(headerLine)}</p>`;
+          }
+
+          const card = document.createElement('div');
+          card.className = 'glass-card resume-data-card p-3.5 rounded-xl border border-white/10 bg-white/5 space-y-2 transition-all hover:border-primary/40 shadow-sm font-mono cursor-pointer select-none h-full flex flex-col justify-between';
+          card.setAttribute('data-expanded', 'false');
+
+          card.innerHTML = `
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5 truncate min-w-0">
+            <span class="material-symbols-outlined text-base text-tertiary flex-shrink-0">work</span>
+            <div class="truncate min-w-0">
+              <h4 class="font-bold text-white text-xs font-display truncate">${escapeHtml(role)}</h4>
+              <div class="text-[11px] text-primary font-mono font-semibold truncate">${escapeHtml(company)}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-[10px] font-mono text-tertiary bg-tertiary/10 px-2 py-0.5 rounded border border-tertiary/20 font-semibold truncate">${escapeHtml(period)}</span>
+            <span class="material-symbols-outlined text-sm text-text-secondary transition-transform duration-300 card-chevron">expand_more</span>
+          </div>
+        </div>
+        <div class="card-details overflow-hidden transition-all duration-300 max-h-0 opacity-0">
+          <div class="pt-2 border-t border-white/10 text-xs text-text-secondary leading-relaxed max-h-60 overflow-y-auto pr-1">
+            ${bulletsHtml || '<p class="text-xs text-text-secondary italic">No additional details provided.</p>'}
+          </div>
+        </div>
+      `;
+          attachCardExpandListener(card);
+          container.appendChild(card);
+        });
+      }
+
+      function parseEducationHeader(headerLine) {
+        let dateMatch = headerLine.match(/\b(20\d{2}|19\d{2})\b.*?\b(Present|Current|20\d{2}|19\d{2})\b/i);
+        if (!dateMatch) {
+          dateMatch = headerLine.match(/\b(20\d{2}|19\d{2})\b/);
+        }
+        const period = dateMatch ? dateMatch[0] : 'Graduation Date';
+        let cleanHdr = dateMatch ? headerLine.replace(dateMatch[0], '').replace(/[()]/g, '').trim() : headerLine;
+        cleanHdr = cleanHdr.replace(/^[-•*–—\s]+|[-•*–—\s]+$/g, '').trim();
+
+        let course = cleanHdr;
+        let inst = "Academic Institution";
+
+        const atMatch = cleanHdr.match(/^(.*?)\s+(?:at|@)\s+(.*)$/i);
+        if (atMatch) {
+          course = atMatch[1].trim();
+          inst = atMatch[2].trim();
+        } else if (cleanHdr.includes(',')) {
+          const commaParts = cleanHdr.split(',').map(p => p.trim()).filter(p => p.length > 0);
+          if (commaParts.length > 1) {
+            inst = commaParts[commaParts.length - 1];
+            course = commaParts.slice(0, commaParts.length - 1).join(', ');
+          } else if (commaParts.length === 1) {
+            course = commaParts[0];
+          }
+        }
+
+        if (!course) course = headerLine;
+        return { course, inst, period };
+      }
+
+      function renderEducationCards() {
+        const container = document.getElementById('educationCardsContainer');
+        if (!container) return;
+        const text = eduInput ? eduInput.value.trim() : '';
+
+        if (!text) {
+          container.innerHTML = `<div class="col-span-full p-4 rounded-xl bg-white/5 border border-white/5 text-text-supporting text-xs font-mono">No education history added yet. Upload a resume or type in edit form.</div>`;
+          return;
+        }
+
+        const rawBlocks = splitTextIntoDiscreteBlocks(text);
+        container.innerHTML = '';
+
+        rawBlocks.forEach((blockText) => {
+          const lines = blockText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+          if (lines.length === 0) return;
+
+          const headerLine = lines[0];
+          const detailLines = lines.slice(1);
+
+          const { course, inst, period } = parseEducationHeader(headerLine);
+
+          let detailsHtml = '';
+          if (detailLines.length > 0) {
+            detailsHtml = `<div class="text-xs text-text-secondary leading-relaxed space-y-1">
+          ${detailLines.map(d => `<p class="flex items-start gap-2"><span class="text-primary font-bold mt-0.5">•</span><span>${escapeHtml(d.replace(/^[-•*–—\d+\.]\s*/, ''))}</span></p>`).join('')}
+        </div>`;
+          }
+
+          const card = document.createElement('div');
+          card.className = 'glass-card resume-data-card p-3.5 rounded-xl border border-white/10 bg-white/5 space-y-2 transition-all hover:border-primary/40 shadow-sm font-mono cursor-pointer select-none h-full flex flex-col justify-between';
+          card.setAttribute('data-expanded', 'false');
+
+          card.innerHTML = `
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5 truncate min-w-0">
+            <span class="material-symbols-outlined text-base text-primary flex-shrink-0">school</span>
+            <div class="truncate min-w-0">
+              <h4 class="font-bold text-white text-xs font-display truncate">${escapeHtml(course)}</h4>
+              <div class="text-[11px] text-tertiary font-mono font-semibold truncate">${escapeHtml(inst)}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-[10px] font-mono text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20 font-semibold truncate">${escapeHtml(period)}</span>
+            <span class="material-symbols-outlined text-sm text-text-secondary transition-transform duration-300 card-chevron">expand_more</span>
+          </div>
+        </div>
+        <div class="card-details overflow-hidden transition-all duration-300 max-h-0 opacity-0">
+          <div class="pt-2 border-t border-white/10 text-xs text-text-secondary leading-relaxed max-h-60 overflow-y-auto pr-1">
+            ${detailsHtml || '<p class="text-xs text-text-secondary italic">No additional details provided.</p>'}
+          </div>
+        </div>
+      `;
+          attachCardExpandListener(card);
+          container.appendChild(card);
+        });
+      }
+
+      function renderAchievementsCards() {
+        const container = document.getElementById('achievementsCardsContainer');
+        if (!container) return;
+        const text = achInput ? achInput.value.trim() : '';
+
+        if (!text) {
+          container.innerHTML = `<div class="col-span-full p-4 rounded-xl bg-white/5 border border-white/5 text-text-supporting text-xs font-mono">No projects, achievements, or certifications added yet. Upload a resume or type in edit form.</div>`;
+          return;
+        }
+
+        const rawBlocks = splitTextIntoDiscreteBlocks(text);
+        container.innerHTML = '';
+
+        rawBlocks.forEach((blockText) => {
+          const lines = blockText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+          if (lines.length === 0) return;
+
+          const headerLine = lines[0];
+          const detailLines = lines.slice(1);
+
+          const colonIdx = headerLine.indexOf(':');
+          let title = headerLine;
+          let desc = headerLine;
+          let subtitle = '';
+
+          if (colonIdx > 0 && colonIdx < 60) {
+            title = headerLine.substring(0, colonIdx).trim();
+            desc = headerLine.substring(colonIdx + 1).trim();
+          }
+
+          const fullBlockStr = blockText;
+          const techMatch = fullBlockStr.match(/(?:built with|tech stack|technologies|using|stack|tools):\s*([^.]+)/i) || fullBlockStr.match(/\(([^)]+)\)/);
+          if (techMatch) {
+            subtitle = techMatch[1].trim();
+          } else if (colonIdx > 0 && colonIdx < 60 && desc.length > 0) {
+            subtitle = desc;
+          }
+
+          let bodyHtml = '';
+          if (detailLines.length > 0) {
+            bodyHtml = `<ul class="space-y-1.5 text-xs text-text-secondary leading-relaxed">
+          ${detailLines.map(d => `<li class="flex items-start gap-2"><span class="text-amber-400 font-bold mt-0.5">•</span><span>${escapeHtml(d.replace(/^[-•*–—\d+\.]\s*/, ''))}</span></li>`).join('')}
+        </ul>`;
+            if (colonIdx > 0 && colonIdx < 60 && desc) {
+              bodyHtml = `<p class="text-xs text-text-secondary mb-2 font-medium leading-relaxed">${escapeHtml(desc)}</p>` + bodyHtml;
+            }
+          } else {
+            const fullText = (colonIdx > 0 && colonIdx < 60 && desc) ? desc : headerLine;
+            bodyHtml = `<p class="text-xs text-text-secondary leading-relaxed">${escapeHtml(fullText)}</p>`;
+          }
+
+          const card = document.createElement('div');
+          card.className = 'glass-card resume-data-card p-3.5 rounded-xl border border-white/10 bg-white/5 space-y-2 transition-all hover:border-primary/40 shadow-sm font-mono cursor-pointer select-none h-full flex flex-col justify-between';
+          card.setAttribute('data-expanded', 'false');
+
+          card.innerHTML = `
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5 truncate min-w-0">
+            <span class="material-symbols-outlined text-base text-amber-400 flex-shrink-0">emoji_events</span>
+            <div class="truncate min-w-0">
+              <h4 class="font-bold text-white text-xs font-display truncate">${escapeHtml(title)}</h4>
+              ${subtitle ? `<div class="text-[11px] text-amber-300/80 font-mono font-semibold truncate">${escapeHtml(subtitle)}</div>` : ''}
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="material-symbols-outlined text-sm text-text-secondary transition-transform duration-300 card-chevron">expand_more</span>
+          </div>
+        </div>
+        <div class="card-details overflow-hidden transition-all duration-300 max-h-0 opacity-0">
+          <div class="pt-2 border-t border-white/10 text-xs text-text-secondary leading-relaxed max-h-60 overflow-y-auto pr-1">
+            ${bodyHtml}
+          </div>
+        </div>
+      `;
+          attachCardExpandListener(card);
+          container.appendChild(card);
+        });
+      }
+
+      function renderAllCards() {
+        renderWorkExperienceCards();
+        renderEducationCards();
+        renderAchievementsCards();
+      }
+
+      // Toggle Edit Form vs Interactive Component Cards View
+      const toggleEditBtn = document.getElementById('toggleProfileEditBtn');
+      const toggleEditLabel = document.getElementById('toggleProfileEditLabel');
+      let isEditMode = true;
+
+      if (toggleEditBtn) {
+        if (toggleEditLabel) toggleEditLabel.textContent = 'Hide Edit Form';
+        toggleEditBtn.addEventListener('click', () => {
+          isEditMode = !isEditMode;
+          document.getElementById('workExperienceEditArea').classList.toggle('hidden', !isEditMode);
+          document.getElementById('educationEditArea').classList.toggle('hidden', !isEditMode);
+          document.getElementById('achievementsEditArea').classList.toggle('hidden', !isEditMode);
+
+          if (toggleEditLabel) {
+            toggleEditLabel.textContent = isEditMode ? 'Hide Edit Form' : 'Show Edit Form';
+          }
+        });
+      }
+
+      function setupCtrlEnterShortcut(textarea) {
+        if (!textarea) return;
+        textarea.addEventListener('keydown', (e) => {
+          if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const val = textarea.value;
+            const insertion = '\n\n<<<KEIKO_ITEM_BREAK>>>\n\n';
+            textarea.value = val.substring(0, start) + insertion + val.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + insertion.length;
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        });
+      }
+
+      setupCtrlEnterShortcut(expInput);
+      setupCtrlEnterShortcut(eduInput);
+      setupCtrlEnterShortcut(achInput);
+
+      if (expInput) expInput.addEventListener('input', renderWorkExperienceCards);
+      if (eduInput) eduInput.addEventListener('input', renderEducationCards);
+      if (achInput) achInput.addEventListener('input', renderAchievementsCards);
+
+      function populateFormFields(p) {
+        const profileObj = p || {};
+        nameInput.value = profileObj.name || '';
+        emailInput.value = profileObj.email || '';
+        phoneInput.value = profileObj.phone || '';
+        setSkillsFromText(profileObj.skills || '');
+        if (expInput) expInput.value = profileObj.experience || '';
+        if (eduInput) eduInput.value = profileObj.education || '';
+        if (achInput) achInput.value = profileObj.achievements || '';
+        renderAllCards();
+      }
+
+      // ── Real-Time Storage & Profile Sync Engine ─────────────────
+      function syncProfilesFromStorage() {
+        const profiles = getSavedProfiles();
+        const keys = Object.keys(profiles);
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramProf = urlParams.get('profile');
+
+        let targetName = localStorage.getItem('keiko_last_user_name') || '';
+
+        if (paramProf && profiles[paramProf]) {
+          targetName = paramProf;
+        } else if (!targetName || !profiles[targetName]) {
+          if (keys.length > 0) {
+            targetName = keys[0];
+          }
+        }
+
+        if (targetName && profiles[targetName]) {
+          localStorage.setItem('keiko_last_user_name', targetName);
+          populateFormFields(profiles[targetName]);
+        } else if (keys.length === 0) {
+          populateFormFields({});
+        }
+
+        renderSavedProfilesGrid();
+      }
+
+      syncProfilesFromStorage();
+
+      // ── Event Listeners ───────────────────────────────────────
+      if (savedProfileSelect) {
+        savedProfileSelect.addEventListener('change', (e) => {
+          const selName = e.target.value;
+          if (!selName) {
+            localStorage.removeItem('keiko_last_user_name');
+            populateFormFields({});
+            renderSavedProfilesGrid();
+            return;
+          }
+          const profiles = getSavedProfiles();
+          if (profiles[selName]) {
+            localStorage.setItem('keiko_last_user_name', selName);
+            populateFormFields(profiles[selName]);
+            renderSavedProfilesGrid();
+          }
+        });
+      }
+
+      // ── Drag & Drop Resume File Handling ──────────────────────
+      const dropzone = document.getElementById('resumeDropzone');
+      const fileInput = document.getElementById('resumeFile');
+      const fileNameDisplay = document.getElementById('resumeFileNameDisplay');
+      const fileInfo = document.getElementById('resumeFileInfo');
+      const clearFileBtn = document.getElementById('clearResumeFileBtn');
+
+      if (clearFileBtn && fileInput && fileInfo) {
+        clearFileBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          fileInput.value = '';
+          fileInfo.classList.add('hidden');
+          fileInfo.classList.remove('flex');
+        });
+      }
+
+      if (dropzone && fileInput) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+          dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.add('border-primary', 'bg-primary/10');
+          }, false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+          dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.remove('border-primary', 'bg-primary/10');
+          }, false);
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+          if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            updateFileInfoDisplay(fileInput.files[0]);
+            handleResumeFileParse();
+          }
+        });
+
+        fileInput.addEventListener('change', () => {
+          if (fileInput.files.length > 0) {
+            updateFileInfoDisplay(fileInput.files[0]);
+            handleResumeFileParse();
+          }
+        });
+      }
+
+      function updateFileInfoDisplay(file) {
+        if (file && fileNameDisplay && fileInfo) {
+          const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+          fileNameDisplay.textContent = `${file.name} (${sizeMb} MB)`;
+          fileInfo.classList.remove('hidden');
+          fileInfo.classList.add('flex');
+        }
+      }
+
+      window.addEventListener('storage', syncProfilesFromStorage);
+      window.addEventListener('focus', syncProfilesFromStorage);
+
+        // ── Parse & Analyze Candidate Profile Preview ─────────────
+        const analyzeBtn = document.getElementById('analyzeProfileBtn');
+        const parsingStatus = document.getElementById('parsingStatus');
+        const parsedPreviewCard = document.getElementById('parsedProfilePreview');
+
+        async function handleResumeFileParse() {
+          if (parsingStatus) parsingStatus.textContent = "Analyzing candidate resume context...";
+          if (analyzeBtn) analyzeBtn.disabled = true;
+
+          try {
+            const formData = new FormData();
+            const jdVal = document.getElementById('jdText').value.trim();
+            if (jdVal) formData.append('jd_text', jdVal);
+            if (fileInput && fileInput.files.length > 0) formData.append('file', fileInput.files[0]);
+
+            const res = await fetch('/api/v1/interview/parse_preview', {
+              method: 'POST',
+              body: formData
+            });
+
+            if (!res.ok) throw new Error(`Parsing failed (HTTP ${res.status})`);
+            const data = await res.json();
+            const prev = data.preview || {};
+            const cand = prev.candidate_profile || {};
+
+            // Auto pre-fill extracted candidate profile fields
+            if (cand.full_name && (!nameInput.value || nameInput.value === 'Candidate')) {
+              nameInput.value = cand.full_name;
+            }
+            if (cand.email && !emailInput.value) emailInput.value = cand.email;
+            if (cand.phone && !phoneInput.value) phoneInput.value = cand.phone;
+
+            // Extract skills into tags
+            const skillsObj = cand.skills || {};
+            const getSkillNames = (arr) => (arr || []).map(s => typeof s === 'object' ? s.name : s);
+            const allSkills = [
+              ...getSkillNames(skillsObj.programming_languages),
+              ...getSkillNames(skillsObj.frameworks),
+              ...getSkillNames(skillsObj.tools_databases),
+              ...getSkillNames(skillsObj.design_and_ai)
+            ];
+            if (allSkills.length > 0) setSkillsFromText(allSkills.join(', '));
+
+            // Work Experience
+            if (cand.work_history && cand.work_history.length > 0) {
+              const expItems = cand.work_history.map(w => typeof w === 'object' ? `${w.role || w.title || 'Role'} at ${w.company || 'Company'}\n${w.description || ''}`.trim() : w.trim());
+              expInput.value = '<<<KEIKO_SECTION_START:EXPERIENCE>>>\n\n' + expItems.join('\n\n<<<KEIKO_ITEM_BREAK>>>\n\n') + '\n\n<<<KEIKO_SECTION_END:EXPERIENCE>>>';
+            }
+
+            // Education
+            if (cand.education && cand.education.length > 0) {
+              const eduItems = cand.education.map(e => typeof e === 'object' ? `${e.degree || e.course || 'Degree'}, ${e.institution || 'University'}\n${e.details || ''}`.trim() : e.trim());
+              eduInput.value = '<<<KEIKO_SECTION_START:EDUCATION>>>\n\n' + eduItems.join('\n\n<<<KEIKO_ITEM_BREAK>>>\n\n') + '\n\n<<<KEIKO_SECTION_END:EDUCATION>>>';
+            }
+
+            // Achievements, Projects & Certifications
+            const achList = [];
+            if (cand.achievements && cand.achievements.length > 0) achList.push(...cand.achievements);
+            if (cand.projects && cand.projects.length > 0) {
+              cand.projects.forEach(pr => achList.push(typeof pr === 'object' ? `${pr.name}: ${pr.description}` : pr));
+            }
+            if (cand.certifications && cand.certifications.length > 0) {
+              cand.certifications.forEach(cr => achList.push(typeof cr === 'object' ? `${cr.name}: ${cr.description}` : cr));
+            }
+            if (achList.length > 0) {
+              const achItems = achList.map(a => typeof a === 'string' ? a.trim() : JSON.stringify(a));
+              achInput.value = '<<<KEIKO_SECTION_START:PROJECTS>>>\n\n' + achItems.join('\n\n<<<KEIKO_ITEM_BREAK>>>\n\n') + '\n\n<<<KEIKO_SECTION_END:PROJECTS>>>';
+            }
+
+            renderAllCards();
+
+            // Reveal Preview Intelligence Card
+            if (parsedPreviewCard) {
+              parsedPreviewCard.classList.remove('hidden');
+              const scoreVal = typeof prev.alignment_score === 'number' ? prev.alignment_score : 0;
+              const displayScore = scoreVal <= 1.0 ? Math.round(scoreVal * 100) : Math.round(scoreVal);
+              document.getElementById('previewAlignmentBadge').textContent = `Match Score: ${displayScore}%`;
+              if (document.getElementById('previewCareerLevel')) {
+                document.getElementById('previewCareerLevel').value = cand.career_level || 'Mid-level';
+              }
+
+              // Extracted Skill Tags preview
+              const tagsContainer = document.getElementById('previewSkillTags');
+              if (tagsContainer) {
+                tagsContainer.innerHTML = '';
+                const displaySkills = allSkills.length > 0 ? allSkills : ["Software Engineering", "Problem Solving"];
+                displaySkills.forEach(sk => {
+                  const tag = document.createElement('span');
+                  tag.className = 'px-2 py-0.5 rounded bg-purple-500/20 text-primary border border-purple-500/30 text-[10px]';
+                  tag.textContent = sk;
+                  tagsContainer.appendChild(tag);
+                });
+              }
+
+              // Strengths & Skill Gaps
+              const strList = document.getElementById('previewStrengths');
+              if (strList) {
+                strList.innerHTML = '';
+                (prev.strengths || ["Matching core requirements"]).forEach(st => {
+                  const li = document.createElement('li');
+                  li.textContent = st;
+                  strList.appendChild(li);
+                });
+              }
+
+              const gapList = document.getElementById('previewGaps');
+              if (gapList) {
+                gapList.innerHTML = '';
+                (prev.skill_gaps || ["Targeting deeper technical architecture"]).forEach(gp => {
+                  const li = document.createElement('li');
+                  li.textContent = gp;
+                  gapList.appendChild(li);
+                });
+              }
+            }
+
+            if (parsingStatus) parsingStatus.textContent = "Resume parsed! All cards & details pre-filled.";
+          } catch (err) {
+            console.error("Parse preview error:", err);
+            if (parsingStatus) parsingStatus.textContent = "Parsing completed with available context.";
+          } finally {
+            if (analyzeBtn) analyzeBtn.disabled = false;
+          }
+        }
+
+        if (analyzeBtn) analyzeBtn.addEventListener('click', handleResumeFileParse);
+
+        // ── Save Candidate Profile Action ────────────────────────
+        const saveProfileBtn = document.getElementById('saveCandidateProfileBtn');
+        if (saveProfileBtn) {
+          saveProfileBtn.addEventListener('click', () => {
+            const pNameInput = document.getElementById('saveProfileNameInput');
+            const profileName = (pNameInput ? pNameInput.value.trim() : '') || nameInput.value.trim();
+            if (!profileName) {
+              alert("Please enter a name for the candidate profile.");
+              return;
+            }
+
+            const profiles = getSavedProfiles();
+            profiles[profileName] = {
+              name: nameInput.value.trim(),
+              email: emailInput.value.trim(),
+              phone: phoneInput.value.trim(),
+              skills: skillsInput.value.trim(),
+              experience: expInput.value.trim(),
+              education: eduInput.value.trim(),
+              achievements: achInput.value.trim(),
+              savedAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('keiko_saved_profiles', JSON.stringify(profiles));
+            localStorage.setItem('keiko_last_user_name', profileName);
+            if (emailInput.value.trim()) localStorage.setItem('keiko_last_user_email', emailInput.value.trim());
+
+            renderSavedProfilesGrid();
+            alert(`Candidate Profile "${profileName}" saved successfully!`);
+          });
+        }
+
+        // ── Session Initialization Handler (Guest vs Permanent Profile) ─────
+        async function runInterviewSetup({ isGuest = false }) {
+          const candName = nameInput.value.trim() || (isGuest ? 'Guest Candidate' : 'Candidate');
+          const candEmail = emailInput.value.trim() || (isGuest ? 'guest@local' : 'user@local.app');
+
+          const guestBtn = document.getElementById('startGuestBtn');
+          const saveStartBtn = document.getElementById('saveAndStartBtn');
+
+          if (guestBtn) guestBtn.disabled = true;
+          if (saveStartBtn) saveStartBtn.disabled = true;
+
+          const activeBtn = isGuest ? guestBtn : saveStartBtn;
+          if (activeBtn) activeBtn.innerHTML = `<span>Initializing Session...</span>`;
+
+          try {
+            // Always set keiko_last_user_name so chamber context guard passes
+            localStorage.setItem('keiko_last_user_name', candName);
+            localStorage.setItem('keiko_last_user_email', candEmail);
+
+            if (!isGuest) {
+              // Save profile permanently to localStorage
+              const profiles = getSavedProfiles();
+              profiles[candName] = {
+                name: candName,
+                email: candEmail,
+                phone: phoneInput.value.trim(),
+                skills: skillsInput.value.trim(),
+                experience: expInput.value.trim(),
+                education: eduInput.value.trim(),
+                achievements: achInput.value.trim(),
+                savedAt: new Date().toISOString()
+              };
+              localStorage.setItem('keiko_saved_profiles', JSON.stringify(profiles));
+            }
+
+            // ── Read Interview Configuration Parameters ─────
+            const selectedType = document.getElementById('interviewType')?.value || 'Tech';
+            const selectedDifficulty = document.getElementById('difficultyMode')?.value || 'Adaptive';
+            const targetRole = document.getElementById('roleDomain')?.value.trim() || document.getElementById('targetRole')?.value.trim() || "Software Engineer";
+
+            let questionCountMode = '10';
+            const qRadios = document.getElementsByName('questionCountOption');
+            for (const r of qRadios) {
+              if (r.checked) {
+                questionCountMode = r.value;
+                break;
+              }
+            }
+
+            let durationVal = 10;
+            const customInputEl = document.getElementById('customQuestionCount');
+            if (questionCountMode === 'custom') {
+              const customVal = parseInt(customInputEl?.value, 10);
+              durationVal = (!isNaN(customVal) && customVal > 0) ? customVal : 10;
+            } else {
+              durationVal = parseInt(questionCountMode, 10) || 10;
+            }
+
+            // Save selected configuration to localStorage key keiko_interview_config
+            const interviewConfigPayload = {
+              interview_type: selectedType,
+              role_domain: targetRole,
+              question_count: durationVal,
+              question_count_mode: questionCountMode,
+              custom_question_count: customInputEl?.value || '',
+              difficulty: selectedDifficulty
+            };
+            localStorage.setItem('keiko_interview_config', JSON.stringify(interviewConfigPayload));
+
+            let durationType = 'questions';
+
+            // Gather candidate context and job description text before starting session
+            const jdText = document.getElementById('jdText').value.trim();
+            const candidateContext = {
+              name: candName,
+              email: candEmail,
+              phone: phoneInput.value.trim(),
+              skills: skillsInput.value.trim(),
+              experience: expInput.value.trim(),
+              education: eduInput.value.trim(),
+              achievements: achInput.value.trim(),
+              target_role: targetRole
+            };
+
+            // Step 1: Start Session WITH candidate context & JD text included directly
+            const startRes = await fetch('/api/v1/interview/start', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                interview_type: selectedType,
+                difficulty_mode: selectedDifficulty,
+                duration_type: durationType,
+                duration_value: durationVal,
+                candidate_context: candidateContext,
+                jd_text: jdText
+              })
+            });
+
+            if (!startRes.ok) {
+              throw new Error(`Failed to start session (HTTP ${startRes.status})`);
+            }
+
+            const startData = await startRes.json();
+            const sessionId = startData.session_id;
+            if (!sessionId) throw new Error("Failed to obtain session_id from backend response.");
+
+            // Step 2: Upload Resume file (if selected) — triggers full resume parsing
+            if (fileInput && fileInput.files.length > 0) {
+              const resumeFormData = new FormData();
+              resumeFormData.append('file', fileInput.files[0]);
+              await fetch(`/api/v1/interview/upload/resume/${sessionId}`, {
+                method: 'POST',
+                body: resumeFormData
+              });
+            }
+
+            // Step 3: Upload Job Description text file/data if present
+            if (jdText) {
+              const jdFormData = new FormData();
+              jdFormData.append('jd_text', jdText);
+              await fetch(`/api/v1/interview/upload/jd/${sessionId}`, {
+                method: 'POST',
+                body: jdFormData
+              });
+            }
+
+            // Step 4: Upload Candidate Context to session directory
+            await fetch(`/api/v1/interview/upload/candidate_context/${sessionId}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(candidateContext)
+            });
+
+            // Step 5: Sync active telemetry weights from backend settings to session
+            try {
+              const sysRes = await fetch('/api/v1/interview/system/settings');
+              if (sysRes.ok) {
+                const sysData = await sysRes.json();
+                if (sysData.telemetry_weights) {
+                  await fetch(`/api/v1/interview/config/weights/${sessionId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sysData.telemetry_weights)
+                  });
+                }
+              }
+            } catch (e) {
+              console.warn("Using default weights for session", e);
+            }
+
+            // Step 6: Redirect to Active Interview Chamber
+            window.location.href = `active-interview-chamber.html?session_id=${encodeURIComponent(sessionId)}`;
+          } catch (err) {
+            console.error("Failed to initialize session:", err);
+            alert(`Error initializing session: ${err.message}`);
+            if (guestBtn) guestBtn.disabled = false;
+            if (saveStartBtn) saveStartBtn.disabled = false;
+          }
+        }
+
+        function initInterviewConfigControls() {
+          const customInput = document.getElementById('customQuestionCount');
+          const qRadios = document.getElementsByName('questionCountOption');
+          const roleInput = document.getElementById('roleDomain');
+          const jdRoleInput = document.getElementById('targetRole');
+
+          if (roleInput && jdRoleInput) {
+            roleInput.addEventListener('input', () => {
+              if (roleInput.value.trim()) jdRoleInput.value = roleInput.value.trim();
+            });
+            jdRoleInput.addEventListener('input', () => {
+              if (jdRoleInput.value.trim()) roleInput.value = jdRoleInput.value.trim();
+            });
+          }
+
+          function updateCustomQuestionState() {
+            let selectedVal = '10';
+            for (const r of qRadios) {
+              if (r.checked) {
+                selectedVal = r.value;
+                break;
+              }
+            }
+            if (customInput) {
+              if (selectedVal === 'custom') {
+                customInput.disabled = false;
+                customInput.focus();
+              } else {
+                customInput.disabled = true;
+              }
+            }
+          }
+
+          for (const r of qRadios) {
+            r.addEventListener('change', updateCustomQuestionState);
+          }
+
+          const storedConfigRaw = localStorage.getItem('keiko_interview_config');
+          if (storedConfigRaw) {
+            try {
+              const cfg = JSON.parse(storedConfigRaw);
+              if (cfg.interview_type && document.getElementById('interviewType')) {
+                document.getElementById('interviewType').value = cfg.interview_type;
+              }
+              if (cfg.role_domain) {
+                if (roleInput) roleInput.value = cfg.role_domain;
+                if (jdRoleInput) jdRoleInput.value = cfg.role_domain;
+              }
+              if (cfg.difficulty && document.getElementById('difficultyMode')) {
+                document.getElementById('difficultyMode').value = cfg.difficulty;
+              }
+              if (cfg.question_count_mode) {
+                for (const r of qRadios) {
+                  if (r.value === cfg.question_count_mode) {
+                    r.checked = true;
+                    break;
+                  }
+                }
+              }
+              if (cfg.custom_question_count && customInput) {
+                customInput.value = cfg.custom_question_count;
+              }
+              updateCustomQuestionState();
+            } catch (e) {
+              console.warn("Error restoring keiko_interview_config:", e);
+            }
+          } else {
+            updateCustomQuestionState();
+          }
+        }
+
+        initInterviewConfigControls();
+
+        const startGuestBtn = document.getElementById('startGuestBtn');
+        const saveAndStartBtn = document.getElementById('saveAndStartBtn');
+
+        if (startGuestBtn) {
+          startGuestBtn.addEventListener('click', () => runInterviewSetup({ isGuest: true }));
+        }
+        if (saveAndStartBtn) {
+          saveAndStartBtn.addEventListener('click', () => runInterviewSetup({ isGuest: false }));
+        }
+
+        const setupForm = document.getElementById('setupForm');
+        if (setupForm) {
+          setupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            runInterviewSetup({ isGuest: false });
+          });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSetupSession);
+    } else {
+      initSetupSession();
+    }
   </script>
 
 </body>
+
 </html>

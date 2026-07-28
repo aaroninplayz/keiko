@@ -25,6 +25,10 @@ class InterviewSession(Base):
     current_question = Column(Text, nullable=True)
     next_question_feedback = Column(Text, nullable=True)
     
+    # State & Metrics Trackers
+    interviewer_interest = Column(Float, nullable=False, default=50.0) # 0-100
+    job_fit_score = Column(Float, nullable=False, default=50.0)        # 0-100
+    
     # Cached context objects (enables full session recovery without local files)
     resume_profile = Column(JSON, nullable=True)     # Extracted candidate profile details
     jd_profile = Column(JSON, nullable=True)         # Extracted job description details
@@ -91,3 +95,24 @@ class ConversationHistory(Base):
 
     # Relationships
     session = relationship("InterviewSession", back_populates="history")
+
+
+from core.database import engine
+from sqlalchemy import inspect, text
+
+def ensure_db_schema():
+    try:
+        inspector = inspect(engine)
+        if "interview_sessions" in inspector.get_table_names():
+            columns = [c["name"] for c in inspector.get_columns("interview_sessions")]
+            with engine.begin() as conn:
+                if "interviewer_interest" not in columns:
+                    conn.execute(text("ALTER TABLE interview_sessions ADD COLUMN interviewer_interest FLOAT DEFAULT 50.0"))
+                if "job_fit_score" not in columns:
+                    conn.execute(text("ALTER TABLE interview_sessions ADD COLUMN job_fit_score FLOAT DEFAULT 50.0"))
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).warning(f"Could not auto-migrate DB schema: {e}")
+
+ensure_db_schema()
+

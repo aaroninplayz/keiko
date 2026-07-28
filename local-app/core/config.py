@@ -8,6 +8,9 @@ MODELS_DIR = str(Path(__file__).resolve().parent.parent / "models")
 os.makedirs(MODELS_DIR, exist_ok=True)
 os.environ["HF_HOME"] = MODELS_DIR
 os.environ["SENTENCE_TRANSFORMERS_HOME"] = MODELS_DIR
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+os.environ["HF_DATASETS_OFFLINE"] = "1"
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Modular Web App"
@@ -33,6 +36,11 @@ class Settings(BaseSettings):
 
     GROQ_API_KEY: Optional[str] = None
     GROQ_MODEL: str = "llama3-8b-8192"
+
+    # Local Ollama / Lightweight Parameter Model Settings
+    # Recommended minimum model size: qwen2.5:7b or llama3:8b (smaller 1.5b models may struggle with structured output and reasoning)
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "qwen2.5:7b"
 
     # Speech-to-Text Configuration
     STT_PROVIDER: str = "local"

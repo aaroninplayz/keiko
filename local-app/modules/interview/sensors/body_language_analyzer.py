@@ -47,7 +47,11 @@ class BodyLanguageAnalyzer:
                 )
                 self._landmarker = HolisticLandmarker.create_from_options(options)
             else:
-                logger.warning(f"Holistic model not found at {model_path}")
+                logger.error(
+                    f"Holistic model file 'holistic_landmarker.task' not found at {model_path}. "
+                    "Please download it from https://storage.googleapis.com/mediapipe-models/ "
+                    f"and place it in '{MODELS_DIR}'."
+                )
         self._prev_wrists = None
         self._hand_movement_history = deque(maxlen=30)
         self._head_y_history = deque(maxlen=20)

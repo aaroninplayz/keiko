@@ -12,17 +12,21 @@ class MatchingEngine:
     """
 
     _shared_model = None
+    _model_loaded = False
 
     def __init__(self):
-        self._load_model()
+        pass
 
     @property
     def _model(self):
+        if not MatchingEngine._model_loaded:
+            self._load_model()
         return MatchingEngine._shared_model
 
     def _load_model(self):
-        if MatchingEngine._shared_model is not None:
+        if MatchingEngine._model_loaded:
             return
+        MatchingEngine._model_loaded = True
         try:
             from sentence_transformers import SentenceTransformer
             # Uses a fast, lightweight CPU-friendly embedding model (~90MB download size)

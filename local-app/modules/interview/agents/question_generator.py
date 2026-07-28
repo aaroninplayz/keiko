@@ -108,9 +108,18 @@ class QuestionGenerator:
     def __init__(self):
         self._llm_client = LLMClient()
         self._generator = None
-        self._load_local_llm()
+        self._local_llm_attempted = False
+
+    @property
+    def generator(self):
+        if not self._local_llm_attempted:
+            self._load_local_llm()
+        return self._generator
 
     def _load_local_llm(self):
+        if self._local_llm_attempted:
+            return
+        self._local_llm_attempted = True
         try:
             from transformers import pipeline
             # Use Qwen2.5-0.5B-Instruct: tiny, lightweight instruct model (~950MB) running cleanly on CPU
@@ -135,39 +144,77 @@ class QuestionGenerator:
         history: List[Dict[str, str]],
         evaluator_feedback: Optional[str] = None,
         interview_type: str = 'Tech',
-        difficulty: str = 'Intermediate'
+        difficulty: str = 'Intermediate',
+        sensor_data: Optional[Dict[str, Any]] = None
     ) -> str:
         """
-        Generates the next question based on context and evaluator feedback.
+        Generates the next interview question using multi-stage context, 10-Q phase thresholding,
+        live emotion/composure ingestion, and resume discrepancy cross-referencing.
         """
-        # Tier 1: Try External LLM API
+        turn_count = len(history) + 1
+        raw_name = candidate_profile.get('full_name') or candidate_profile.get('name') or 'Candidate'
+        first_name = raw_name.strip().split()[0] if raw_name and raw_name != 'Candidate' else 'Candidate'
+        target_role = candidate_profile.get('target_role') or 'Target Role'
+
+        # Turn 1: Onboarding with natural pleasantries
+        if turn_count == 1:
+            return f"Hello {first_name}! Welcome to your {interview_type} interview today for the {target_role} position. How are you doing, and could you briefly introduce yourself and walk me through your background?"
+
+        # Stage/Phase Thresholding
+        phase_label = "Phase 1: Onboarding & Background" if turn_count <= 10 else ("Phase 2: Technical Deep Dive" if turn_count <= 20 else "Phase 3: System Architecture")
+
+        # Tier 1: Try LLM Client (OpenAI, Gemini, Anthropic, Groq, or local Ollama qwen2.5:1.5b)
         active_provider = self._llm_client.detect_provider()
         if active_provider:
             try:
-                logger.info(f"Generating question via external LLM client ({active_provider})...")
+                logger.info(f"Generating question via LLM provider ({active_provider}) for Turn {turn_count} ({phase_label})...")
+                
+                last_turn_str = ""
+                if history:
+                    last_turn = history[-1]
+                    last_turn_str = f"Last Interviewer Question: {last_turn.get('question')}\nCandidate Answer: {last_turn.get('answer')[:350]}\n"
+
+                # Extract live emotion & sensor telemetry
+                sensor_info = ""
+                if sensor_data:
+                    comp = sensor_data.get('composure', 75)
+                    eye = sensor_data.get('eye_contact', 80)
+                    tone = sensor_data.get('tone', 'confident')
+                    sensor_info = f"Candidate Live Composure: {comp}%, Eye Contact: {eye}%, Tone: {tone}.\n"
+                    if comp < 50:
+                        sensor_info += "STRESS DETECTED: Keep question encouraging, concise, and clear.\n"
+                    elif comp > 85:
+                        sensor_info += "HIGH CONFIDENCE: Escalate technical challenge.\n"
+
                 system_message = (
-                    "You are Keiko, a professional technical interviewer. Your goal is to ask the candidate a single, clear, "
-                    "direct interview question based on their resume, job description, and previous evaluation feedback.\n"
-                    f"Interview Type: {interview_type}\n"
-                    f"Difficulty Level: {difficulty}\n"
-                    "Follow these rules:\n"
-                    "1. Ask ONLY one question.\n"
-                    "2. Do not write introductory chatter, explanations, or salutations.\n"
-                    "3. If evaluator feedback tells you to probe, ask a probing question about the target topic.\n"
-                    "4. Keep the question under 30 words."
+                    "You are Keiko, a professional and personable AI technical interviewer.\n\n"
+                    f"Candidate's first name: {first_name}\n"
+                    f"Current Phase: {phase_label} | Mode: {interview_type} | Level: {difficulty}\n"
+                    f"{sensor_info}\n"
+                    "ALWAYS:\n"
+                    "1. Start with a brief, natural acknowledgment of the candidate's last answer (1-2 sentences).\n"
+                    "2. Then ask your next question.\n"
+                    "3. Be conversational but professional.\n"
+                    "4. If the candidate asks you something, respond naturally.\n"
+                    "5. If the candidate is rude or unprofessional, calmly redirect while noting it.\n"
+                    f"6. Use the candidate's name ({first_name}) occasionally.\n"
+                    "7. Keep total response under 60 words.\n"
+                    "8. Cross-reference answers with their resume — if they claim something contradictory, politely ask for clarification.\n\n"
+                    "NEVER:\n"
+                    "1. Skip acknowledging the candidate's answer.\n"
+                    "2. Be robotic or formulaic.\n"
+                    "3. Repeat questions that have already been asked.\n"
+                    "4. Ignore what the candidate said."
                 )
                 
-                history_str = ""
-                for h in history:
-                    history_str += f"Interviewer: {h.get('question')}\nCandidate: {h.get('answer')}\n"
-
                 user_message = (
-                    f"Candidate Experience Level: {candidate_profile.get('career_level')}\n"
-                    f"Job Description: {jd_text[:300]}\n"
-                    f"Skill Gaps Identified: {', '.join(skill_gaps)}\n"
-                    f"Interview History:\n{history_str}\n"
-                    f"Evaluator Guidance: {evaluator_feedback or 'First question, ask a main job description question.'}\n\n"
-                    "Generate the next question:"
+                    f"Candidate Name: {first_name}\n"
+                    f"Target Role & JD Context: {jd_text[:1500]}\n"
+                    f"Candidate Resume Context: {resume_text[:1500]}\n"
+                    f"Priority Skill Gaps: {', '.join(skill_gaps[:3]) if skill_gaps else 'None identified'}\n"
+                    f"{last_turn_str}"
+                    f"Evaluator Guidance: {evaluator_feedback or 'Ask next relevant question for current phase.'}\n\n"
+                    "Generate your response (1-sentence conversational acknowledgment + next question):"
                 )
 
                 messages = [
@@ -175,34 +222,53 @@ class QuestionGenerator:
                     {"role": "user", "content": user_message}
                 ]
                 
-                question = self._llm_client.complete(messages, provider=active_provider, temperature=0.7)
+                question = self._llm_client.complete(messages, provider=active_provider, temperature=0.7, max_tokens=150)
                 if question:
                     question = re.sub(r'[\r\n]+', ' ', question).strip()
                     question = question.replace("<|im_end|>", "").replace("<|endoftext|>", "").strip()
+                    question = re.sub(r"^(Interviewer|Keiko|Question):\s*", "", question, flags=re.IGNORECASE).strip()
                     if len(question) > 10:
                         return question
             except Exception as e:
-                logger.error(f"External API question generation failed: {e}. Falling back to local/heuristics.")
+                logger.error(f"LLM question generation failed: {e}. Falling back to templates.")
 
-        # Tier 2: If local LLM pipeline is loaded, generate using a custom prompt
-        if self._generator:
-            try:
-                prompt = self._build_prompt(resume_text, jd_text, candidate_profile, skill_gaps, history, evaluator_feedback, interview_type, difficulty)
-                result = self._generator(prompt, num_return_sequences=1)
-                text = result[0]['generated_text']
-                # Extract generated assistant response
-                question = text.split("Assistant:")[-1].split("assistant\n")[-1].strip()
-                # Clean up any trailing text
-                question = re.sub(r'[\r\n]+', ' ', question)
-                # Strip system tags
-                question = question.replace("<|im_end|>", "").replace("<|endoftext|>", "").strip()
-                if question and len(question) > 20:
-                    return question
-            except Exception as e:
-                logger.error(f"Error generating question via LLM: {e}")
+        # Turns 1-3 serve as semi-fixed natural onboarding starters using candidate's name
+        if turn_count == 1:
+            return f"Hello {first_name}! Welcome to your {interview_type} interview today for the {target_role} position. How are you doing, and could you briefly introduce yourself and walk me through your background?"
+        elif turn_count == 2:
+            if skill_gaps:
+                target_gap = skill_gaps[0]
+                return f"Thank you for sharing that overview, {first_name}! Looking at the job requirements, I see {target_gap} is a key component. Could you tell me about your experience with {target_gap}?"
+            return f"Thank you for sharing that overview, {first_name}! Could you walk me through a key project or role from your resume that best demonstrates your core capabilities?"
+        elif turn_count == 3:
+            if len(skill_gaps) > 1:
+                target_gap = skill_gaps[1]
+                return f"Got it, {first_name}. Could you also describe your familiarity or experience with {target_gap}?"
+            return "What specific programming languages, frameworks, or tools did you rely on most heavily in that role, and why were they selected?"
 
-        # Tier 3: Fallback to high-fidelity NLP Template Generator
+        # Turn 4+: Rely exclusively on LLM or Tier 3 NLP Template Generator (no fixed elif chain)
         return self._generate_nlp_fallback(candidate_profile, skill_gaps, history, evaluator_feedback, interview_type, difficulty)
+
+    def generate_hint(self, question: str, candidate_answer: str, resume_text: str = "") -> str:
+        """
+        Generates a concise 1-sentence AI hint / clarification for the candidate without changing the main question.
+        """
+        active_provider = self._llm_client.detect_provider()
+        if active_provider:
+            try:
+                prompt = (
+                    f"Interviewer Question: {question}\n"
+                    f"Candidate Current Draft: {candidate_answer[:200]}\n"
+                    "Provide a helpful 1-sentence technical hint to guide the candidate's answer. NO salutations, under 25 words."
+                )
+                res = self._llm_client.complete([{"role": "user", "content": prompt}], provider=active_provider, temperature=0.5, max_tokens=60)
+                if res:
+                    clean = re.sub(r'[\r\n]+', ' ', res).strip()
+                    return clean
+            except Exception as e:
+                logger.warning(f"AI hint generation failed: {e}")
+
+        return "Focus on your specific individual contribution, key architectural choices, and measurable results achieved."
 
     def _build_prompt(
         self,
@@ -221,23 +287,27 @@ class QuestionGenerator:
 
         prompt = (
             "<|im_start|>system\n"
-            "You are Keiko, a professional technical interviewer. Your goal is to ask the candidate a single, clear, "
-            "direct interview question based on their resume, job description, and previous evaluation feedback.\n"
+            "You are Keiko, a professional and personable AI technical interviewer.\n"
             f"Interview Type: {interview_type}\n"
             f"Difficulty Level: {difficulty}\n"
-            "Follow these rules:\n"
-            "1. Ask ONLY one question.\n"
-            "2. Do not write introductory chatter, explanations, or salutations.\n"
-            "3. If evaluator feedback tells you to probe, ask a probing question about the target topic.\n"
-            "4. Keep the question under 30 words.\n"
+            "ALWAYS:\n"
+            "1. Start with a brief, natural acknowledgment of the candidate's last answer (1-2 sentences).\n"
+            "2. Then ask your next question.\n"
+            "3. Be conversational but professional.\n"
+            "4. Keep total response under 60 words.\n"
+            "NEVER:\n"
+            "1. Skip acknowledging the candidate's answer.\n"
+            "2. Be robotic or formulaic.\n"
+            "3. Repeat questions.\n"
             "<|im_end|>\n"
             "<|im_start|>user\n"
             f"Candidate Experience Level: {profile.get('career_level')}\n"
-            f"Job Description: {jd_text[:300]}\n"
+            f"Candidate Resume Context: {resume_text[:1500]}\n"
+            f"Job Description: {jd_text[:1500]}\n"
             f"Skill Gaps Identified: {', '.join(gaps)}\n"
             f"Interview History:\n{history_str}\n"
             f"Evaluator Guidance: {feedback or 'First question, ask a main job description question.'}\n\n"
-            "Generate the next question:\n"
+            "Generate your response (acknowledgment + next question):\n"
             "<|im_end|>\n"
             "<|im_start|>assistant\n"
         )
@@ -254,10 +324,23 @@ class QuestionGenerator:
     ) -> str:
         """
         High-fidelity template engine. Synthesizes contextual probing and main questions.
-        Uses interview type and difficulty to select from comprehensive template banks.
+        Uses candidate name, interview type, skill gaps, and difficulty to select from comprehensive template banks.
         """
-        # Determine current stage of the interview
         q_count = len(history)
+        raw_name = profile.get('full_name') or profile.get('name') or 'Candidate'
+        first_name = raw_name.strip().split()[0] if raw_name and raw_name != 'Candidate' else 'Candidate'
+
+        # Conversational acknowledgment prefix if candidate answered a previous question
+        ack_prefix = ""
+        if history:
+            ack_options = [
+                f"Thank you for sharing that overview, {first_name}.",
+                f"That makes sense, {first_name}.",
+                "Thanks for explaining that.",
+                "Appreciate the context.",
+                f"Got it, {first_name}."
+            ]
+            ack_prefix = random.choice(ack_options) + " "
 
         # 1. Handle Evaluator Feedback (Probing / Adjustments)
         if feedback:
@@ -265,16 +348,15 @@ class QuestionGenerator:
             # If evaluator instructs to probe a specific topic or skill
             for gap in gaps:
                 if gap.lower() in lower_fb:
-                    return f"I noticed a gap in {gap} on your resume. Could you describe your familiarity with {gap} or any experience learning similar technologies?"
+                    return f"{ack_prefix}I noticed a gap in {gap} on your resume. Could you describe your familiarity with {gap} or any experience learning similar technologies?"
 
             # If evaluator wants details on projects
             if "project" in lower_fb and profile.get("project_expertise"):
                 proj = profile["project_expertise"][0]
-                return f"You worked on the project: '{proj}'. Could you detail your specific engineering contributions and the technical stack you used?"
+                return f"{ack_prefix}You worked on the project '{proj}'. Could you detail your specific engineering contributions and the technical stack you used?"
 
             # When probing is requested AND skill gaps exist, target the gaps first
             if "probe" in lower_fb and gaps:
-                # Check which gaps have already been asked about
                 asked_topics = set()
                 for h in history:
                     q_lower = h.get('question', '').lower()
@@ -284,16 +366,19 @@ class QuestionGenerator:
                 unasked_gaps = [g for g in gaps if g not in asked_topics]
                 if unasked_gaps:
                     target_gap = unasked_gaps[0]
-                    return f"Looking at the job requirements, I see {target_gap} is a key component. Can you walk me through your experience with {target_gap} or related tools?"
+                    return f"{ack_prefix}Looking at the job requirements, I see {target_gap} is a key component. Can you walk me through your experience with {target_gap} or related tools?"
 
-            # General probing fallback based on feedback (no gaps to target)
+            # General probing fallback based on feedback
             if "probe" in lower_fb:
                 cand_skills = []
                 for cat, skills in profile.get("skills", {}).items():
                     for s in skills:
-                        cand_skills.append(s["name"])
+                        if isinstance(s, dict):
+                            cand_skills.append(s.get('name', ''))
+                        else:
+                            cand_skills.append(str(s))
                 if cand_skills:
-                    return f"Can you explain a challenging problem you solved using {cand_skills[0]} and how you optimized your solution?"
+                    return f"{ack_prefix}Can you explain a challenging problem you solved using {cand_skills[0]} and how you optimized your solution?"
 
         # 2. Skill Gap Targeting: If gaps exist and haven't been addressed yet, ask about them
         if gaps and q_count > 0:
@@ -306,14 +391,22 @@ class QuestionGenerator:
             unasked_gaps = [g for g in gaps if g not in asked_topics]
             if unasked_gaps:
                 target_gap = unasked_gaps[0]
-                return f"Looking at the job requirements, I see {target_gap} is a key component. Can you walk me through your experience with {target_gap} or related tools?"
+                return f"{ack_prefix}Looking at the job requirements, I see {target_gap} is a key component. Can you walk me through your experience with {target_gap} or related tools?"
 
-        # 3. Template-based question selection using interview type and difficulty
+        # 3. Dynamic Template-based question selection avoiding duplicates
         templates = QUESTION_TEMPLATES.get(interview_type, QUESTION_TEMPLATES['Tech'])
         questions = templates.get(difficulty, templates['Intermediate'])
-        # Cycle through the template bank based on question index
-        index = q_count % len(questions)
-        return questions[index]
+        
+        # Filter out already asked questions
+        history_questions = {h.get('question', '').strip().lower() for h in history}
+        available_questions = [q for q in questions if q.strip().lower() not in history_questions]
+        
+        if not available_questions:
+            available_questions = questions
+
+        index = q_count % len(available_questions)
+        selected_q = available_questions[index]
+        return f"{ack_prefix}{selected_q}"
 
     def generate_concluding(self, interview_type: str = 'Tech') -> str:
         """Returns a random concluding question to wrap up the interview."""

@@ -42,7 +42,11 @@ class FacialExpressionAnalyzer:
                 )
                 self._landmarker = FaceLandmarker.create_from_options(options)
             else:
-                logger.warning(f"Face model not found at {model_path}")
+                logger.error(
+                    f"Face model file 'face_landmarker.task' not found at {model_path}. "
+                    "Please download it from https://storage.googleapis.com/mediapipe-models/ "
+                    f"and place it in '{MODELS_DIR}'."
+                )
 
     def process_frame(self, frame: np.ndarray) -> Dict[str, Any]:
         if not MEDIAPIPE_AVAILABLE or self._landmarker is None:

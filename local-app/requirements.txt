@@ -15,6 +15,7 @@ accelerate>=0.29.0
 peft>=0.10.0
 flask>=3.0.0
 pypdf
+pymupdf
 python-docx
 sentence-transformers
 python-multipart

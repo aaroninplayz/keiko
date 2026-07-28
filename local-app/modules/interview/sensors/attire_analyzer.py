@@ -46,7 +46,11 @@ class AttireAnalyzer:
                 )
                 self._landmarker = PoseLandmarker.create_from_options(options)
             else:
-                logger.warning(f"Pose model not found at {model_path}")
+                logger.error(
+                    f"Pose model file 'pose_landmarker_lite.task' not found at {model_path}. "
+                    "Please download it from https://storage.googleapis.com/mediapipe-models/ "
+                    f"and place it in '{MODELS_DIR}'."
+                )
         self._score_history = deque(maxlen=30)
 
     def process_frame(self, frame: np.ndarray) -> Dict[str, Any]:

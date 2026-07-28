@@ -127,7 +127,7 @@ keiko/
 │   │   └── registry.py      # Dynamic module discovery & loading
 │   │
 │   ├── modules/
-│   │   ├── auth/            # Authentication (bypassed → analyst@keiko.ai)
+│   │   ├── auth/            # Authentication (bypassed → user@local.app)
 │   │   │   ├── dependencies.py  # Auto-user injection (no tokens required)
 │   │   │   ├── models_db.py     # User SQLAlchemy model
 │   │   │   ├── router.py        # Auth endpoints (legacy, bypassed)

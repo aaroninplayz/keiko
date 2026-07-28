@@ -605,123 +605,153 @@
             // Uniform factor for color skewing calculations
             this.rawFactor = Math.random();
 
-            // Assign shape statically to create a mixed superposition constellation of shapes
-            const localShapes = ['sphere', 'torus', 'helix', 'cube'];
+            // Assign constellation shape statically to create a mixed superposition constellation
+            const localShapes = ['orion', 'big_dipper', 'cassiopeia', 'scorpius', 'cygnus', 'pleiades', 'galaxy_spiral'];
             this.assignedShape = localShapes[this.index % localShapes.length];
 
             // Recruited states (initially ambient wandering)
             this.isAmbient = true;
+            this.isAlphaStar = false;
 
-            // Organic noise jitter so shapes look fuzzy ("not fully there")
-            this.noiseX = (Math.random() - 0.5) * 22;
-            this.noiseY = (Math.random() - 0.5) * 22;
-            this.noiseZ = (Math.random() - 0.5) * 22;
+            // Organic noise jitter for cosmic stellar glow
+            this.noiseX = (Math.random() - 0.5) * 8;
+            this.noiseY = (Math.random() - 0.5) * 8;
+            this.noiseZ = (Math.random() - 0.5) * 8;
+        }
+
+        sampleConstellationGeometry(stars, lines, N_partition, localIdx, scaleFactor) {
+            if (localIdx < stars.length) {
+                const s = stars[localIdx];
+                this.x3d = s.x * scaleFactor + this.noiseX * 0.2;
+                this.y3d = s.y * scaleFactor + this.noiseY * 0.2;
+                this.z3d = s.z * scaleFactor + this.noiseZ * 0.2;
+                this.isAlphaStar = true;
+            } else {
+                const lineIdx = localIdx % lines.length;
+                const pair = lines[lineIdx];
+                const s1 = stars[pair[0]];
+                const s2 = stars[pair[1]];
+                const t = Math.sin((localIdx / N_partition) * Math.PI * 4) * 0.5 + 0.5;
+                
+                this.x3d = (s1.x + (s2.x - s1.x) * t) * scaleFactor + this.noiseX;
+                this.y3d = (s1.y + (s2.y - s1.y) * t) * scaleFactor + this.noiseY;
+                this.z3d = (s1.z + (s2.z - s1.z) * t) * scaleFactor + this.noiseZ;
+                this.isAlphaStar = false;
+            }
         }
 
         calculateShapeCoordinates(shape, N_partition, localIdx) {
+            const scaleFactor = (cfg.shapes[shape] && cfg.shapes[shape].scale) ? cfg.shapes[shape].scale : 185;
+            
             switch(shape) {
-                case 'sphere': {
-                    const theta = Math.acos(1 - 2 * (localIdx + 0.5) / N_partition);
-                    const phi = Math.sqrt(N_partition * Math.PI) * theta;
-                    const R = cfg.shapes.sphere.R;
-                    this.x3d = R * Math.sin(theta) * Math.cos(phi) + this.noiseX;
-                    this.y3d = R * Math.sin(theta) * Math.sin(phi) + this.noiseY;
-                    this.z3d = R * Math.cos(theta) + this.noiseZ;
+                case 'orion': {
+                    const stars = [
+                        { x: -0.5, y: -0.7, z: 0.1 },  // Betelgeuse (Left Shoulder)
+                        { x: 0.5, y: -0.7, z: -0.1 },  // Bellatrix (Right Shoulder)
+                        { x: -0.25, y: 0.0, z: 0 },    // Alnitak (Belt Left)
+                        { x: 0.0, y: 0.0, z: 0 },      // Alnilam (Belt Center)
+                        { x: 0.25, y: 0.0, z: 0 },     // Mintaka (Belt Right)
+                        { x: -0.4, y: 0.8, z: 0.1 },   // Saiph (Left Foot)
+                        { x: 0.4, y: 0.8, z: -0.1 },   // Rigel (Right Foot)
+                        { x: 0.0, y: -1.0, z: 0 },     // Meissa (Head)
+                        { x: 0.0, y: 0.35, z: 0.2 }    // Orion Nebula / Sword
+                    ];
+                    const lines = [
+                        [0, 1], [0, 2], [1, 4], [2, 3], [3, 4],
+                        [2, 5], [4, 6], [5, 6], [0, 7], [1, 7], [3, 8]
+                    ];
+                    this.sampleConstellationGeometry(stars, lines, N_partition, localIdx, scaleFactor);
                     break;
                 }
-                case 'cube': {
-                    const edge = localIdx % 12;
-                    // Distribute uniformly along the 12 edges to prevent clumping
-                    const t = (((localIdx / 12) | 0) / Math.max(1, N_partition / 12)) * 2 - 1; // range -1 to 1
-                    const halfSize = cfg.shapes.cube.halfSize;
-                    switch(edge) {
-                        // Top face edges
-                        case 0: this.x3d = t * halfSize; this.y3d = -halfSize; this.z3d = -halfSize; break;
-                        case 1: this.x3d = halfSize; this.y3d = t * halfSize; this.z3d = -halfSize; break;
-                        case 2: this.x3d = t * halfSize; this.y3d = halfSize; this.z3d = -halfSize; break;
-                        case 3: this.x3d = -halfSize; this.y3d = t * halfSize; this.z3d = -halfSize; break;
-                        // Bottom face edges
-                        case 4: this.x3d = t * halfSize; this.y3d = -halfSize; this.z3d = halfSize; break;
-                        case 5: this.x3d = halfSize; this.y3d = t * halfSize; this.z3d = fillProgress = halfSize; this.z3d = halfSize; break;
-                        case 6: this.x3d = t * halfSize; this.y3d = halfSize; this.z3d = halfSize; break;
-                        case 7: this.x3d = -halfSize; this.y3d = t * halfSize; this.z3d = halfSize; break;
-                        // Vertical connecting edges
-                        case 8: this.x3d = -halfSize; this.y3d = -halfSize; this.z3d = t * halfSize; break;
-                        case 9: this.x3d = halfSize; this.y3d = -halfSize; this.z3d = t * halfSize; break;
-                        case 10: this.x3d = halfSize; this.y3d = halfSize; this.z3d = t * halfSize; break;
-                        case 11: this.x3d = -halfSize; this.y3d = halfSize; this.z3d = t * halfSize; break;
-                    }
-                    this.x3d += this.noiseX;
-                    this.y3d += this.noiseY;
-                    this.z3d += this.noiseZ;
+                case 'big_dipper': {
+                    const stars = [
+                        { x: 0.6, y: -0.5, z: 0 },     // Dubhe
+                        { x: 0.6, y: 0.1, z: 0.1 },    // Merak
+                        { x: 0.1, y: 0.2, z: -0.1 },   // Phecda
+                        { x: 0.1, y: -0.4, z: 0 },     // Megrez
+                        { x: -0.25, y: -0.2, z: 0.1 }, // Alioth
+                        { x: -0.55, y: -0.1, z: 0 },   // Mizar
+                        { x: -0.85, y: 0.1, z: -0.1 }  // Alkaid
+                    ];
+                    const lines = [
+                        [0, 1], [1, 2], [2, 3], [3, 0], // Bowl
+                        [3, 4], [4, 5], [5, 6]          // Handle
+                    ];
+                    this.sampleConstellationGeometry(stars, lines, N_partition, localIdx, scaleFactor);
                     break;
                 }
-                case 'torus': {
-                    const R_torus = cfg.shapes.torus.R_torus;
-                    const r_tube = cfg.shapes.torus.r_tube;
-                    const rings = Math.floor(Math.sqrt(N_partition));
-                    const u = (localIdx % rings / rings) * Math.PI * 2;
-                    const v = (Math.floor(localIdx / rings) / (N_partition / rings)) * Math.PI * 2;
-                    this.x3d = (R_torus + r_tube * Math.cos(v)) * Math.cos(u) + this.noiseX;
-                    this.y3d = (R_torus + r_tube * Math.cos(v)) * Math.sin(u) + this.noiseY;
-                    this.z3d = r_tube * Math.sin(v) + this.noiseZ;
+                case 'cassiopeia': {
+                    const stars = [
+                        { x: -0.8, y: -0.4, z: 0.1 },  // Caph
+                        { x: -0.4, y: 0.2, z: -0.1 },   // Schedar
+                        { x: 0.0, y: -0.5, z: 0 },      // Gamma Cassiopeiae
+                        { x: 0.4, y: 0.1, z: 0.1 },    // Ruchbah
+                        { x: 0.8, y: -0.3, z: -0.1 }   // Segin
+                    ];
+                    const lines = [
+                        [0, 1], [1, 2], [2, 3], [3, 4]  // W-shape
+                    ];
+                    this.sampleConstellationGeometry(stars, lines, N_partition, localIdx, scaleFactor);
                     break;
                 }
-                case 'tesseract': {
-                    const corner = localIdx % 16;
-                    const x4 = (corner & 1 ? 1 : -1);
-                    const y4 = (corner & 2 ? 1 : -1);
-                    const z4 = (corner & 4 ? 1 : -1);
-                    const w4 = (corner & 8 ? 1 : -1);
-                    const cX = Math.cos(angleX), sX = Math.sin(angleX);
-                    const cY = Math.cos(angleY), sY = Math.sin(angleY);
-                    const xRot = x4 * cY - w4 * sY;
-                    const wRot = x4 * sY + w4 * cY;
-                    const yRot = y4 * cX - wRot * sX;
-                    const wRot2 = y4 * sX + wRot * cX;
-                    const factor = cfg.shapes.tesseract.scale / (2.0 + wRot2);
-                    this.x3d = xRot * factor + this.noiseX;
-                    this.y3d = yRot * factor + this.noiseY;
-                    this.z3d = z4 * factor * 0.7 + this.noiseZ;
+                case 'scorpius': {
+                    const stars = [
+                        { x: -0.6, y: -0.8, z: 0 },    // Graffias
+                        { x: -0.3, y: -0.7, z: 0.1 },  // Dschubba
+                        { x: 0.0, y: -0.3, z: 0 },     // Antares (Heart)
+                        { x: 0.1, y: 0.1, z: -0.1 },   // Wei
+                        { x: 0.3, y: 0.5, z: 0 },      // Sargas
+                        { x: 0.6, y: 0.7, z: 0.1 },    // Shaula
+                        { x: 0.7, y: 0.6, z: 0.2 }     // Lesath
+                    ];
+                    const lines = [
+                        [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]
+                    ];
+                    this.sampleConstellationGeometry(stars, lines, N_partition, localIdx, scaleFactor);
                     break;
                 }
-                case 'mobius': {
-                    const u = (localIdx / N_partition) * Math.PI * 2;
-                    const v = ((localIdx % 12) / 12 - 0.5) * cfg.shapes.mobius.tube; 
-                    const scale = cfg.shapes.mobius.scale;
-                    this.x3d = (scale + v * Math.cos(u / 2)) * Math.cos(u) + this.noiseX;
-                    this.y3d = (scale + v * Math.cos(u / 2)) * Math.sin(u) + this.noiseY;
-                    this.z3d = v * Math.sin(u / 2) + this.noiseZ;
+                case 'cygnus': {
+                    const stars = [
+                        { x: 0.0, y: -0.9, z: 0 },     // Deneb (Tail)
+                        { x: 0.0, y: -0.1, z: 0 },     // Sadr (Center)
+                        { x: 0.0, y: 0.8, z: 0 },      // Albireo (Head)
+                        { x: -0.75, y: -0.1, z: 0.2 }, // Gienah (Left Wing)
+                        { x: 0.75, y: -0.1, z: -0.2 }  // Delta Cygni (Right Wing)
+                    ];
+                    const lines = [
+                        [0, 1], [1, 2], [3, 1], [1, 4] // Northern Cross
+                    ];
+                    this.sampleConstellationGeometry(stars, lines, N_partition, localIdx, scaleFactor);
                     break;
                 }
-                case 'helix': {
-                    const t = (localIdx / N_partition) * Math.PI * 8; 
-                    const side = (localIdx % 2 === 0) ? 1 : -1;
-                    const R_helix = cfg.shapes.helix.R;
-                    const len = cfg.shapes.helix.length;
-                    this.x3d = R_helix * Math.cos(t) * side + this.noiseX;
-                    this.y3d = R_helix * Math.sin(t) * side + this.noiseY;
-                    this.z3d = (localIdx / N_partition - 0.5) * len + this.noiseZ;
+                case 'pleiades': {
+                    const stars = [
+                        { x: -0.3, y: -0.2, z: 0 },    // Alcyone
+                        { x: -0.1, y: -0.4, z: 0.1 },  // Atlas
+                        { x: -0.4, y: 0.1, z: -0.1 },  // Electra
+                        { x: 0.1, y: -0.1, z: 0.2 },   // Maia
+                        { x: 0.3, y: 0.2, z: -0.1 },   // Merope
+                        { x: 0.0, y: 0.4, z: 0 },      // Taygeta
+                        { x: 0.4, y: -0.3, z: 0.1 }    // Pleione
+                    ];
+                    const lines = [
+                        [0, 1], [0, 2], [0, 3], [3, 4], [3, 5], [1, 6]
+                    ];
+                    this.sampleConstellationGeometry(stars, lines, N_partition, localIdx, scaleFactor);
                     break;
                 }
-                case 'infinity': {
-                    const theta = (localIdx / N_partition) * Math.PI * 2;
-                    const cosT = Math.cos(theta);
-                    const sinT = Math.sin(theta);
-                    const denom = 1 + sinT * sinT;
-                    const scale_inf = cfg.shapes.infinity.scale;
-                    this.x3d = scale_inf * cosT / denom + this.noiseX;
-                    this.y3d = scale_inf * cosT * sinT / denom + this.noiseY;
-                    this.z3d = 18 * sinT + this.noiseZ;
-                    break;
-                }
+                case 'galaxy_spiral':
                 default: {
-                    const theta = Math.acos(1 - 2 * (localIdx + 0.5) / N_partition);
-                    const phi = Math.sqrt(N_partition * Math.PI) * theta;
-                    const R = 100;
-                    this.x3d = R * Math.sin(theta) * Math.cos(phi) + this.noiseX;
-                    this.y3d = R * Math.sin(theta) * Math.sin(phi) + this.noiseY;
-                    this.z3d = R * Math.cos(theta) + this.noiseZ;
+                    const a = 12;
+                    const b = 0.22;
+                    const arm = localIdx % 2;
+                    const theta = (localIdx / N_partition) * Math.PI * 6 + arm * Math.PI;
+                    const r = a * Math.exp(b * (theta % (Math.PI * 3)));
+                    const z = (Math.random() - 0.5) * 30;
+                    this.x3d = r * Math.cos(theta) + this.noiseX;
+                    this.y3d = r * Math.sin(theta) + this.noiseY;
+                    this.z3d = z + this.noiseZ;
+                    this.isAlphaStar = (localIdx % 15 === 0);
                     break;
                 }
             }
@@ -864,27 +894,36 @@
         }
 
         draw() {
-            ctx.beginPath();
             const posX = (state === 'wandering' || this.isAmbient) ? this.x : this.currentX;
             const posY = (state === 'wandering' || this.isAmbient) ? this.y : this.currentY;
 
-            ctx.arc(posX, posY, cfg.particleRadius, 0, Math.PI * 2);
-            
-            // Dynamic color dominance ratio shifting mathematically:
-            // At top (currentScrollProgress = 0): skewed heavily purple (factor near 0)
-            // At bottom (currentScrollProgress = 1): skewed heavily blue/cyan (factor near 1)
             const u = this.rawFactor;
             const u_purple = Math.pow(u, 2.5);
             const u_blue = 1 - Math.pow(1 - u, 2.5);
             const factor = u_purple * (1 - currentScrollProgress) + u_blue * currentScrollProgress;
             
-            // Blending colors
             const r = Math.round(currentPColor1.r + (currentPColor2.r - currentPColor1.r) * factor);
             const g = Math.round(currentPColor1.g + (currentPColor2.g - currentPColor1.g) * factor);
             const b = Math.round(currentPColor1.b + (currentPColor2.b - currentPColor1.b) * factor);
-            
-            ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${currentOpacity})`;
-            ctx.fill();
+
+            // Render prominent Alpha Stars in constellations with bright stellar halo
+            if (!this.isAmbient && this.isAlphaStar && (state === 'shape' || state === 'transitionToShape')) {
+                const starRadius = cfg.particleRadius * 2.2;
+                ctx.beginPath();
+                ctx.arc(posX, posY, starRadius * 2.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${currentOpacity * 0.35})`;
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(posX, posY, starRadius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${Math.min(1.0, currentOpacity * 1.4)})`;
+                ctx.fill();
+            } else {
+                ctx.beginPath();
+                ctx.arc(posX, posY, cfg.particleRadius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${currentOpacity})`;
+                ctx.fill();
+            }
         }
     }
 

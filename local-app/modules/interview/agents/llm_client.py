@@ -1,5 +1,6 @@
 import logging
 import json
+import os
 from typing import List, Dict, Any, Optional
 from core.config import settings
 
@@ -21,9 +22,11 @@ class LLMClient:
 
     def detect_provider(self) -> Optional[str]:
         """
-        Determines the active provider based on configured API keys.
-        Priority: OpenAI -> Gemini -> Anthropic -> Groq
+        Determines the active provider based on configured API keys or local Ollama presence.
+        Priority: OpenAI -> Gemini -> Anthropic -> Groq -> Ollama (Local 1B-3B model)
         """
+        if os.getenv("KEIKO_OFFLINE_LLM") == "1":
+            return None
         if settings.OPENAI_API_KEY:
             return "openai"
         if settings.GEMINI_API_KEY:
@@ -32,7 +35,33 @@ class LLMClient:
             return "anthropic"
         if settings.GROQ_API_KEY:
             return "groq"
+        
+        # Check if local Ollama service is accessible on localhost:11434
+        if self._check_ollama_available():
+            return "ollama"
+
         return None
+
+    def _check_ollama_available(self) -> bool:
+        """Pings local Ollama server to check if a local LLM is available."""
+        url = f"{settings.OLLAMA_BASE_URL.rstrip('/')}/api/tags"
+        try:
+            if self.requests:
+                res = self.requests.get(url, timeout=0.3)
+                if res.status_code == 200:
+                    models = res.json().get("models", [])
+                    return len(models) > 0
+                return False
+            else:
+                import urllib.request
+                req = urllib.request.Request(url, method="GET")
+                with urllib.request.urlopen(req, timeout=0.3) as res:
+                    if res.status == 200:
+                        data = json.loads(res.read().decode("utf-8"))
+                        return len(data.get("models", [])) > 0
+                    return False
+        except Exception:
+            return False
 
     def complete(self, messages: List[Dict[str, str]], provider: Optional[str] = None, **kwargs) -> Optional[str]:
         """
@@ -41,7 +70,7 @@ class LLMClient:
         if not provider:
             provider = self.detect_provider()
             if not provider:
-                logger.warning("No LLM API keys configured. Cannot complete chat.")
+                logger.warning("No LLM API keys or local Ollama instance configured. Cannot complete chat.")
                 return None
 
         provider = provider.lower()
@@ -53,15 +82,36 @@ class LLMClient:
             return self._call_anthropic(messages, **kwargs)
         elif provider == "groq":
             return self._call_groq(messages, **kwargs)
+        elif provider == "ollama":
+            return self._call_ollama(messages, **kwargs)
         else:
             logger.error(f"Unsupported provider: {provider}")
             return None
 
-    def _send_request(self, url: str, headers: Dict[str, str], payload: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def _call_ollama(self, messages: List[Dict[str, str]], **kwargs) -> Optional[str]:
+        url = f"{settings.OLLAMA_BASE_URL.rstrip('/')}/api/chat"
+        headers = {"Content-Type": "application/json"}
+        payload = {
+            "model": kwargs.get("model", settings.OLLAMA_MODEL),
+            "messages": messages,
+            "stream": False,
+            "options": {
+                "temperature": kwargs.get("temperature", 0.1)
+            }
+        }
+        req_timeout = kwargs.get("timeout", 2.5)
+        res_json = self._send_request(url, headers, payload, timeout=req_timeout)
+        if res_json and "message" in res_json:
+            return res_json["message"].get("content")
+        elif res_json and "response" in res_json:
+            return res_json.get("response")
+        return None
+
+    def _send_request(self, url: str, headers: Dict[str, str], payload: Dict[str, Any], timeout: float = 6.0) -> Optional[Dict[str, Any]]:
         """Sends HTTP POST request using either requests or urllib.request."""
         if self.requests:
             try:
-                response = self.requests.post(url, headers=headers, json=payload, timeout=30)
+                response = self.requests.post(url, headers=headers, json=payload, timeout=timeout)
                 response.raise_for_status()
                 return response.json()
             except Exception as e:
@@ -75,7 +125,7 @@ class LLMClient:
             data_bytes = json.dumps(payload).encode("utf-8")
             req = urllib.request.Request(url, data=data_bytes, headers=headers, method="POST")
             try:
-                with urllib.request.urlopen(req, timeout=30) as response:
+                with urllib.request.urlopen(req, timeout=timeout) as response:
                     res_bytes = response.read()
                     return json.loads(res_bytes.decode("utf-8"))
             except urllib.error.HTTPError as e:
@@ -98,7 +148,8 @@ class LLMClient:
             "temperature": kwargs.get("temperature", 0.7),
             "max_tokens": kwargs.get("max_tokens", 800)
         }
-        res = self._send_request(url, headers, payload)
+        req_timeout = kwargs.get("timeout", 6.0)
+        res = self._send_request(url, headers, payload, timeout=req_timeout)
         if res and "choices" in res:
             try:
                 return res["choices"][0]["message"]["content"]
@@ -118,7 +169,8 @@ class LLMClient:
             "temperature": kwargs.get("temperature", 0.7),
             "max_tokens": kwargs.get("max_tokens", 800)
         }
-        res = self._send_request(url, headers, payload)
+        req_timeout = kwargs.get("timeout", 6.0)
+        res = self._send_request(url, headers, payload, timeout=req_timeout)
         if res and "choices" in res:
             try:
                 return res["choices"][0]["message"]["content"]
@@ -150,7 +202,8 @@ class LLMClient:
         if system_content:
             payload["system"] = system_content
 
-        res = self._send_request(url, headers, payload)
+        req_timeout = kwargs.get("timeout", 6.0)
+        res = self._send_request(url, headers, payload, timeout=req_timeout)
         if res and "content" in res:
             try:
                 return res["content"][0]["text"]
@@ -186,7 +239,8 @@ class LLMClient:
         if system_instruction:
             payload["systemInstruction"] = system_instruction
 
-        res = self._send_request(url, headers, payload)
+        req_timeout = kwargs.get("timeout", 6.0)
+        res = self._send_request(url, headers, payload, timeout=req_timeout)
         if res and "candidates" in res:
             try:
                 return res["candidates"][0]["content"]["parts"][0]["text"]

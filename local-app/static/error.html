@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KEIKO — System Exception / Error</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0c0a0d',
+            surface: '#17151a',
+            surfaceBorder: '#292530',
+            primary: '#8b5cf6',
+            primaryHover: '#7c3aed'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%23ef4444'/><text x='16' y='22' text-anchor='middle' font-size='18' fill='white' font-family='sans-serif'>!</text></svg>" />
+</head>
+<body class="bg-bg text-gray-100 min-h-screen flex flex-col justify-between font-sans antialiased">
+
+  <!-- Navigation Header -->
+  <header class="border-b border-surfaceBorder bg-surface/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="dashboard.html" class="flex items-center gap-2">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary to-indigo-500 flex items-center justify-center font-bold text-white text-xl shadow-lg shadow-primary/30">K</div>
+        <span class="font-extrabold text-xl tracking-tight text-white">KEIKO</span>
+      </a>
+      <div class="flex items-center gap-4">
+        <a href="dashboard.html" class="text-sm text-gray-400 hover:text-white transition-colors">Dashboard</a>
+        <a href="settings.html" class="text-sm text-gray-400 hover:text-white transition-colors">Settings</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Error Workspace -->
+  <main class="flex-1 flex items-center justify-center p-6">
+    <div class="max-w-xl w-full bg-surface border border-surfaceBorder rounded-3xl p-8 space-y-6 text-center shadow-2xl relative overflow-hidden">
+      
+      <!-- Ambient Glow -->
+      <div class="absolute -top-20 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Local Error Illustration -->
+      <div class="relative z-10 overflow-hidden rounded-2xl border border-surfaceBorder shadow-xl max-h-56">
+        <img src="images/error_illustration.jpg" alt="KEIKO Local System Error" class="w-full h-full object-cover" />
+      </div>
+
+      <!-- Error Text -->
+      <div class="space-y-2 relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono font-bold">
+          <span class="w-2 h-2 rounded-full bg-red-400 animate-ping"></span>
+          SYSTEM DIAGNOSTIC NOTICE
+        </div>
+        <h1 class="text-2xl font-extrabold text-white tracking-tight" id="errorTitle">System Exception Encountered</h1>
+        <p class="text-xs text-gray-400 max-w-md mx-auto leading-relaxed" id="errorDetails">
+          The local KEIKO system encountered an unexpected condition or requested a resource that is currently unavailable.
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 relative z-10">
+        <a href="dashboard.html" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-primary hover:bg-primaryHover text-white text-xs font-bold transition-all shadow-lg shadow-primary/20">
+          Return to Dashboard
+        </a>
+        <a href="settings.html" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-medium transition-all border border-white/15">
+          System Settings
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-4 border-t border-surfaceBorder text-center text-xs text-gray-500 font-mono">
+    KEIKO Local Lab — 100% Offline Engine
+  </footer>
+
+  <script>
+    // Extract error parameters from URL if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const msg = urlParams.get('message');
+    const code = urlParams.get('code');
+    if (msg) {
+      document.getElementById('errorDetails').textContent = msg;
+    }
+    if (code) {
+      document.getElementById('errorTitle').textContent = 'Error Code ' + code;
+    }
+  </script>
+</body>
+</html>

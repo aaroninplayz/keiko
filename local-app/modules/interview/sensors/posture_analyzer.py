@@ -51,7 +51,11 @@ class PostureAnalyzer:
                 )
                 self._landmarker = PoseLandmarker.create_from_options(options)
             else:
-                logger.warning(f"Pose model not found at {model_path}")
+                logger.error(
+                    f"Pose model file 'pose_landmarker_lite.task' not found at {model_path}. "
+                    "Please download it from https://storage.googleapis.com/mediapipe-models/ "
+                    f"and place it in '{MODELS_DIR}'."
+                )
         self._history: list = []
         self._max_history = 30
 

@@ -77,6 +77,7 @@ class DifficultyMode(str, Enum):
 class DurationType(str, Enum):
     questions = 'questions'
     minutes = 'minutes'
+    unlimited = 'unlimited'
 
 class StartSessionRequest(BaseModel):
     interview_type: InterviewType
@@ -84,6 +85,8 @@ class StartSessionRequest(BaseModel):
     duration_type: DurationType
     duration_value: int = Field(..., gt=0)
     session_id: Optional[str] = None
+    candidate_context: Optional[Dict[str, Any]] = None
+    jd_text: Optional[str] = None
 
 class SubmitAnswerRequest(BaseModel):
     session_id: str

@@ -74,20 +74,74 @@ class InterviewOrchestrator:
         self.session_weights: Dict[str, WeightConfig] = {}
         self.latest_session_metrics: Dict[str, Dict[str, Any]] = {}
 
-        # Sensors
-        self.posture_analyzer = PostureAnalyzer()
-        self.eye_contact_analyzer = EyeContactAnalyzer()
-        self.body_language_analyzer = BodyLanguageAnalyzer()
-        self.attire_analyzer = AttireAnalyzer()
-        self.confidence_metric = ConfidenceMetric()
-        self.facial_expression_analyzer = FacialExpressionAnalyzer()
-        self.voice_analyzer = VoiceAnalyzer()
-        self.engagement_tracker = EngagementTracker()
-        self.professional_presence_evaluator = ProfessionalPresenceEvaluator()
+        # Lazy initialized sensors
+        self._posture_analyzer = None
+        self._eye_contact_analyzer = None
+        self._body_language_analyzer = None
+        self._attire_analyzer = None
+        self._confidence_metric = None
+        self._facial_expression_analyzer = None
+        self._voice_analyzer = None
+        self._engagement_tracker = None
+        self._professional_presence_evaluator = None
 
         # Frame throttle: process every Nth frame
         self._frame_counters: Dict[str, int] = {}
         self._process_every_n = 3  # analyze every 3rd frame for performance
+
+    @property
+    def posture_analyzer(self):
+        if self._posture_analyzer is None:
+            self._posture_analyzer = PostureAnalyzer()
+        return self._posture_analyzer
+
+    @property
+    def eye_contact_analyzer(self):
+        if self._eye_contact_analyzer is None:
+            self._eye_contact_analyzer = EyeContactAnalyzer()
+        return self._eye_contact_analyzer
+
+    @property
+    def body_language_analyzer(self):
+        if self._body_language_analyzer is None:
+            self._body_language_analyzer = BodyLanguageAnalyzer()
+        return self._body_language_analyzer
+
+    @property
+    def attire_analyzer(self):
+        if self._attire_analyzer is None:
+            self._attire_analyzer = AttireAnalyzer()
+        return self._attire_analyzer
+
+    @property
+    def confidence_metric(self):
+        if self._confidence_metric is None:
+            self._confidence_metric = ConfidenceMetric()
+        return self._confidence_metric
+
+    @property
+    def facial_expression_analyzer(self):
+        if self._facial_expression_analyzer is None:
+            self._facial_expression_analyzer = FacialExpressionAnalyzer()
+        return self._facial_expression_analyzer
+
+    @property
+    def voice_analyzer(self):
+        if self._voice_analyzer is None:
+            self._voice_analyzer = VoiceAnalyzer()
+        return self._voice_analyzer
+
+    @property
+    def engagement_tracker(self):
+        if self._engagement_tracker is None:
+            self._engagement_tracker = EngagementTracker()
+        return self._engagement_tracker
+
+    @property
+    def professional_presence_evaluator(self):
+        if self._professional_presence_evaluator is None:
+            self._professional_presence_evaluator = ProfessionalPresenceEvaluator()
+        return self._professional_presence_evaluator
 
     async def connect(self, session_id: str, websocket: WebSocket):
         await websocket.accept()
@@ -358,7 +412,7 @@ class InterviewOrchestrator:
                 
                 # 16-bit mono 16000Hz PCM has 32000 bytes per second (16000 * 2)
                 audio_len = len(buffer_data) / 32000.0
-                telemetry = self.voice_analyzer.analyze_speech(text, audio_len=audio_len)
+                telemetry = self.voice_analyzer.analyze_speech(text, audio_len=audio_len, pcm_bytes=buffer_data)
                 self._latest_voice_metrics[session_id] = telemetry
                 
                 return text
