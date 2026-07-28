@@ -1,225 +1,266 @@
 <!DOCTYPE html>
-
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-    }
-  </style>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Audio Intelligence — KEIKO Candidate Intelligence</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#050506",
+              "bg-card": "#0c0c0e",
+              "surface-container": "#13141f",
+              "primary": "#d2bbff",
+              "secondary": "#adc6ff",
+              "tertiary": "#71f8e4",
+              "text-primary": "#F4F4F5",
+              "text-secondary": "#9E9E9F",
+              "accent-gradient": "linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #14B8A6 100%)"
+            },
+            fontFamily: {
+              "display": ["Space Grotesk", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "mono": ["IBM Plex Mono", "monospace"]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body { background-color: #050506; color: #F4F4F5; font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(12, 12, 14, 0.85); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-card { background: rgba(19, 20, 31, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.06); }
+    </style>
 </head>
-<body>
-<!-- KEIKO TopNavBar -->
-<nav class="fixed top-0 w-full z-50 bg-[#050506]/50 backdrop-blur-lg border-b border-white/5 h-20">
-  <div class="flex justify-between items-center h-full px-8 max-w-[1440px] mx-auto w-full">
-    <a href="/" class="hover:opacity-90 transition-opacity"><img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-10"></a>
-    <div class="hidden md:flex items-center space-x-8">
-      <a id="nav-about" class="text-sm text-gray-400 hover:text-white transition-colors" href="about">About</a>
-      <a id="nav-interview-journey" class="text-sm text-gray-400 hover:text-white transition-colors" href="interview-journey">Journey</a>
-      <a id="nav-features" class="text-sm text-gray-400 hover:text-white transition-colors" href="features">Features</a>
-      <a id="nav-architecture" class="text-sm text-gray-400 hover:text-white transition-colors" href="architecture">Architecture</a>
-      <a id="nav-download" class="text-sm text-gray-400 hover:text-white transition-colors" href="download">Download</a>
-    </div>
-    <a class="bg-[#7c3aed] text-white px-6 py-2 rounded-full font-bold text-sm transition-all hover:scale-105 hover:opacity-90 active:scale-95 shadow-lg shadow-purple-500/20" href="experience">
-      Experience KEIKO
+<body class="min-h-screen flex flex-col selection:bg-primary/20">
+
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-[#050506]/75 backdrop-blur-lg border-b border-white/10 h-20">
+  <div class="flex justify-between items-center h-full px-8 max-w-[1600px] mx-auto w-full">
+    <a href="index.html" class="hover:opacity-90 transition-opacity flex items-center gap-3">
+      <img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-10">
+      <span class="font-display font-semibold text-lg text-primary tracking-wide">Audio Intelligence</span>
     </a>
+    <div class="hidden md:flex items-center space-x-6 text-sm">
+      <a class="text-gray-400 hover:text-white transition-colors" href="resume-intelligence.html">Resume Intel</a>
+      <a class="text-gray-400 hover:text-white transition-colors" href="job-intelligence.html">JD Intel</a>
+      <a class="text-gray-400 hover:text-white transition-colors" href="video-intelligence.html">Video Intel</a>
+      <a class="text-primary font-bold transition-colors" href="audio-intelligence.html">Audio Intel</a>
+      <a class="text-gray-400 hover:text-white transition-colors" href="interview-intelligence.html">Central Engine</a>
+    </div>
   </div>
 </nav>
-<!-- STITCH_SHADER_START:ANIMATION_49 class="fixed inset-0 w-full h-full" -->
-<div class="fixed inset-0 w-full h-full" style="display:block;">
-<canvas id="shader-canvas-ANIMATION_49" style="display:block;width:100%;height:100%"></canvas>
+
+<!-- Main Workspace -->
+<main class="flex-1 pt-28 pb-12 px-6 md:px-10 max-w-[1600px] mx-auto w-full space-y-6">
+
+    <!-- Header Section -->
+    <div class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="text-xs font-mono tracking-widest text-tertiary uppercase mb-1">MODULE 04 • AUDIO INTELLIGENCE</div>
+            <h1 class="font-display text-3xl font-bold text-white flex items-center gap-3">
+                <span class="material-symbols-outlined text-tertiary text-4xl">mic</span>
+                Vocal & Speech Pattern Audio Intelligence
+            </h1>
+            <p class="text-text-secondary text-sm mt-1">Speaking rate WPM, pitch modulation, Whisper STT clarity, sentiment trajectory, and filler word frequency tracking.</p>
+        </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-xs font-mono uppercase">Total Audio Files</span>
+            <div class="font-display text-3xl font-bold text-white mt-2">420</div>
+            <span class="text-xs text-tertiary mt-1 block">100% transcribed</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-xs font-mono uppercase">Avg Audio Score</span>
+            <div class="font-display text-3xl font-bold text-primary mt-2">87.0</div>
+            <span class="text-xs text-text-secondary mt-1 block">Vocal fluency score</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-xs font-mono uppercase">Avg Speaking Clarity</span>
+            <div class="font-display text-3xl font-bold text-tertiary mt-2">92.0%</div>
+            <span class="text-xs text-tertiary mt-1 block">Optimal STT confidence</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-xs font-mono uppercase">Avg Speaking Rate</span>
+            <div class="font-display text-3xl font-bold text-white mt-2">138 WPM</div>
+            <span class="text-xs text-text-secondary mt-1 block">Ideal range: 130-150 WPM</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-xs font-mono uppercase">Filler Word Count</span>
+            <div class="font-display text-3xl font-bold text-tertiary mt-2">2.5</div>
+            <span class="text-xs text-tertiary mt-1 block">Per response average</span>
+        </div>
+    </div>
+
+    <!-- Main Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Audio List -->
+        <div class="lg:col-span-4 glass-panel p-6 rounded-3xl space-y-4">
+            <h2 class="font-display font-bold text-lg text-white border-b border-white/10 pb-3">Processed Audio Streams</h2>
+            <div class="space-y-3" id="audioListContainer"></div>
+        </div>
+
+        <!-- Right Audio Deep Analysis -->
+        <div class="lg:col-span-8 glass-panel p-6 rounded-3xl space-y-5">
+            <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                <div>
+                    <h2 class="font-display font-bold text-xl text-white" id="aCandidateName">Sarah Jenkins</h2>
+                    <p class="text-xs text-primary font-mono" id="aMeta">35 Mins • Processed 2026-07-28</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-text-secondary uppercase font-mono block">Audio Score</span>
+                    <span class="font-display text-3xl font-bold text-primary" id="aScore">87.0</span>
+                </div>
+            </div>
+
+            <!-- Waveform Visualizer -->
+            <div class="glass-card p-4 rounded-2xl space-y-3 border border-primary/30">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-mono text-primary uppercase">Audio Waveform & Pitch Telemetry</span>
+                    <span class="text-xs font-mono text-tertiary">138 WPM (Optimal)</span>
+                </div>
+                <div class="h-20 flex items-center justify-center gap-1.5 overflow-hidden">
+                    <div class="w-1.5 bg-primary/60 h-8 rounded-full"></div>
+                    <div class="w-1.5 bg-primary/80 h-14 rounded-full animate-pulse"></div>
+                    <div class="w-1.5 bg-primary h-18 rounded-full"></div>
+                    <div class="w-1.5 bg-secondary h-10 rounded-full"></div>
+                    <div class="w-1.5 bg-primary h-16 rounded-full animate-pulse"></div>
+                    <div class="w-1.5 bg-tertiary h-12 rounded-full"></div>
+                    <div class="w-1.5 bg-primary h-6 rounded-full"></div>
+                    <div class="w-1.5 bg-primary/40 h-14 rounded-full"></div>
+                    <div class="w-1.5 bg-primary h-18 rounded-full animate-pulse"></div>
+                    <div class="w-1.5 bg-secondary h-8 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Speech Metrics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div class="glass-card p-3.5 rounded-2xl">
+                    <span class="text-xs text-text-secondary block font-mono">Clarity Score</span>
+                    <span class="font-display text-xl font-bold text-white" id="aClarity">92%</span>
+                </div>
+                <div class="glass-card p-3.5 rounded-2xl">
+                    <span class="text-xs text-text-secondary block font-mono">Dominant Tone</span>
+                    <span class="font-display text-sm font-bold text-tertiary" id="aSentiment">Confident</span>
+                </div>
+                <div class="glass-card p-3.5 rounded-2xl">
+                    <span class="text-xs text-text-secondary block font-mono">Filler Words</span>
+                    <span class="font-display text-xl font-bold text-white" id="aFillers">3</span>
+                </div>
+                <div class="glass-card p-3.5 rounded-2xl">
+                    <span class="text-xs text-text-secondary block font-mono">STAR Structure</span>
+                    <span class="font-display text-sm font-bold text-primary">Detected</span>
+                </div>
+            </div>
+
+            <!-- Sentiment Graph -->
+            <div class="glass-card p-4 rounded-2xl space-y-2">
+                <h4 class="text-xs font-mono text-primary uppercase">Tone & Sentiment Trajectory</h4>
+                <div class="h-44">
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+            </div>
+
+            <!-- AI Vocal Insights -->
+            <div class="glass-card p-4 rounded-2xl space-y-2">
+                <h4 class="text-xs font-mono text-primary uppercase flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">auto_awesome</span> Speech & Vocal Insights
+                </h4>
+                <ul class="text-xs text-text-secondary list-disc list-inside space-y-1" id="aInsightsList"></ul>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
 <script>
-(function() {
-  const canvas = document.getElementById('shader-canvas-ANIMATION_49');
+let audioData = [];
+let selectedAudio = null;
+let sentChartObj = null;
 
-  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
-  // This fires on initial layout and whenever the element is resized.
-  function syncSize() {
-    const w = canvas.clientWidth  || 1280;
-    const h = canvas.clientHeight || 720;
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width  = w;
-      canvas.height = h;
-    }
-  }
-  if (typeof ResizeObserver !== 'undefined') {
-    new ResizeObserver(syncSize).observe(canvas);
-  }
-  syncSize();
-
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-  if (!gl) return;
-  const vs = `attribute vec2 a_position;
-varying vec2 v_texCoord;
-void main() {
-  v_texCoord = a_position * 0.5 + 0.5;
-  gl_Position = vec4(a_position, 0.0, 1.0);
-}`;
-  const fs = `precision highp float;
-uniform float u_time;
-uniform vec2 u_resolution;
-uniform vec2 u_mouse;
-varying vec2 v_texCoord;
-
-float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+async function fetchAudio() {
+    try {
+        const res = await fetch('/api/v1/interview/intelligence/audio');
+        const json = await res.json();
+        if(json.status === 'success' && json.data) {
+            audioData = json.data;
+            renderAudioList(audioData);
+            if(audioData.length > 0) selectAudio(audioData[0].id);
+        }
+    } catch(e) { console.error(e); }
 }
 
-float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    f = f * f * (3.0 - 2.0 * f);
-    return mix(mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), f.x),
-               mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+function renderAudioList(list) {
+    const container = document.getElementById('audioListContainer');
+    container.innerHTML = list.map(a => `
+        <div onclick="selectAudio(${a.id})" class="glass-card p-4 rounded-2xl hover:border-primary/50 cursor-pointer transition ${selectedAudio && selectedAudio.id === a.id ? 'border-primary bg-primary/10' : ''}">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-semibold text-white">${a.candidate_name}</h3>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-tertiary/20 text-tertiary border border-tertiary/30">${a.status}</span>
+            </div>
+            <div class="flex items-center justify-between mt-2 text-xs text-text-secondary">
+                <span>${a.duration_minutes}m • ${a.speaking_rate_wpm} WPM</span>
+                <span class="font-mono text-primary font-bold">Score ${a.audio_score}</span>
+            </div>
+        </div>
+    `).join('');
 }
 
-void main() {
-    vec2 uv = v_texCoord;
-    vec2 mouse = u_mouse / u_resolution;
-    
-    // Base obsidian background #131314
-    vec3 color = vec3(0.0745, 0.0745, 0.0784);
-    
-    // Waveform logic: Multiple overlapping sine waves with noise modulation
-    float wave = 0.0;
-    for(float i = 0.0; i < 5.0; i++) {
-        float freq = 3.0 + i * 2.0;
-        float speed = 0.4 + i * 0.15;
-        float amp = 0.03 / (i + 1.0);
-        float offset = i * 1.2;
-        
-        // Modulate amplitude with slow noise to simulate speech cadence
-        float speechMod = noise(vec2(u_time * 0.2, i)) * 1.5;
-        
-        float y = 0.5 + sin(uv.x * freq + u_time * speed + offset) * amp * speechMod;
-        
-        float dist = abs(uv.y - y);
-        float line = smoothstep(0.003, 0.0, dist);
-        wave += line * (0.4 + 0.6 * sin(u_time + i));
-    }
-    
-    // Gradient for the waves (Violet to Teal)
-    vec3 waveColor = mix(vec3(0.486, 0.227, 0.929), vec3(0.08, 0.72, 0.65), uv.x);
-    color += wave * waveColor;
-    
-    // Background technical grid
-    vec2 grid = fract(uv * 15.0);
-    float g = (smoothstep(0.02, 0.0, grid.x) + smoothstep(0.02, 0.0, grid.y)) * 0.03;
-    color += g;
-    
-    // Ambient pulse for "intelligence activity"
-    float n = noise(uv * 4.0 - u_time * 0.1);
-    color += smoothstep(0.4, 0.6, n) * vec3(0.12, 0.6, 0.6) * 0.02;
-    
-    // Mouse interaction glow
-    float d = distance(uv, mouse);
-    float glow = smoothstep(0.5, 0.0, d) * 0.06;
-    color += glow * vec3(0.486, 0.227, 0.929);
-    
-    gl_FragColor = vec4(color, 1.0);
-}`;
-  function cs(type, src) {
-    const s = gl.createShader(type);
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    return s;
-  }
-  const prog = gl.createProgram();
-  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
-  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
-  gl.linkProgram(prog);
-  gl.useProgram(prog);
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-  const pos = gl.getAttribLocation(prog, 'a_position');
-  gl.enableVertexAttribArray(pos);
-  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-  const uTime = gl.getUniformLocation(prog, 'u_time');
-  const uRes = gl.getUniformLocation(prog, 'u_resolution');
-  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+function selectAudio(id) {
+    selectedAudio = audioData.find(a => a.id === id);
+    if(!selectedAudio) return;
 
-  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
-  // Shaders that need normalized coords should use: u_mouse / u_resolution.
-  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
-  window.addEventListener('mousemove', (event) => {
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width && rect.height) {
-      const nx = (event.clientX - rect.left) / rect.width;
-      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
-      mouse.x = nx * canvas.width;
-      mouse.y = ny * canvas.height;
-    }
-  });
+    renderAudioList(audioData);
 
-  function render(t) {
-    if (typeof ResizeObserver === 'undefined') syncSize();
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    if (uTime) gl.uniform1f(uTime, t * 0.001);
-    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
-    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    requestAnimationFrame(render);
-  }
-  render(0);
-})();
-</script>
-</div>
-<!-- STITCH_SHADER_END:ANIMATION_49 -->
-<!-- KEIKO Footer -->
-<footer class="bg-[#0A0A0B] border-t border-white/10 w-full py-16 mt-32">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-8 max-w-[1440px] mx-auto">
-    <div class="lg:col-span-1">
-      <div><img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-12 mb-4"></div>
-      <p class="text-sm text-gray-500 mb-6 max-w-xs" style="font-family:'Inter',sans-serif">Engineering-grade intelligence for the modern technical interview.</p>
-      <p class="text-xs text-gray-600" style="font-family:'Inter',sans-serif">&copy; 2026 KEIKO Intelligence. All rights reserved.</p>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Platform</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="about">About Us</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="interview-journey">Interview Journey</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="features">Features</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="architecture">Architecture</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="download">Download Engine</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="experience">Experience KEIKO</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Resources</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation">Documentation</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation">API Configuration</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#changelogs">Roadmap</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#opensource">Open Source</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#faq">FAQ</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#changelogs">Changelog</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Legal</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Privacy Policy</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Terms of Service</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Contact Research</a></li>
-      </ul>
-    </div>
-  </div>
-</footer>
-<script>
-(function(){
-  var p = window.location.pathname.split('/').pop() || 'index.html';
-  var m = {'about.html':'nav-about','interview-journey.html':'nav-journey','features.html':'nav-features','architecture.html':'nav-architecture'};
-  var id = m[p];
-  if(id){var el=document.getElementById(id);if(el){el.style.color='#d2bbff';el.style.fontWeight='bold';el.style.borderBottom='2px solid #d2bbff';el.style.paddingBottom='4px';}}
-})();
+    document.getElementById('aCandidateName').innerText = selectedAudio.candidate_name;
+    document.getElementById('aMeta').innerText = `${selectedAudio.duration_minutes} Mins • Processed ${selectedAudio.recorded_at}`;
+    document.getElementById('aScore').innerText = selectedAudio.audio_score;
+    document.getElementById('aClarity').innerText = selectedAudio.clarity_score + '%';
+    document.getElementById('aSentiment').innerText = selectedAudio.sentiment;
+    document.getElementById('aFillers').innerText = selectedAudio.filler_word_count;
+
+    document.getElementById('aInsightsList').innerHTML = (selectedAudio.ai_insights || []).map(i => `<li>${i}</li>`).join('');
+
+    renderSentChart();
+}
+
+function renderSentChart() {
+    const ctx = document.getElementById('sentimentChart').getContext('2d');
+    if(sentChartObj) sentChartObj.destroy();
+    sentChartObj = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'],
+            datasets: [
+                { label: 'Positive Tone', data: [75, 80, 85, 88, 92], borderColor: '#71f8e4', tension: 0.3 },
+                { label: 'Neutral Tone', data: [20, 15, 12, 10, 8], borderColor: '#adc6ff', tension: 0.3 }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#9E9E9F', font: { size: 10 } } } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#9E9E9F' } },
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9E9E9F' }, max: 100 }
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', fetchAudio);
 </script>
 </body>
 </html>

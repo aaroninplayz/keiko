@@ -1,226 +1,433 @@
 <!DOCTYPE html>
-
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-    }
-  </style>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Central Evaluation Engine — KEIKO Master Candidate Intelligence</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#050506",
+              "bg-card": "#0c0c0e",
+              "surface-container": "#13141f",
+              "primary": "#d2bbff",
+              "secondary": "#adc6ff",
+              "tertiary": "#71f8e4",
+              "text-primary": "#F4F4F5",
+              "text-secondary": "#9E9E9F",
+              "accent-gradient": "linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #14B8A6 100%)"
+            },
+            fontFamily: {
+              "display": ["Space Grotesk", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "mono": ["IBM Plex Mono", "monospace"]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body { background-color: #050506; color: #F4F4F5; font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(12, 12, 14, 0.85); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-card { background: rgba(19, 20, 31, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.06); }
+    </style>
 </head>
-<body>
-<!-- KEIKO TopNavBar -->
-<nav class="fixed top-0 w-full z-50 bg-[#050506]/50 backdrop-blur-lg border-b border-white/5 h-20">
-  <div class="flex justify-between items-center h-full px-8 max-w-[1440px] mx-auto w-full">
-    <a href="/" class="hover:opacity-90 transition-opacity"><img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-10"></a>
-    <div class="hidden md:flex items-center space-x-8">
-      <a id="nav-about" class="text-sm text-gray-400 hover:text-white transition-colors" href="about">About</a>
-      <a id="nav-interview-journey" class="text-sm text-gray-400 hover:text-white transition-colors" href="interview-journey">Journey</a>
-      <a id="nav-features" class="text-sm text-gray-400 hover:text-white transition-colors" href="features">Features</a>
-      <a id="nav-architecture" class="text-sm text-gray-400 hover:text-white transition-colors" href="architecture">Architecture</a>
-      <a id="nav-download" class="text-sm text-gray-400 hover:text-white transition-colors" href="download">Download</a>
-    </div>
-    <a class="bg-[#7c3aed] text-white px-6 py-2 rounded-full font-bold text-sm transition-all hover:scale-105 hover:opacity-90 active:scale-95 shadow-lg shadow-purple-500/20" href="experience">
-      Experience KEIKO
+<body class="min-h-screen flex flex-col selection:bg-primary/20">
+
+<!-- Top Navigation -->
+<nav class="fixed top-0 w-full z-50 bg-[#050506]/75 backdrop-blur-lg border-b border-white/10 h-20">
+  <div class="flex justify-between items-center h-full px-8 max-w-[1600px] mx-auto w-full">
+    <a href="index.html" class="hover:opacity-90 transition-opacity flex items-center gap-3">
+      <img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-10">
+      <span class="font-display font-semibold text-lg text-primary tracking-wide">Central Evaluation Engine</span>
     </a>
+    <div class="hidden md:flex items-center space-x-6 text-sm">
+      <a class="text-gray-400 hover:text-white transition-colors" href="resume-intelligence.html">Resume Intel</a>
+      <a class="text-gray-400 hover:text-white transition-colors" href="job-intelligence.html">JD Intel</a>
+      <a class="text-gray-400 hover:text-white transition-colors" href="video-intelligence.html">Video Intel</a>
+      <a class="text-gray-400 hover:text-white transition-colors" href="audio-intelligence.html">Audio Intel</a>
+      <a class="text-primary font-bold transition-colors" href="interview-intelligence.html">Central Engine</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="alert('Exporting Master Recruiter Report...')" class="px-5 py-2.5 bg-accent-gradient text-white rounded-full font-bold text-sm shadow-lg hover:scale-105 transition flex items-center gap-2">
+        <span class="material-symbols-outlined text-lg">download</span> Export Full Report
+      </button>
+    </div>
   </div>
 </nav>
-<!-- STITCH_SHADER_START:ANIMATION_45 class="fixed inset-0 w-full h-full" -->
-<div class="fixed inset-0 w-full h-full" style="display:block;">
-<canvas id="shader-canvas-ANIMATION_45" style="display:block;width:100%;height:100%"></canvas>
+
+<!-- Main Workspace -->
+<main class="flex-1 pt-28 pb-12 px-6 md:px-10 max-w-[1600px] mx-auto w-full space-y-6">
+
+    <!-- Header Section -->
+    <div class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="text-xs font-mono tracking-widest text-primary uppercase mb-1">MASTER MODULE • CENTRAL EVALUATION ENGINE</div>
+            <h1 class="font-display text-3xl font-bold text-white flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-4xl">psychology_alt</span>
+                Central Evaluation Engine — Unified Candidate Intelligence Platform
+            </h1>
+            <p class="text-text-secondary text-sm mt-1">Unified evaluation platform aggregating Resume CV, JD Alignment, Video Visual Telemetry, and Audio Fluency into composite score intelligence.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <select id="evalFilterDept" onchange="applyEvalFilters()" class="bg-bg-card border border-white/10 rounded-xl px-4 py-2 text-sm text-text-primary focus:outline-none">
+                <option value="ALL">All Departments</option>
+                <option value="Engineering">Engineering</option>
+                <option value="AI Research">AI Research</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Master Summary Metrics -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-xs font-mono uppercase">Total Evaluated</span>
+            <div class="font-display text-3xl font-bold text-white mt-2" id="eMetricTotal">542</div>
+            <span class="text-xs text-tertiary mt-1 block">+68 this month</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-xs font-mono uppercase">Avg Final Score</span>
+            <div class="font-display text-3xl font-bold text-primary mt-2" id="eMetricAvgScore">88.5</div>
+            <span class="text-xs text-text-secondary mt-1 block">Cross-modal composite</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-xs font-mono uppercase">Hire Rate</span>
+            <div class="font-display text-3xl font-bold text-tertiary mt-2">42.8%</div>
+            <span class="text-xs text-tertiary mt-1 block">High quality threshold</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-xs font-mono uppercase">Active Evaluations</span>
+            <div class="font-display text-3xl font-bold text-white mt-2">18</div>
+            <span class="text-xs text-text-secondary mt-1 block">In recruiter pipeline</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-xs font-mono uppercase">Completed</span>
+            <div class="font-display text-3xl font-bold text-purple-400 mt-2">68</div>
+            <span class="text-xs text-purple-400 mt-1 block">+18.4% MoM trend</span>
+        </div>
+    </div>
+
+    <!-- Dynamic Score Weight Controls -->
+    <div class="glass-panel p-6 rounded-3xl space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <h2 class="font-display font-bold text-lg text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">sliders</span> Live Score Dimension Weight Controls
+            </h2>
+            <span class="text-xs font-mono text-text-secondary">Sliders auto-normalize to sum to 100%</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-mono">
+                    <span class="text-primary">Resume Intelligence</span>
+                    <span id="wResumeVal">25%</span>
+                </div>
+                <input type="range" id="wResume" min="0" max="100" value="25" oninput="updateWeights()" class="w-full h-1.5 bg-bg-card rounded-lg appearance-none cursor-pointer accent-primary"/>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-mono">
+                    <span class="text-secondary">JD Match</span>
+                    <span id="wJdVal">25%</span>
+                </div>
+                <input type="range" id="wJd" min="0" max="100" value="25" oninput="updateWeights()" class="w-full h-1.5 bg-bg-card rounded-lg appearance-none cursor-pointer accent-secondary"/>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-mono">
+                    <span class="text-purple-400">Video Telemetry</span>
+                    <span id="wVideoVal">25%</span>
+                </div>
+                <input type="range" id="wVideo" min="0" max="100" value="25" oninput="updateWeights()" class="w-full h-1.5 bg-bg-card rounded-lg appearance-none cursor-pointer accent-purple-400"/>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-mono">
+                    <span class="text-tertiary">Audio Fluency</span>
+                    <span id="wAudioVal">25%</span>
+                </div>
+                <input type="range" id="wAudio" min="0" max="100" value="25" oninput="updateWeights()" class="w-full h-1.5 bg-bg-card rounded-lg appearance-none cursor-pointer accent-tertiary"/>
+            </div>
+        </div>
+    </div>
+
+    <!-- Candidate Master Table & Selected Candidate Deep Dive -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Candidate Table (6 cols) -->
+        <div class="lg:col-span-6 glass-panel p-6 rounded-3xl space-y-4">
+            <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                <h2 class="font-display font-bold text-lg text-white">Candidate Master Directory</h2>
+                <input type="text" id="evalSearch" onkeyup="applyEvalFilters()" placeholder="Search candidate..." class="bg-bg-card border border-white/10 rounded-xl px-4 py-1.5 text-xs text-text-primary focus:outline-none w-48"/>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-text-secondary text-xs uppercase font-mono border-b border-white/10">
+                            <th class="py-3 px-3">Candidate</th>
+                            <th class="py-3 px-3 text-center">Resume</th>
+                            <th class="py-3 px-3 text-center">JD Match</th>
+                            <th class="py-3 px-3 text-center">Video</th>
+                            <th class="py-3 px-3 text-center">Audio</th>
+                            <th class="py-3 px-3 text-center">Final</th>
+                        </tr>
+                    </thead>
+                    <tbody id="evalTableBody" class="divide-y divide-white/5"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right Master Deep Dive (6 cols) -->
+        <div class="lg:col-span-6 glass-panel p-6 rounded-3xl space-y-5">
+            <div class="flex items-center justify-between border-b border-white/10 pb-4">
+                <div>
+                    <h2 class="font-display font-bold text-xl text-white" id="eCandidateName">Sarah Jenkins</h2>
+                    <p class="text-xs text-primary font-mono" id="ePosition">Senior Full-Stack Engineer • Engineering</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-text-secondary uppercase font-mono block">Final Composite</span>
+                    <span class="font-display text-3xl font-bold text-tertiary" id="eFinalScore">88.5</span>
+                </div>
+            </div>
+
+            <!-- 4 Quadrant Grid -->
+            <div class="grid grid-cols-2 gap-3">
+                <a href="resume-intelligence.html" class="glass-card p-3.5 rounded-2xl hover:border-primary/50 transition block">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-text-secondary">Resume Score</span>
+                        <span class="text-primary font-bold" id="eResumeScore">88.5</span>
+                    </div>
+                    <p class="text-xs text-text-secondary mt-1">Deep FastAPI & React</p>
+                </a>
+                <a href="job-intelligence.html" class="glass-card p-3.5 rounded-2xl hover:border-secondary/50 transition block">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-text-secondary">JD Match</span>
+                        <span class="text-secondary font-bold" id="eJdMatchScore">92.0</span>
+                    </div>
+                    <p class="text-xs text-text-secondary mt-1">92% Skill Alignment</p>
+                </a>
+                <a href="video-intelligence.html" class="glass-card p-3.5 rounded-2xl hover:border-purple-400/50 transition block">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-text-secondary">Video Score</span>
+                        <span class="text-purple-400 font-bold" id="eVideoScore">86.5</span>
+                    </div>
+                    <p class="text-xs text-text-secondary mt-1">88% Eye Contact</p>
+                </a>
+                <a href="audio-intelligence.html" class="glass-card p-3.5 rounded-2xl hover:border-tertiary/50 transition block">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-text-secondary">Audio Score</span>
+                        <span class="text-tertiary font-bold" id="eAudioScore">87.0</span>
+                    </div>
+                    <p class="text-xs text-text-secondary mt-1">138 WPM Fluency</p>
+                </a>
+            </div>
+
+            <!-- Unified Radar Chart -->
+            <div class="glass-card p-4 rounded-2xl space-y-2">
+                <h4 class="text-xs font-mono text-primary uppercase">Unified Cross-Modal Radar Chart</h4>
+                <div class="h-44">
+                    <canvas id="unifiedRadarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Executive Summary -->
+            <div class="glass-card p-4 rounded-2xl space-y-2">
+                <h4 class="text-xs font-mono text-primary uppercase flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">auto_awesome</span> AI Executive Summary Narrative
+                </h4>
+                <p class="text-xs text-text-secondary leading-relaxed" id="eExecSummary"></p>
+            </div>
+
+            <!-- Recruiter Decision Toolbar -->
+            <div class="flex items-center gap-3">
+                <button onclick="alert('Decision logged: HIRE RECOMMENDATION')" class="flex-1 py-2.5 bg-tertiary/20 text-tertiary border border-tertiary/40 rounded-xl text-xs font-semibold hover:bg-tertiary/30 transition">
+                    Recommend Hire
+                </button>
+                <button onclick="alert('Decision logged: HOLD FOR SECOND ROUND')" class="flex-1 py-2.5 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-xl text-xs font-semibold hover:bg-amber-500/30 transition">
+                    Hold / Second Round
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Portfolio Analytics Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-panel p-6 rounded-3xl space-y-3">
+            <h3 class="font-display font-semibold text-white text-md flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-sm">filter_alt</span> Hiring Pipeline Funnel
+            </h3>
+            <div class="h-52">
+                <canvas id="funnelChart"></canvas>
+            </div>
+        </div>
+        <div class="glass-panel p-6 rounded-3xl space-y-3">
+            <h3 class="font-display font-semibold text-white text-md flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary text-sm">grid_view</span> Cross-Metric Score Heatmap Correlation
+            </h3>
+            <div class="h-52 flex items-center justify-center text-xs font-mono text-text-secondary border border-white/10 rounded-2xl">
+                Resume (0.85) • JD Match (0.92) • Video (0.78) • Audio (0.88) High Inter-Metric Validity
+            </div>
+        </div>
+    </div>
+
+</main>
+
 <script>
-(function() {
-  const canvas = document.getElementById('shader-canvas-ANIMATION_45');
+let evalData = [];
+let selectedEval = null;
+let unifiedRadarObj = null;
+let funnelChartObj = null;
 
-  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
-  // This fires on initial layout and whenever the element is resized.
-  function syncSize() {
-    const w = canvas.clientWidth  || 1280;
-    const h = canvas.clientHeight || 720;
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width  = w;
-      canvas.height = h;
-    }
-  }
-  if (typeof ResizeObserver !== 'undefined') {
-    new ResizeObserver(syncSize).observe(canvas);
-  }
-  syncSize();
-
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-  if (!gl) return;
-  const vs = `attribute vec2 a_position;
-varying vec2 v_texCoord;
-void main() {
-  v_texCoord = a_position * 0.5 + 0.5;
-  gl_Position = vec4(a_position, 0.0, 1.0);
-}`;
-  const fs = `precision highp float;
-uniform float u_time;
-uniform vec2 u_resolution;
-uniform vec2 u_mouse;
-varying vec2 v_texCoord;
-
-float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+async function fetchEvaluations() {
+    try {
+        const res = await fetch('/api/v1/intelligence/evaluations');
+        const json = await res.json();
+        if(json.status === 'success' && json.data) {
+            evalData = json.data;
+            renderEvalTable(evalData);
+            if(evalData.length > 0) selectEval(evalData[0].id);
+            initFunnelChart();
+        }
+    } catch(e) { console.error(e); }
 }
 
-float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    f = f * f * (3.0 - 2.0 * f);
-    return mix(mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), f.x),
-               mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+function renderEvalTable(list) {
+    const tbody = document.getElementById('evalTableBody');
+    tbody.innerHTML = list.map(e => `
+        <tr onclick="selectEval(${e.id})" class="hover:bg-white/5 cursor-pointer transition ${selectedEval && selectedEval.id === e.id ? 'bg-primary/10 border-l-2 border-primary' : ''}">
+            <td class="py-3.5 px-3">
+                <div class="font-semibold text-white">${e.candidate_name}</div>
+                <div class="text-xs text-text-secondary">${e.position_applied}</div>
+            </td>
+            <td class="py-3.5 px-3 text-center font-mono text-primary">${e.resume_score}</td>
+            <td class="py-3.5 px-3 text-center font-mono text-secondary">${e.jd_match_score}</td>
+            <td class="py-3.5 px-3 text-center font-mono text-purple-400">${e.video_score}</td>
+            <td class="py-3.5 px-3 text-center font-mono text-tertiary">${e.audio_score}</td>
+            <td class="py-3.5 px-3 text-center font-mono font-bold text-tertiary">${e.final_composite_score}</td>
+        </tr>
+    `).join('');
 }
 
-void main() {
-    vec2 uv = v_texCoord;
-    vec2 mouse = u_mouse / u_resolution;
-    
-    // Obsidian background #131314
-    vec3 color = vec3(0.0745, 0.0745, 0.0784);
-    
-    // Orchestration flow: animated dialogue "bubbles" or nodes
-    float nodes = 0.0;
-    for(float i = 0.0; i < 6.0; i++) {
-        vec2 p = vec2(hash(vec2(i, 1.0)), hash(vec2(i, 2.0)));
-        p.x += sin(u_time * 0.15 + i) * 0.15;
-        p.y += cos(u_time * 0.1 + i) * 0.2;
-        
-        float d = distance(uv, p);
-        float circle = smoothstep(0.015, 0.01, d);
-        nodes += circle * (0.5 + 0.5 * sin(u_time + i));
-    }
-    color += nodes * vec3(0.486, 0.227, 0.929) * 0.3; // Violet nodes
-    
-    // Connection lines (adaptive intelligence paths)
-    float lines = 0.0;
-    vec2 p1 = vec2(0.5, 0.5);
-    for(float i = 0; i < 4.0; i++) {
-        vec2 p2 = vec2(hash(vec2(i, 7.0)), hash(vec2(i, 8.0)));
-        p2.x += sin(u_time * 0.2) * 0.1;
-        
-        vec2 pa = uv - p1, ba = p2 - p1;
-        float h = clamp(dot(pa,ba)/dot(ba,ba), 0.0, 1.0);
-        float d = length(pa - ba*h);
-        lines += smoothstep(0.002, 0.0, d) * 0.1;
-    }
-    color += lines * vec3(0.08, 0.72, 0.65); // Teal lines
-    
-    // Faint technical grid
-    vec2 grid = fract(uv * 15.0);
-    float g = (smoothstep(0.03, 0.0, grid.x) + smoothstep(0.03, 0.0, grid.y)) * 0.02;
-    color += g;
-    
-    // Interaction glow
-    float dist = distance(uv, mouse);
-    float glow = smoothstep(0.5, 0.0, dist) * 0.08;
-    color += glow * vec3(0.23, 0.51, 0.96); // Blue
-    
-    gl_FragColor = vec4(color, 1.0);
-}`;
-  function cs(type, src) {
-    const s = gl.createShader(type);
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    return s;
-  }
-  const prog = gl.createProgram();
-  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
-  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
-  gl.linkProgram(prog);
-  gl.useProgram(prog);
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-  const pos = gl.getAttribLocation(prog, 'a_position');
-  gl.enableVertexAttribArray(pos);
-  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-  const uTime = gl.getUniformLocation(prog, 'u_time');
-  const uRes = gl.getUniformLocation(prog, 'u_resolution');
-  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+function selectEval(id) {
+    selectedEval = evalData.find(e => e.id === id);
+    if(!selectedEval) return;
 
-  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
-  // Shaders that need normalized coords should use: u_mouse / u_resolution.
-  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
-  window.addEventListener('mousemove', (event) => {
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width && rect.height) {
-      const nx = (event.clientX - rect.left) / rect.width;
-      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
-      mouse.x = nx * canvas.width;
-      mouse.y = ny * canvas.height;
-    }
-  });
+    renderEvalTable(evalData);
+    recalculateComposite();
 
-  function render(t) {
-    if (typeof ResizeObserver === 'undefined') syncSize();
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    if (uTime) gl.uniform1f(uTime, t * 0.001);
-    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
-    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    requestAnimationFrame(render);
-  }
-  render(0);
-})();
-</script>
-</div>
-<!-- STITCH_SHADER_END:ANIMATION_45 -->
-<!-- KEIKO Footer -->
-<footer class="bg-[#0A0A0B] border-t border-white/10 w-full py-16 mt-32">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-8 max-w-[1440px] mx-auto">
-    <div class="lg:col-span-1">
-      <div><img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-12 mb-4"></div>
-      <p class="text-sm text-gray-500 mb-6 max-w-xs" style="font-family:'Inter',sans-serif">Engineering-grade intelligence for the modern technical interview.</p>
-      <p class="text-xs text-gray-600" style="font-family:'Inter',sans-serif">&copy; 2026 KEIKO Intelligence. All rights reserved.</p>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Platform</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="about">About Us</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="interview-journey">Interview Journey</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="features">Features</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="architecture">Architecture</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="download">Download Engine</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="experience">Experience KEIKO</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Resources</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation">Documentation</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation">API Configuration</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#changelogs">Roadmap</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#opensource">Open Source</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#faq">FAQ</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#changelogs">Changelog</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Legal</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Privacy Policy</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Terms of Service</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Contact Research</a></li>
-      </ul>
-    </div>
-  </div>
-</footer>
-<script>
-(function(){
-  var p = window.location.pathname.split('/').pop() || 'index.html';
-  var m = {'about.html':'nav-about','interview-journey.html':'nav-journey','features.html':'nav-features','architecture.html':'nav-architecture'};
-  var id = m[p];
-  if(id){var el=document.getElementById(id);if(el){el.style.color='#d2bbff';el.style.fontWeight='bold';el.style.borderBottom='2px solid #d2bbff';el.style.paddingBottom='4px';}}
-})();
+    document.getElementById('eCandidateName').innerText = selectedEval.candidate_name;
+    document.getElementById('ePosition').innerText = `${selectedEval.position_applied} • ${selectedEval.department}`;
+    document.getElementById('eResumeScore').innerText = selectedEval.resume_score;
+    document.getElementById('eJdMatchScore').innerText = selectedEval.jd_match_score;
+    document.getElementById('eVideoScore').innerText = selectedEval.video_score;
+    document.getElementById('eAudioScore').innerText = selectedEval.audio_score;
+    document.getElementById('eExecSummary').innerText = selectedEval.executive_summary;
+
+    renderUnifiedRadar();
+}
+
+function updateWeights() {
+    let wR = parseFloat(document.getElementById('wResume').value);
+    let wJ = parseFloat(document.getElementById('wJd').value);
+    let wV = parseFloat(document.getElementById('wVideo').value);
+    let wA = parseFloat(document.getElementById('wAudio').value);
+
+    let sum = wR + wJ + wV + wA;
+    if(sum === 0) sum = 1;
+
+    let pR = Math.round((wR / sum) * 100);
+    let pJ = Math.round((wJ / sum) * 100);
+    let pV = Math.round((wV / sum) * 100);
+    let pA = Math.round((wA / sum) * 100);
+
+    document.getElementById('wResumeVal').innerText = pR + '%';
+    document.getElementById('wJdVal').innerText = pJ + '%';
+    document.getElementById('wVideoVal').innerText = pV + '%';
+    document.getElementById('wAudioVal').innerText = pA + '%';
+
+    recalculateComposite();
+}
+
+function recalculateComposite() {
+    if(!selectedEval) return;
+    let wR = parseFloat(document.getElementById('wResume').value) || 25;
+    let wJ = parseFloat(document.getElementById('wJd').value) || 25;
+    let wV = parseFloat(document.getElementById('wVideo').value) || 25;
+    let wA = parseFloat(document.getElementById('wAudio').value) || 25;
+    let sum = wR + wJ + wV + wA;
+    if(sum === 0) sum = 1;
+
+    let finalVal = (selectedEval.resume_score * (wR/sum)) +
+                   (selectedEval.jd_match_score * (wJ/sum)) +
+                   (selectedEval.video_score * (wV/sum)) +
+                   (selectedEval.audio_score * (wA/sum));
+
+    document.getElementById('eFinalScore').innerText = finalVal.toFixed(1);
+}
+
+function renderUnifiedRadar() {
+    if(!selectedEval) return;
+    const ctx = document.getElementById('unifiedRadarChart').getContext('2d');
+    if(unifiedRadarObj) unifiedRadarObj.destroy();
+    unifiedRadarObj = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Resume', 'JD Match', 'Eye Contact', 'Posture', 'Speaking Rate', 'Clarity'],
+            datasets: [{
+                label: selectedEval.candidate_name,
+                data: [selectedEval.resume_score, selectedEval.jd_match_score, selectedEval.video_score, 90, selectedEval.audio_score, 92],
+                backgroundColor: 'rgba(210, 187, 255, 0.25)',
+                borderColor: '#d2bbff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { r: { angleLines: { color: 'rgba(255,255,255,0.1)' }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#9E9E9F', font: { size: 10 } }, ticks: { display: false } } },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+function initFunnelChart() {
+    const ctx = document.getElementById('funnelChart').getContext('2d');
+    if(funnelChartObj) funnelChartObj.destroy();
+    funnelChartObj = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Applied (1280)', 'Parsed (1120)', 'Screened (540)', 'Evaluated (310)', 'Offered (68)'],
+            datasets: [{
+                data: [1280, 1120, 540, 310, 68],
+                backgroundColor: ['rgba(210,187,255,0.6)', 'rgba(173,198,255,0.6)', 'rgba(113,248,228,0.6)', 'rgba(124,58,237,0.6)', 'rgba(245,158,11,0.6)']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { grid: { display: false }, ticks: { color: '#9E9E9F' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9E9E9F' } } }
+        }
+    });
+}
+
+function applyEvalFilters() {
+    const dept = document.getElementById('evalFilterDept').value;
+    const search = document.getElementById('evalSearch').value.toLowerCase();
+
+    const filtered = evalData.filter(e => {
+        const matchesDept = dept === 'ALL' || e.department === dept;
+        const matchesSearch = e.candidate_name.toLowerCase().includes(search) || e.position_applied.toLowerCase().includes(search);
+        return matchesDept && matchesSearch;
+    });
+    renderEvalTable(filtered);
+}
+
+document.addEventListener('DOMContentLoaded', fetchEvaluations);
 </script>
 </body>
 </html>
