@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Audio Intelligence — KEIKO Candidate Intelligence</title>
+    <title>Audio Intelligence — KEIKO Architecture & Process Guide</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -37,230 +37,229 @@
         body { background-color: #050506; color: #F4F4F5; font-family: 'Inter', sans-serif; }
         .glass-panel { background: rgba(12, 12, 14, 0.85); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .glass-card { background: rgba(19, 20, 31, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.06); }
+        .gradient-text { background-image: linear-gradient(135deg, #d2bbff 0%, #adc6ff 50%, #71f8e4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-primary/20">
 
 <!-- Top Navigation -->
-<nav class="fixed top-0 w-full z-50 bg-[#050506]/75 backdrop-blur-lg border-b border-white/10 h-20">
+<nav class="fixed top-0 w-full z-50 bg-[#050506]/85 backdrop-blur-lg border-b border-white/10 h-20">
   <div class="flex justify-between items-center h-full px-8 max-w-[1600px] mx-auto w-full">
     <a href="index.html" class="hover:opacity-90 transition-opacity flex items-center gap-3">
       <img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-10">
-      <span class="font-display font-semibold text-lg text-primary tracking-wide">Audio Intelligence</span>
+      <span class="font-display font-semibold text-lg text-tertiary tracking-wide">Audio Intelligence</span>
     </a>
-    <div class="hidden md:flex items-center space-x-6 text-sm">
+    <div class="hidden md:flex items-center space-x-6 text-xs font-mono uppercase tracking-wider">
       <a class="text-gray-400 hover:text-white transition-colors" href="resume-intelligence.html">Resume Intel</a>
       <a class="text-gray-400 hover:text-white transition-colors" href="job-intelligence.html">JD Intel</a>
       <a class="text-gray-400 hover:text-white transition-colors" href="video-intelligence.html">Video Intel</a>
-      <a class="text-primary font-bold transition-colors" href="audio-intelligence.html">Audio Intel</a>
+      <a class="text-tertiary font-bold transition-colors" href="audio-intelligence.html">Audio Intel</a>
       <a class="text-gray-400 hover:text-white transition-colors" href="interview-intelligence.html">Central Engine</a>
     </div>
+    <a href="index.html" class="px-5 py-2 rounded-full border border-white/20 text-xs font-mono text-gray-300 hover:text-white hover:border-tertiary transition">
+      ← Back to Architecture Overview
+    </a>
   </div>
 </nav>
 
-<!-- Main Workspace -->
-<main class="flex-1 pt-28 pb-12 px-6 md:px-10 max-w-[1600px] mx-auto w-full space-y-6">
+<!-- Main Explanatory Workspace -->
+<main class="flex-1 pt-28 pb-16 px-6 md:px-12 max-w-[1600px] mx-auto w-full space-y-10">
 
-    <!-- Header Section -->
-    <div class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <div class="text-xs font-mono tracking-widest text-tertiary uppercase mb-1">MODULE 04 • AUDIO INTELLIGENCE</div>
-            <h1 class="font-display text-3xl font-bold text-white flex items-center gap-3">
-                <span class="material-symbols-outlined text-tertiary text-4xl">mic</span>
-                Vocal & Speech Pattern Audio Intelligence
-            </h1>
-            <p class="text-text-secondary text-sm mt-1">Speaking rate WPM, pitch modulation, Whisper STT clarity, sentiment trajectory, and filler word frequency tracking.</p>
+    <!-- Module Hero Header -->
+    <div class="glass-panel p-8 md:p-12 rounded-3xl relative overflow-hidden space-y-6">
+        <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-tertiary/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-tertiary/10 border border-tertiary/30 text-tertiary text-xs font-mono uppercase tracking-widest">
+            <span class="material-symbols-outlined text-sm">mic</span> KEIKO System Architecture • Module 04
         </div>
+        <h1 class="font-display text-4xl md:text-5xl font-bold text-white max-w-4xl leading-tight">
+            Audio Intelligence & <span class="gradient-text">Speech Pattern Processing</span>
+        </h1>
+        <p class="text-text-secondary text-base md:text-lg max-w-3xl leading-relaxed">
+            The Audio Intelligence Module captures verbal communication during interviews. While the LLM evaluates response content, this module evaluates *how* responses are delivered: speaking pace (WPM), voice modulation, articulation clarity, and filler word frequency.
+        </p>
     </div>
 
-    <!-- Summary Metrics -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div class="glass-panel p-5 rounded-2xl">
-            <span class="text-text-secondary text-xs font-mono uppercase">Total Audio Files</span>
-            <div class="font-display text-3xl font-bold text-white mt-2">420</div>
-            <span class="text-xs text-tertiary mt-1 block">100% transcribed</span>
+    <!-- 4 Audio Processing Pillars -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+            <div class="text-xs font-mono text-tertiary uppercase font-bold">PILLAR 01</div>
+            <h3 class="font-display font-bold text-lg text-white">Whisper Speech-to-Text Pipeline</h3>
+            <p class="text-xs text-text-secondary leading-relaxed">
+                Converts live candidate speech into real-time text streams, generating precise transcripts that enable LLMs to analyze technical answer correctness.
+            </p>
         </div>
-        <div class="glass-panel p-5 rounded-2xl">
-            <span class="text-text-secondary text-xs font-mono uppercase">Avg Audio Score</span>
-            <div class="font-display text-3xl font-bold text-primary mt-2">87.0</div>
-            <span class="text-xs text-text-secondary mt-1 block">Vocal fluency score</span>
+
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+            <div class="text-xs font-mono text-primary uppercase font-bold">PILLAR 02</div>
+            <h3 class="font-display font-bold text-lg text-white">Voice Modulation & Pitch Analysis</h3>
+            <p class="text-xs text-text-secondary leading-relaxed">
+                Measures pitch variation, speaking energy, and vocal confidence to identify expressive, engaging delivery versus monotone or hesitant speech.
+            </p>
         </div>
-        <div class="glass-panel p-5 rounded-2xl">
-            <span class="text-text-secondary text-xs font-mono uppercase">Avg Speaking Clarity</span>
-            <div class="font-display text-3xl font-bold text-tertiary mt-2">92.0%</div>
-            <span class="text-xs text-tertiary mt-1 block">Optimal STT confidence</span>
+
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+            <div class="text-xs font-mono text-secondary uppercase font-bold">PILLAR 03</div>
+            <h3 class="font-display font-bold text-lg text-white">Speaking Rate & Pace (WPM)</h3>
+            <p class="text-xs text-text-secondary leading-relaxed">
+                Calculates Words Per Minute (WPM) speed against ideal benchmarks (130-150 WPM), identifying rushed or excessively slow response patterns.
+            </p>
         </div>
-        <div class="glass-panel p-5 rounded-2xl">
-            <span class="text-text-secondary text-xs font-mono uppercase">Avg Speaking Rate</span>
-            <div class="font-display text-3xl font-bold text-white mt-2">138 WPM</div>
-            <span class="text-xs text-text-secondary mt-1 block">Ideal range: 130-150 WPM</span>
+
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+            <div class="text-xs font-mono text-purple-400 uppercase font-bold">PILLAR 04</div>
+            <h3 class="font-display font-bold text-lg text-white">Filler Word & Fluency Tracking</h3>
+            <p class="text-xs text-text-secondary leading-relaxed">
+                Detects hesitation markers (*um, uh, like, you know*) and long pauses, quantifying speech fluency and articulation clarity.
+            </p>
         </div>
-        <div class="glass-panel p-5 rounded-2xl">
-            <span class="text-text-secondary text-xs font-mono uppercase">Filler Word Count</span>
-            <div class="font-display text-3xl font-bold text-tertiary mt-2">2.5</div>
-            <span class="text-xs text-tertiary mt-1 block">Per response average</span>
-        </div>
+
     </div>
 
-    <!-- Main Grid Layout -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-        <!-- Left Audio List -->
-        <div class="lg:col-span-4 glass-panel p-6 rounded-3xl space-y-4">
-            <h2 class="font-display font-bold text-lg text-white border-b border-white/10 pb-3">Processed Audio Streams</h2>
-            <div class="space-y-3" id="audioListContainer"></div>
-        </div>
-
-        <!-- Right Audio Deep Analysis -->
-        <div class="lg:col-span-8 glass-panel p-6 rounded-3xl space-y-5">
-            <div class="flex items-center justify-between border-b border-white/10 pb-4">
-                <div>
-                    <h2 class="font-display font-bold text-xl text-white" id="aCandidateName">Sarah Jenkins</h2>
-                    <p class="text-xs text-primary font-mono" id="aMeta">35 Mins • Processed 2026-07-28</p>
-                </div>
-                <div class="text-right">
-                    <span class="text-xs text-text-secondary uppercase font-mono block">Audio Score</span>
-                    <span class="font-display text-3xl font-bold text-primary" id="aScore">87.0</span>
-                </div>
+    <!-- Interactive Speech Telemetry Simulator -->
+    <div class="glass-panel p-8 rounded-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+            <div>
+                <div class="text-xs font-mono text-tertiary uppercase font-bold tracking-widest">LIVE AUDIO PROCESSING SIMULATOR</div>
+                <h2 class="font-display font-bold text-2xl text-white mt-1">Real-Time Speech & Vocal Pattern Analyzer</h2>
+                <p class="text-xs text-text-secondary">Select sample speech tracks to observe real-time WPM calculation, Whisper STT streaming, and filler word detection.</p>
             </div>
+            <div class="flex items-center gap-3">
+                <button onclick="simulateAudio('confident')" class="px-4 py-2 rounded-xl bg-tertiary/20 text-tertiary border border-tertiary/40 text-xs font-mono font-semibold hover:bg-tertiary/30 transition">
+                    Sample 1: Confident Technical Delivery
+                </button>
+                <button onclick="simulateAudio('hesitant')" class="px-4 py-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 text-xs font-mono font-semibold hover:bg-amber-500/30 transition">
+                    Sample 2: Hesitant / Nervous Delivery
+                </button>
+            </div>
+        </div>
 
-            <!-- Waveform Visualizer -->
-            <div class="glass-card p-4 rounded-2xl space-y-3 border border-primary/30">
+        <!-- Simulator Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Waveform & Transcript -->
+            <div class="lg:col-span-6 glass-card p-6 rounded-2xl space-y-4">
                 <div class="flex items-center justify-between">
-                    <span class="text-xs font-mono text-primary uppercase">Audio Waveform & Pitch Telemetry</span>
-                    <span class="text-xs font-mono text-tertiary">138 WPM (Optimal)</span>
+                    <span class="text-xs font-mono text-text-secondary uppercase">Live Audio Stream Waveform</span>
+                    <span class="text-xs font-mono text-tertiary font-bold" id="simAudioWpm">138 WPM (Optimal)</span>
                 </div>
-                <div class="h-20 flex items-center justify-center gap-1.5 overflow-hidden">
-                    <div class="w-1.5 bg-primary/60 h-8 rounded-full"></div>
-                    <div class="w-1.5 bg-primary/80 h-14 rounded-full animate-pulse"></div>
-                    <div class="w-1.5 bg-primary h-18 rounded-full"></div>
-                    <div class="w-1.5 bg-secondary h-10 rounded-full"></div>
-                    <div class="w-1.5 bg-primary h-16 rounded-full animate-pulse"></div>
+
+                <div class="bg-black/60 p-4 rounded-xl border border-tertiary/30 h-24 flex items-center justify-center gap-1.5 overflow-hidden">
+                    <div class="w-1.5 bg-tertiary/60 h-8 rounded-full"></div>
+                    <div class="w-1.5 bg-tertiary h-16 rounded-full animate-pulse"></div>
+                    <div class="w-1.5 bg-primary h-20 rounded-full"></div>
                     <div class="w-1.5 bg-tertiary h-12 rounded-full"></div>
-                    <div class="w-1.5 bg-primary h-6 rounded-full"></div>
-                    <div class="w-1.5 bg-primary/40 h-14 rounded-full"></div>
-                    <div class="w-1.5 bg-primary h-18 rounded-full animate-pulse"></div>
-                    <div class="w-1.5 bg-secondary h-8 rounded-full"></div>
+                    <div class="w-1.5 bg-secondary h-16 rounded-full animate-pulse"></div>
+                    <div class="w-1.5 bg-tertiary h-10 rounded-full"></div>
+                    <div class="w-1.5 bg-tertiary/40 h-6 rounded-full"></div>
+                </div>
+
+                <div class="space-y-1">
+                    <span class="text-xs font-mono text-text-secondary uppercase">Real-Time Whisper STT Transcript Stream</span>
+                    <p class="bg-black/40 p-4 rounded-xl text-xs font-mono text-text-primary leading-relaxed border border-white/5 h-32 overflow-y-auto" id="simTranscript">
+                        "I have built backend services in Python and FastAPI for three years. In my last project, I optimized PostgreSQL indexing..."
+                    </p>
                 </div>
             </div>
 
-            <!-- Speech Metrics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <div class="glass-card p-3.5 rounded-2xl">
-                    <span class="text-xs text-text-secondary block font-mono">Clarity Score</span>
-                    <span class="font-display text-xl font-bold text-white" id="aClarity">92%</span>
+            <!-- Speech Metrics Breakdown -->
+            <div class="lg:col-span-6 glass-card p-6 rounded-2xl space-y-5">
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-black/40 p-3.5 rounded-xl border border-tertiary/20">
+                        <span class="text-xs font-mono text-text-secondary block">Speech Clarity</span>
+                        <span class="font-display text-2xl font-bold text-tertiary" id="simAudioClarity">92%</span>
+                    </div>
+                    <div class="bg-black/40 p-3.5 rounded-xl border border-primary/20">
+                        <span class="text-xs font-mono text-text-secondary block">Dominant Tone</span>
+                        <span class="font-display text-sm font-bold text-primary" id="simAudioTone">Confident</span>
+                    </div>
+                    <div class="bg-black/40 p-3.5 rounded-xl border border-amber-500/20">
+                        <span class="text-xs font-mono text-text-secondary block">Filler Words</span>
+                        <span class="font-display text-2xl font-bold text-amber-400" id="simAudioFillers">2</span>
+                    </div>
                 </div>
-                <div class="glass-card p-3.5 rounded-2xl">
-                    <span class="text-xs text-text-secondary block font-mono">Dominant Tone</span>
-                    <span class="font-display text-sm font-bold text-tertiary" id="aSentiment">Confident</span>
-                </div>
-                <div class="glass-card p-3.5 rounded-2xl">
-                    <span class="text-xs text-text-secondary block font-mono">Filler Words</span>
-                    <span class="font-display text-xl font-bold text-white" id="aFillers">3</span>
-                </div>
-                <div class="glass-card p-3.5 rounded-2xl">
-                    <span class="text-xs text-text-secondary block font-mono">STAR Structure</span>
-                    <span class="font-display text-sm font-bold text-primary">Detected</span>
+
+                <div class="space-y-2">
+                    <span class="text-xs font-mono uppercase text-text-secondary">Tone & Sentiment Trajectory</span>
+                    <div class="h-44">
+                        <canvas id="audioSentChart"></canvas>
+                    </div>
                 </div>
             </div>
 
-            <!-- Sentiment Graph -->
-            <div class="glass-card p-4 rounded-2xl space-y-2">
-                <h4 class="text-xs font-mono text-primary uppercase">Tone & Sentiment Trajectory</h4>
-                <div class="h-44">
-                    <canvas id="sentimentChart"></canvas>
-                </div>
-            </div>
-
-            <!-- AI Vocal Insights -->
-            <div class="glass-card p-4 rounded-2xl space-y-2">
-                <h4 class="text-xs font-mono text-primary uppercase flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs">auto_awesome</span> Speech & Vocal Insights
-                </h4>
-                <ul class="text-xs text-text-secondary list-disc list-inside space-y-1" id="aInsightsList"></ul>
-            </div>
         </div>
+    </div>
 
+    <!-- Academic Insights -->
+    <div class="glass-panel p-6 rounded-3xl space-y-3">
+        <h3 class="font-display font-bold text-white text-lg flex items-center gap-2">
+            <span class="material-symbols-outlined text-tertiary">menu_book</span> Academic Rationale (KEIKO Report Section VII)
+        </h3>
+        <p class="text-xs text-text-secondary leading-relaxed max-w-4xl">
+            Section VII of the VTU report explains that speech analytics is an essential counterpart to content evaluation. Candidates may know the right answer, but hesitant delivery or excessive filler words impact communication efficacy in client-facing and collaborative technical roles.
+        </p>
     </div>
 
 </main>
 
 <script>
-let audioData = [];
-let selectedAudio = null;
-let sentChartObj = null;
+const audioSims = {
+    confident: {
+        wpm: "138 WPM (Optimal)",
+        transcript: '"I have built backend services in Python and FastAPI for three years. In my last project, I optimized PostgreSQL query indexing which reduced latency by 80% under high concurrent load."',
+        clarity: "92%",
+        tone: "Confident & Structured",
+        fillers: "2",
+        data: [75, 80, 85, 90, 92]
+    },
+    hesitant: {
+        wpm: "95 WPM (Slow / Pausing)",
+        transcript: '"Um, well, I used Python a bit, uh, like last year... and, um, we tried using FastAPI, but, uh, I think PostgreSQL was somewhat difficult to set up."',
+        clarity: "74%",
+        tone: "Hesitant / Uncertain",
+        fillers: "8",
+        data: [45, 50, 48, 52, 55]
+    }
+};
 
-async function fetchAudio() {
-    try {
-        const res = await fetch('/api/v1/interview/intelligence/audio');
-        const json = await res.json();
-        if(json.status === 'success' && json.data) {
-            audioData = json.data;
-            renderAudioList(audioData);
-            if(audioData.length > 0) selectAudio(audioData[0].id);
-        }
-    } catch(e) { console.error(e); }
+let audioChartObj = null;
+
+function simulateAudio(key) {
+    const d = audioSims[key];
+    document.getElementById('simAudioWpm').innerText = d.wpm;
+    document.getElementById('simTranscript').innerText = d.transcript;
+    document.getElementById('simAudioClarity').innerText = d.clarity;
+    document.getElementById('simAudioTone').innerText = d.tone;
+    document.getElementById('simAudioFillers').innerText = d.fillers;
+
+    renderAudioChart(d.data);
 }
 
-function renderAudioList(list) {
-    const container = document.getElementById('audioListContainer');
-    container.innerHTML = list.map(a => `
-        <div onclick="selectAudio(${a.id})" class="glass-card p-4 rounded-2xl hover:border-primary/50 cursor-pointer transition ${selectedAudio && selectedAudio.id === a.id ? 'border-primary bg-primary/10' : ''}">
-            <div class="flex items-center justify-between">
-                <h3 class="font-display font-semibold text-white">${a.candidate_name}</h3>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-tertiary/20 text-tertiary border border-tertiary/30">${a.status}</span>
-            </div>
-            <div class="flex items-center justify-between mt-2 text-xs text-text-secondary">
-                <span>${a.duration_minutes}m • ${a.speaking_rate_wpm} WPM</span>
-                <span class="font-mono text-primary font-bold">Score ${a.audio_score}</span>
-            </div>
-        </div>
-    `).join('');
-}
-
-function selectAudio(id) {
-    selectedAudio = audioData.find(a => a.id === id);
-    if(!selectedAudio) return;
-
-    renderAudioList(audioData);
-
-    document.getElementById('aCandidateName').innerText = selectedAudio.candidate_name;
-    document.getElementById('aMeta').innerText = `${selectedAudio.duration_minutes} Mins • Processed ${selectedAudio.recorded_at}`;
-    document.getElementById('aScore').innerText = selectedAudio.audio_score;
-    document.getElementById('aClarity').innerText = selectedAudio.clarity_score + '%';
-    document.getElementById('aSentiment').innerText = selectedAudio.sentiment;
-    document.getElementById('aFillers').innerText = selectedAudio.filler_word_count;
-
-    document.getElementById('aInsightsList').innerHTML = (selectedAudio.ai_insights || []).map(i => `<li>${i}</li>`).join('');
-
-    renderSentChart();
-}
-
-function renderSentChart() {
-    const ctx = document.getElementById('sentimentChart').getContext('2d');
-    if(sentChartObj) sentChartObj.destroy();
-    sentChartObj = new Chart(ctx, {
+function renderAudioChart(vals) {
+    const ctx = document.getElementById('audioSentChart').getContext('2d');
+    if(audioChartObj) audioChartObj.destroy();
+    audioChartObj = new Chart(ctx, {
         type: 'line',
         data: {
             labels: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'],
-            datasets: [
-                { label: 'Positive Tone', data: [75, 80, 85, 88, 92], borderColor: '#71f8e4', tension: 0.3 },
-                { label: 'Neutral Tone', data: [20, 15, 12, 10, 8], borderColor: '#adc6ff', tension: 0.3 }
-            ]
+            datasets: [{
+                label: 'Vocal Confidence Index',
+                data: vals,
+                borderColor: '#71f8e4',
+                borderWidth: 2,
+                tension: 0.3
+            }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: '#9E9E9F', font: { size: 10 } } } },
-            scales: {
-                x: { grid: { display: false }, ticks: { color: '#9E9E9F' } },
-                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9E9E9F' }, max: 100 }
-            }
+            plugins: { legend: { display: false } },
+            scales: { x: { grid: { display: false }, ticks: { color: '#9E9E9F' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9E9E9F' }, max: 100 } }
         }
     });
 }
 
-document.addEventListener('DOMContentLoaded', fetchAudio);
+document.addEventListener('DOMContentLoaded', () => simulateAudio('confident'));
 </script>
 </body>
 </html>

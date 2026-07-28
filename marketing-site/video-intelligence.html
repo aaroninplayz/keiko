@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Video Intelligence — KEIKO Candidate Intelligence</title>
+    <title>Video Intelligence — KEIKO Architecture & Process Guide</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -37,201 +37,184 @@
         body { background-color: #050506; color: #F4F4F5; font-family: 'Inter', sans-serif; }
         .glass-panel { background: rgba(12, 12, 14, 0.85); backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .glass-card { background: rgba(19, 20, 31, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.06); }
+        .gradient-text { background-image: linear-gradient(135deg, #d2bbff 0%, #adc6ff 50%, #71f8e4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col selection:bg-primary/20">
 
 <!-- Top Navigation -->
-<nav class="fixed top-0 w-full z-50 bg-[#050506]/75 backdrop-blur-lg border-b border-white/10 h-20">
+<nav class="fixed top-0 w-full z-50 bg-[#050506]/85 backdrop-blur-lg border-b border-white/10 h-20">
   <div class="flex justify-between items-center h-full px-8 max-w-[1600px] mx-auto w-full">
     <a href="index.html" class="hover:opacity-90 transition-opacity flex items-center gap-3">
       <img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-10">
       <span class="font-display font-semibold text-lg text-primary tracking-wide">Video Intelligence</span>
     </a>
-    <div class="hidden md:flex items-center space-x-6 text-sm">
+    <div class="hidden md:flex items-center space-x-6 text-xs font-mono uppercase tracking-wider">
       <a class="text-gray-400 hover:text-white transition-colors" href="resume-intelligence.html">Resume Intel</a>
       <a class="text-gray-400 hover:text-white transition-colors" href="job-intelligence.html">JD Intel</a>
       <a class="text-primary font-bold transition-colors" href="video-intelligence.html">Video Intel</a>
       <a class="text-gray-400 hover:text-white transition-colors" href="audio-intelligence.html">Audio Intel</a>
       <a class="text-gray-400 hover:text-white transition-colors" href="interview-intelligence.html">Central Engine</a>
     </div>
+    <a href="index.html" class="px-5 py-2 rounded-full border border-white/20 text-xs font-mono text-gray-300 hover:text-white hover:border-primary transition">
+      ← Back to Architecture Overview
+    </a>
   </div>
 </nav>
 
-<!-- Main Workspace -->
-<main class="flex-1 pt-28 pb-12 px-6 md:px-10 max-w-[1600px] mx-auto w-full space-y-6">
+<!-- Main Explanatory Workspace -->
+<main class="flex-1 pt-28 pb-16 px-6 md:px-12 max-w-[1600px] mx-auto w-full space-y-10">
 
-    <!-- Header Section -->
-    <div class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-            <div class="text-xs font-mono tracking-widest text-primary uppercase mb-1">MODULE 03 • VIDEO INTELLIGENCE</div>
-            <h1 class="font-display text-3xl font-bold text-white flex items-center gap-3">
-                <span class="material-symbols-outlined text-primary text-4xl">videocam</span>
-                Visual Telemetry & Gesture Analysis
-            </h1>
-            <p class="text-text-secondary text-sm mt-1">Real-time posture tracking, gaze direction, MediaPipe blendshape facial expression metrics, and body language posture.</p>
+    <!-- Module Hero Header -->
+    <div class="glass-panel p-8 md:p-12 rounded-3xl relative overflow-hidden space-y-6">
+        <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs font-mono uppercase tracking-widest">
+            <span class="material-symbols-outlined text-sm">videocam</span> KEIKO System Architecture • Module 03
+        </div>
+        <h1 class="font-display text-4xl md:text-5xl font-bold text-white max-w-4xl leading-tight">
+            Video Intelligence & <span class="gradient-text">Visual Kinetic Telemetry</span>
+        </h1>
+        <p class="text-text-secondary text-base md:text-lg max-w-3xl leading-relaxed">
+            The Video Intelligence Module processes real-time video frames from the webcam feed using Computer Vision and MediaPipe. It measures facial expressions, eye contact consistency, spine posture alignment, and non-verbal professional presence throughout the interview session.
+        </p>
+    </div>
+
+    <!-- 4 Visual Telemetry Pillars -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+            <div class="text-xs font-mono text-primary uppercase font-bold">PILLAR 01</div>
+            <h3 class="font-display font-bold text-lg text-white">Facial Expression Analysis</h3>
+            <p class="text-xs text-text-secondary leading-relaxed">
+                Uses MediaPipe facial mesh blendshapes to track 468 facial landmarks, evaluating confidence, neutral composure, enthusiasm, and signs of stress or uncertainty.
+            </p>
+        </div>
+
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+            <div class="text-xs font-mono text-tertiary uppercase font-bold">PILLAR 02</div>
+            <h3 class="font-display font-bold text-lg text-white">Eye Contact & Gaze Direction</h3>
+            <p class="text-xs text-text-secondary leading-relaxed">
+                Calculates iris displacement relative to screen center coordinates, measuring eye contact percentage and detecting visual distractions.
+            </p>
+        </div>
+
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+            <div class="text-xs font-mono text-secondary uppercase font-bold">PILLAR 03</div>
+            <h3 class="font-display font-bold text-lg text-white">Posture & Spine Alignment</h3>
+            <p class="text-xs text-text-secondary leading-relaxed">
+                Monitors upper body posture and shoulder alignment angles over time to detect upright posture versus slouching or physical fatigue.
+            </p>
+        </div>
+
+        <div class="glass-panel p-6 rounded-2xl space-y-3">
+            <div class="text-xs font-mono text-purple-400 uppercase font-bold">PILLAR 04</div>
+            <h3 class="font-display font-bold text-lg text-white">Professional Presence Synthesis</h3>
+            <p class="text-xs text-text-secondary leading-relaxed">
+                Synthesizes visual cues into a composite Professional Presence score (0-100) that is forwarded to the Evaluation Engine.
+            </p>
+        </div>
+
+    </div>
+
+    <!-- Interactive Visual Telemetry Simulator -->
+    <div class="glass-panel p-8 rounded-3xl space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
+            <div>
+                <div class="text-xs font-mono text-primary uppercase font-bold tracking-widest">LIVE COMPUTER VISION SIMULATOR</div>
+                <h2 class="font-display font-bold text-2xl text-white mt-1">Real-Time Facial Landmark & Posture Analyzer</h2>
+                <p class="text-xs text-text-secondary">Simulate live webcam kinetic telemetry processing using MediaPipe facial mesh and iris gaze tracking.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleCameraSim(true)" class="px-4 py-2 rounded-xl bg-primary text-black font-bold text-xs hover:opacity-90 transition flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm">videocam</span> Run Live Visual Mesh Demo
+                </button>
+            </div>
+        </div>
+
+        <!-- Simulation Interface -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Simulated Webcam Frame -->
+            <div class="lg:col-span-6 glass-card p-6 rounded-2xl space-y-4 relative flex flex-col justify-between h-96 overflow-hidden border border-primary/30">
+                <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-black to-blue-900/20 pointer-events-none"></div>
+
+                <div class="flex justify-between items-center z-10">
+                    <span class="px-2.5 py-1 rounded-md bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-mono font-bold flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span> REC • MediaPipe 10 FPS
+                    </span>
+                    <span class="text-xs font-mono text-tertiary bg-black/60 px-3 py-1 rounded-md border border-white/10" id="simFps">10.0 FPS • 1080p</span>
+                </div>
+
+                <!-- Bounding Box & Landmark Wireframe Overlay -->
+                <div class="relative w-48 h-48 mx-auto border-2 border-dashed border-primary/60 rounded-full flex items-center justify-center text-center z-10 bg-primary/5">
+                    <div class="w-24 h-24 border border-tertiary/60 rounded-full flex items-center justify-center">
+                        <span class="material-symbols-outlined text-4xl text-primary animate-pulse">face</span>
+                    </div>
+                    <!-- Iris Tracking Crosshairs -->
+                    <div class="absolute top-12 left-12 w-3 h-3 bg-tertiary rounded-full animate-ping"></div>
+                    <div class="absolute top-12 right-12 w-3 h-3 bg-tertiary rounded-full animate-ping"></div>
+                </div>
+
+                <div class="flex justify-between items-center text-xs font-mono text-text-secondary z-10 bg-black/60 p-3 rounded-xl border border-white/5">
+                    <span>Gaze Offset: <strong class="text-tertiary" id="simGaze">0.02 (Center)</strong></span>
+                    <span>Spine Angle: <strong class="text-primary" id="simSpine">158° (Upright)</strong></span>
+                </div>
+            </div>
+
+            <!-- Real-Time Metrics & Expression Trajectory -->
+            <div class="lg:col-span-6 glass-card p-6 rounded-2xl space-y-5">
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-black/40 p-3.5 rounded-xl border border-primary/20">
+                        <span class="text-xs font-mono text-text-secondary block">Eye Contact</span>
+                        <span class="font-display text-2xl font-bold text-tertiary" id="simEyePct">88%</span>
+                    </div>
+                    <div class="bg-black/40 p-3.5 rounded-xl border border-secondary/20">
+                        <span class="text-xs font-mono text-text-secondary block">Posture Score</span>
+                        <span class="font-display text-2xl font-bold text-primary" id="simPostureScore">89/100</span>
+                    </div>
+                    <div class="bg-black/40 p-3.5 rounded-xl border border-purple-500/20">
+                        <span class="text-xs font-mono text-text-secondary block">Expressiveness</span>
+                        <span class="font-display text-2xl font-bold text-purple-400">92%</span>
+                    </div>
+                </div>
+
+                <!-- Expression Blendshape Chart -->
+                <div class="space-y-2">
+                    <span class="text-xs font-mono uppercase text-text-secondary">MediaPipe Blendshape Expression Trajectory</span>
+                    <div class="h-44">
+                        <canvas id="videoExpChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- Summary Metrics -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        <div class="glass-panel p-5 rounded-2xl">
-            <span class="text-text-secondary text-xs font-mono uppercase">Total Videos Analyzed</span>
-            <div class="font-display text-3xl font-bold text-white mt-2">312</div>
-            <span class="text-xs text-tertiary mt-1 block">+18 this week</span>
-        </div>
-        <div class="glass-panel p-5 rounded-2xl">
-            <span class="text-text-secondary text-xs font-mono uppercase">Avg Video Score</span>
-            <div class="font-display text-3xl font-bold text-primary mt-2">86.5</div>
-            <span class="text-xs text-text-secondary mt-1 block">Visual presence score</span>
-        </div>
-        <div class="glass-panel p-5 rounded-2xl">
-            <span class="text-text-secondary text-xs font-mono uppercase">Avg Duration</span>
-            <div class="font-display text-3xl font-bold text-white mt-2">32 min</div>
-            <span class="text-xs text-text-secondary mt-1 block">10 FPS telemetry</span>
-        </div>
-        <div class="glass-panel p-5 rounded-2xl">
-            <span class="text-text-secondary text-xs font-mono uppercase">Engagement Rate</span>
-            <div class="font-display text-3xl font-bold text-tertiary mt-2">91.4%</div>
-            <span class="text-xs text-tertiary mt-1 block">Gaze + posture match</span>
-        </div>
-        <div class="glass-panel p-5 rounded-2xl">
-            <span class="text-text-secondary text-xs font-mono uppercase">Flagged Behaviors</span>
-            <div class="font-display text-3xl font-bold text-tertiary mt-2">0</div>
-            <span class="text-xs text-tertiary mt-1 block">Clean visual telemetry</span>
-        </div>
-    </div>
-
-    <!-- Video Analysis Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-        <!-- Left List -->
-        <div class="lg:col-span-4 glass-panel p-6 rounded-3xl space-y-4">
-            <h2 class="font-display font-bold text-lg text-white border-b border-white/10 pb-3">Analyzed Video Sessions</h2>
-            <div class="space-y-3" id="videoListContainer"></div>
-        </div>
-
-        <!-- Right Player & Telemetry Breakdown -->
-        <div class="lg:col-span-8 glass-panel p-6 rounded-3xl space-y-5">
-            <div class="flex items-center justify-between border-b border-white/10 pb-4">
-                <div>
-                    <h2 class="font-display font-bold text-xl text-white" id="vCandidateName">Sarah Jenkins</h2>
-                    <p class="text-xs text-primary font-mono" id="vInterviewType">Technical Deep Dive • 35 Mins</p>
-                </div>
-                <div class="text-right">
-                    <span class="text-xs text-text-secondary uppercase font-mono block">Video Score</span>
-                    <span class="font-display text-3xl font-bold text-primary" id="vScore">86.5</span>
-                </div>
-            </div>
-
-            <!-- Video Player Placeholder -->
-            <div class="glass-card rounded-2xl h-64 flex flex-col items-center justify-center border border-primary/30 relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-purple-600/10"></div>
-                <span class="material-symbols-outlined text-6xl text-primary animate-pulse z-10">play_circle</span>
-                <span class="font-mono text-xs text-text-secondary mt-2 z-10">Webcam Stream Telemetry (35 min session recorded)</span>
-            </div>
-
-            <!-- Telemetry Metrics Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="glass-card p-4 rounded-2xl space-y-2">
-                    <h4 class="text-xs font-mono text-primary uppercase">Eye Contact & Gaze</h4>
-                    <div class="font-display text-2xl font-bold text-white" id="vEyeContact">88%</div>
-                    <p class="text-xs text-text-secondary">Iris position deviation strictly within 0.05 horizontal threshold.</p>
-                </div>
-                <div class="glass-card p-4 rounded-2xl space-y-2">
-                    <h4 class="text-xs font-mono text-secondary uppercase">Posture Alignment</h4>
-                    <div class="font-display text-2xl font-bold text-white" id="vPosture">89%</div>
-                    <p class="text-xs text-text-secondary">Spine angle 158° with zero slouching detected.</p>
-                </div>
-                <div class="glass-card p-4 rounded-2xl space-y-2">
-                    <h4 class="text-xs font-mono text-tertiary uppercase">Facial Expressiveness</h4>
-                    <div class="font-display text-2xl font-bold text-white">92%</div>
-                    <p class="text-xs text-text-secondary">Primary blendshape: Confident & Neutral emotion state.</p>
-                </div>
-            </div>
-
-            <!-- Facial Expression Timeline Graph -->
-            <div class="glass-card p-4 rounded-2xl space-y-2">
-                <h4 class="text-xs font-mono text-primary uppercase">Facial Expression Timeline (MediaPipe Blendshapes)</h4>
-                <div class="h-44">
-                    <canvas id="expressionChart"></canvas>
-                </div>
-            </div>
-
-            <!-- AI Insights -->
-            <div class="glass-card p-4 rounded-2xl space-y-2">
-                <h4 class="text-xs font-mono text-primary uppercase flex items-center gap-1">
-                    <span class="material-symbols-outlined text-xs">auto_awesome</span> Visual Telemetry Insights
-                </h4>
-                <ul class="text-xs text-text-secondary list-disc list-inside space-y-1" id="vInsightsList"></ul>
-            </div>
-        </div>
-
+    <!-- Academic Insights -->
+    <div class="glass-panel p-6 rounded-3xl space-y-3">
+        <h3 class="font-display font-bold text-white text-lg flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">menu_book</span> Academic Rationale (KEIKO Report Section VI)
+        </h3>
+        <p class="text-xs text-text-secondary leading-relaxed max-w-4xl">
+            Section VI of the KEIKO report specifies that visual assessment does not make arbitrary psychological claims. Instead, it measures observable, quantifiable indicators—such as posture stability and eye contact consistency—over time to produce an objective, balanced measure of professional presentation.
+        </p>
     </div>
 
 </main>
 
 <script>
-let videoData = [];
-let selectedVideo = null;
-let expChartObj = null;
+let videoChartObj = null;
 
-async function fetchVideo() {
-    try {
-        const res = await fetch('/api/v1/interview/intelligence/video');
-        const json = await res.json();
-        if(json.status === 'success' && json.data) {
-            videoData = json.data;
-            renderVideoList(videoData);
-            if(videoData.length > 0) selectVideo(videoData[0].id);
-        }
-    } catch(e) { console.error(e); }
-}
-
-function renderVideoList(list) {
-    const container = document.getElementById('videoListContainer');
-    container.innerHTML = list.map(v => `
-        <div onclick="selectVideo(${v.id})" class="glass-card p-4 rounded-2xl hover:border-primary/50 cursor-pointer transition ${selectedVideo && selectedVideo.id === v.id ? 'border-primary bg-primary/10' : ''}">
-            <div class="flex items-center justify-between">
-                <h3 class="font-display font-semibold text-white">${v.candidate_name}</h3>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-mono bg-tertiary/20 text-tertiary border border-tertiary/30">${v.status}</span>
-            </div>
-            <div class="flex items-center justify-between mt-2 text-xs text-text-secondary">
-                <span>${v.interview_type} • ${v.duration_minutes}m</span>
-                <span class="font-mono text-primary font-bold">Score ${v.video_score}</span>
-            </div>
-        </div>
-    `).join('');
-}
-
-function selectVideo(id) {
-    selectedVideo = videoData.find(v => v.id === id);
-    if(!selectedVideo) return;
-
-    renderVideoList(videoData);
-
-    document.getElementById('vCandidateName').innerText = selectedVideo.candidate_name;
-    document.getElementById('vInterviewType').innerText = `${selectedVideo.interview_type} • ${selectedVideo.duration_minutes} Mins`;
-    document.getElementById('vScore').innerText = selectedVideo.video_score;
-    document.getElementById('vEyeContact').innerText = selectedVideo.eye_contact_pct + '%';
-    document.getElementById('vPosture').innerText = (selectedVideo.body_language ? selectedVideo.body_language.posture_confidence : 89) + '%';
-
-    document.getElementById('vInsightsList').innerHTML = (selectedVideo.ai_insights || []).map(i => `<li>${i}</li>`).join('');
-
-    renderExpChart();
-}
-
-function renderExpChart() {
-    const ctx = document.getElementById('expressionChart').getContext('2d');
-    if(expChartObj) expChartObj.destroy();
-    expChartObj = new Chart(ctx, {
+function initVideoChart() {
+    const ctx = document.getElementById('videoExpChart').getContext('2d');
+    if(videoChartObj) videoChartObj.destroy();
+    videoChartObj = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['0m', '5m', '10m', '15m', '20m', '25m', '30m', '35m'],
+            labels: ['0m', '5m', '10m', '15m', '20m', '25m', '30m'],
             datasets: [
-                { label: 'Confident', data: [80, 85, 90, 88, 92, 94, 91, 95], borderColor: '#d2bbff', tension: 0.3 },
-                { label: 'Neutral', data: [20, 15, 10, 12, 8, 6, 9, 5], borderColor: '#adc6ff', tension: 0.3 },
-                { label: 'Nervous', data: [10, 5, 2, 1, 0, 0, 0, 0], borderColor: '#ef4444', tension: 0.3 }
+                { label: 'Confident / Neutral', data: [80, 85, 88, 92, 90, 94, 95], borderColor: '#d2bbff', tension: 0.3 },
+                { label: 'Nervous Signs', data: [15, 10, 5, 2, 1, 0, 0], borderColor: '#ef4444', tension: 0.3 }
             ]
         },
         options: {
@@ -246,7 +229,13 @@ function renderExpChart() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', fetchVideo);
+function toggleCameraSim() {
+    document.getElementById('simEyePct').innerText = (85 + Math.floor(Math.random() * 10)) + '%';
+    document.getElementById('simPostureScore').innerText = (88 + Math.floor(Math.random() * 8)) + '/100';
+    initVideoChart();
+}
+
+document.addEventListener('DOMContentLoaded', initVideoChart);
 </script>
 </body>
 </html>
