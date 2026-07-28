@@ -46,8 +46,8 @@
     <!-- Top Chamber Header Navigation -->
     <header class="h-16 border-b border-white/10 px-6 flex justify-between items-center bg-[#0C0C0E]/90 backdrop-blur-md sticky top-0 z-40">
         <div class="flex items-center gap-4">
-            <a href="dashboard.html" class="flex items-center gap-2 font-display text-xl font-bold tracking-tighter text-white hover:text-primary transition-colors">
-                <span class="material-symbols-outlined text-primary text-2xl">graphic_eq</span> KEIKO CHAMBER
+            <a href="dashboard.html" class="hover:opacity-90 transition-opacity">
+                <img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-8">
             </a>
             <span class="font-mono text-xs text-text-secondary hidden sm:inline-block">AI Evaluation Pipeline Active</span>
         </div>
@@ -155,8 +155,8 @@
                             <span class="material-symbols-outlined text-sm">lightbulb</span> Request AI Hint
                         </button>
                     </div>
-                    <span id="micActivityBadge" class="text-xs text-emerald-400 font-semibold font-mono flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm">mic</span> Mic Active
+                    <span id="micActivityBadge" class="text-xs text-emerald-400 font-semibold font-mono flex items-center gap-1 hidden">
+                        <span class="material-symbols-outlined text-sm">mic</span> PTT Active
                     </span>
                 </div>
             </div>
@@ -174,7 +174,7 @@
 
                 <div class="flex items-center justify-between pt-1">
                     <div class="flex items-center gap-2 font-mono text-xs text-text-secondary">
-                        <span id="sttStatusText" class="text-emerald-400">Capturing audio...</span>
+                        <span id="sttStatusText" class="text-text-secondary font-mono">PTT Muted (Press/Hold Spacebar)</span>
                     </div>
 
                     <div class="flex gap-3">
@@ -324,6 +324,13 @@
         let captureCanvas = null;
         let frameCaptureInterval = null;
 
+        let isPttActive = false;
+        let isPttToggled = false;
+        let isTtsSpeaking = false;
+        let isRecognizing = false;
+        let committedTranscript = '';
+        let interimTranscript = '';
+
         document.addEventListener('DOMContentLoaded', async () => {
             const hasContext = checkCandidateContextGuard();
             if (!hasContext) return;
@@ -333,6 +340,7 @@
             startKineticsTracking();
             await initWebcam();
             initSpeechRecognition();
+            initPttEventListeners();
             await startOrResumeSession();
             initTelemetryWebSocket();
         });
@@ -349,10 +357,6 @@
             }
             return true;
         }
-
-        let isTtsSpeaking = false;
-        let isRecognizing = false;
-        let committedTranscript = '';
 
         function initCandidateProfile() {
             const name = localStorage.getItem('keiko_last_user_name') || 'Candidate';
@@ -487,6 +491,7 @@
 
         function safeStartSpeechRecognition() {
             if (!speechRecognizer || isMicMuted || isTtsSpeaking) return;
+            if (!(isPttActive || isPttToggled)) return;
             try {
                 if (!isRecognizing) speechRecognizer.start();
             } catch(e) {
@@ -499,20 +504,25 @@
             try {
                 if (isRecognizing) speechRecognizer.stop();
             } catch(e) {}
+            commitInterimTranscript();
+        }
+
+        function commitInterimTranscript() {
+            const txtArea = document.getElementById('transcribedAnswer');
+            if (txtArea) {
+                if (interimTranscript.trim()) {
+                    let current = txtArea.value.trim();
+                    committedTranscript = current;
+                    interimTranscript = '';
+                } else {
+                    committedTranscript = txtArea.value.trim();
+                }
+            }
         }
 
         function toggleMic() {
-            if (!mediaStream) return;
-            isMicMuted = !isMicMuted;
-            mediaStream.getAudioTracks().forEach(t => t.enabled = !isMicMuted);
-            const btn = document.getElementById('toggleMicBtn');
-            btn.innerHTML = `<span class="material-symbols-outlined text-base">${isMicMuted ? 'mic_off' : 'mic'}</span>`;
-            btn.classList.toggle('text-red-400', isMicMuted);
-            if (isMicMuted) {
-                safeStopSpeechRecognition();
-            } else {
-                safeStartSpeechRecognition();
-            }
+            isPttToggled = !isPttToggled;
+            updatePttState();
         }
 
         function toggleCam() {
@@ -561,6 +571,95 @@
             }
         }
 
+        // PTT Controller & Visual HUD Synchronization Engine
+        function updatePttState() {
+            const statusText = document.getElementById('sttStatusText');
+            const micBadge = document.getElementById('micActivityBadge');
+            const toggleBtn = document.getElementById('toggleMicBtn');
+
+            const shouldListen = (isPttActive || isPttToggled) && !isMicMuted && !isTtsSpeaking;
+
+            if (mediaStream) {
+                mediaStream.getAudioTracks().forEach(t => t.enabled = shouldListen);
+            }
+
+            if (isTtsSpeaking) {
+                safeStopSpeechRecognition();
+                if (statusText) {
+                    statusText.textContent = 'AI Speaking';
+                    statusText.className = 'text-purple-400 font-semibold font-mono';
+                }
+                if (micBadge) micBadge.classList.add('hidden');
+                if (toggleBtn) {
+                    toggleBtn.innerHTML = `<span class="material-symbols-outlined text-base">volume_up</span>`;
+                    toggleBtn.className = 'p-1.5 rounded-lg text-purple-400 bg-purple-500/20 text-xs transition-colors';
+                }
+                setAudioWaveState('ai');
+            } else if (shouldListen) {
+                if (statusText) {
+                    statusText.textContent = 'PTT Active (Listening...)';
+                    statusText.className = 'text-emerald-400 font-semibold font-mono';
+                }
+                if (micBadge) {
+                    micBadge.classList.remove('hidden');
+                    micBadge.innerHTML = `<span class="material-symbols-outlined text-sm">mic</span> PTT Active`;
+                }
+                if (toggleBtn) {
+                    toggleBtn.innerHTML = `<span class="material-symbols-outlined text-base">mic</span>`;
+                    toggleBtn.className = 'p-1.5 rounded-lg text-emerald-400 bg-emerald-500/20 text-xs transition-colors';
+                }
+                setAudioWaveState('candidate');
+                safeStartSpeechRecognition();
+            } else {
+                safeStopSpeechRecognition();
+                if (statusText) {
+                    statusText.textContent = 'PTT Muted (Press/Hold Spacebar)';
+                    statusText.className = 'text-text-secondary font-mono';
+                }
+                if (micBadge) micBadge.classList.add('hidden');
+                if (toggleBtn) {
+                    toggleBtn.innerHTML = `<span class="material-symbols-outlined text-base">mic_off</span>`;
+                    toggleBtn.className = 'p-1.5 rounded-lg text-white hover:bg-white/10 text-xs transition-colors';
+                }
+                setAudioWaveState('idle');
+            }
+        }
+
+        function initPttEventListeners() {
+            window.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    const target = e.target;
+                    const isEditable = target && (
+                        ['INPUT', 'TEXTAREA'].includes(target.tagName) ||
+                        target.isContentEditable
+                    );
+                    if (!isEditable) {
+                        e.preventDefault();
+                        if (!e.repeat && !isPttActive) {
+                            isPttActive = true;
+                            updatePttState();
+                        }
+                    }
+                }
+            });
+
+            window.addEventListener('keyup', (e) => {
+                if (e.code === 'Space') {
+                    const target = e.target;
+                    const isEditable = target && (
+                        ['INPUT', 'TEXTAREA'].includes(target.tagName) ||
+                        target.isContentEditable
+                    );
+                    if (!isEditable) {
+                        if (isPttActive) {
+                            isPttActive = false;
+                            updatePttState();
+                        }
+                    }
+                }
+            });
+        }
+
         // Web Speech API for Candidate STT with Live Interim Transcript & Auto-Recovery
         function initSpeechRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -581,67 +680,64 @@
 
             speechRecognizer.onstart = () => {
                 isRecognizing = true;
-                if (statusText) statusText.textContent = 'Listening to candidate speech...';
-                const micBadge = document.getElementById('micActivityBadge');
-                if (micBadge) micBadge.classList.remove('hidden');
             };
 
             speechRecognizer.onresult = (event) => {
-                if (isTtsSpeaking || isMicMuted) return;
+                if (isTtsSpeaking || isMicMuted || !(isPttActive || isPttToggled)) return;
 
                 setAudioWaveState('candidate');
                 const txtArea = document.getElementById('transcribedAnswer');
                 if (!txtArea) return;
 
-                let interimTranscript = '';
-                let newFinalTranscript = '';
+                let currentInterim = '';
+                let newFinal = '';
 
                 for (let i = event.resultIndex; i < event.results.length; i++) {
                     const trans = event.results[i][0].transcript;
                     if (event.results[i].isFinal) {
-                        newFinalTranscript += trans + ' ';
+                        newFinal += trans + ' ';
                     } else {
-                        interimTranscript += trans;
+                        currentInterim += trans;
                     }
                 }
 
+                const newFinalTranscript = newFinal.trim();
                 if (newFinalTranscript) {
-                    let currentVal = txtArea.value.trim();
-                    if (interimTranscript.trim() && currentVal.endsWith(interimTranscript.trim())) {
-                        currentVal = currentVal.substring(0, currentVal.length - interimTranscript.trim().length).trim();
+                    const alreadyCommitted = committedTranscript.trim().endsWith(newFinalTranscript) || (txtArea.value.trim().endsWith(newFinalTranscript) && !interimTranscript);
+                    if (!alreadyCommitted) {
+                        committedTranscript = (committedTranscript + ' ' + newFinalTranscript).trim();
                     }
-                    txtArea.value = (currentVal + ' ' + newFinalTranscript).trim();
-                    committedTranscript = txtArea.value;
-                } else if (interimTranscript) {
-                    txtArea.value = (committedTranscript + ' ' + interimTranscript).trim();
+                    interimTranscript = '';
+                } else if (currentInterim) {
+                    interimTranscript = currentInterim.trim();
                 }
+
+                txtArea.value = (committedTranscript + (interimTranscript ? ' ' + interimTranscript : '')).trim();
             };
 
             speechRecognizer.onerror = (e) => {
                 console.warn('STT SpeechRecognition error:', e.error);
                 if (e.error === 'not-allowed') {
                     if (statusText) statusText.textContent = 'Mic permission denied';
-                } else if (e.error === 'no-speech') {
-                    // silent timeout
-                } else {
-                    if (statusText) statusText.textContent = `Mic active (${e.error})`;
                 }
             };
 
             speechRecognizer.onend = () => {
                 isRecognizing = false;
-                setAudioWaveState('idle');
-                if (!isMicMuted && !isTtsSpeaking) {
+                commitInterimTranscript();
+                if ((isPttActive || isPttToggled) && !isMicMuted && !isTtsSpeaking) {
                     setTimeout(() => {
                         safeStartSpeechRecognition();
                     }, 300);
+                } else {
+                    updatePttState();
                 }
             };
 
-            safeStartSpeechRecognition();
+            updatePttState();
         }
 
-        // Text-To-Speech Output with Purple Wave Visualizer & STT Muting
+        // Text-To-Speech Output with Purple Wave Visualizer & STT Muting Interlocking
         function readQuestionAloud() {
             if ('speechSynthesis' in window && currentQuestion) {
                 window.speechSynthesis.cancel();
@@ -653,21 +749,19 @@
 
                 utterance.onstart = () => {
                     isTtsSpeaking = true;
-                    safeStopSpeechRecognition();
                     if (aiStatus) aiStatus.textContent = 'Interviewer speaking question...';
-                    setAudioWaveState('ai');
+                    updatePttState();
                 };
 
                 utterance.onend = () => {
                     isTtsSpeaking = false;
                     if (aiStatus) aiStatus.textContent = 'Listening to candidate response...';
-                    setAudioWaveState('idle');
-                    safeStartSpeechRecognition();
+                    updatePttState();
                 };
 
                 utterance.onerror = () => {
                     isTtsSpeaking = false;
-                    safeStartSpeechRecognition();
+                    updatePttState();
                 };
 
                 window.speechSynthesis.speak(utterance);
@@ -822,29 +916,7 @@
             readQuestionAloud();
         }
 
-        // Text-To-Speech Output with Purple Wave Visualizer
-        function readQuestionAloud() {
-            if ('speechSynthesis' in window && currentQuestion) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(currentQuestion);
-                utterance.rate = 0.95;
-                utterance.pitch = 1.0;
-
-                const aiStatus = document.getElementById('aiStatusText');
-
-                utterance.onstart = () => {
-                    if (aiStatus) aiStatus.textContent = 'Interviewer speaking question...';
-                    setAudioWaveState('ai');
-                };
-
-                utterance.onend = () => {
-                    if (aiStatus) aiStatus.textContent = 'Listening to candidate response...';
-                    setAudioWaveState('idle');
-                };
-
-                window.speechSynthesis.speak(utterance);
-            }
-        }
+        // readQuestionAloud handled via primary TTS Interlocking implementation above
 
         async function submitCurrentAnswer() {
             const answerInput = document.getElementById('transcribedAnswer');
@@ -857,6 +929,8 @@
 
             appendTranscriptBubble('Candidate', answerText);
             historyTurns.push({ question: currentQuestion, answer: answerText });
+            committedTranscript = '';
+            interimTranscript = '';
             answerInput.value = '';
 
             const submitBtn = document.getElementById('submitAnswerBtn');
@@ -987,7 +1061,10 @@
         }
 
         function clearAnswerInput() {
-            document.getElementById('transcribedAnswer').value = '';
+            committedTranscript = '';
+            interimTranscript = '';
+            const txtArea = document.getElementById('transcribedAnswer');
+            if (txtArea) txtArea.value = '';
         }
 
         // Inline AI Hint Request (No browser popups!)
@@ -1019,6 +1096,18 @@
                         window.speechSynthesis.cancel();
                         const ut = new SpeechSynthesisUtterance(`Here is a hint: ${hintMsg}`);
                         ut.rate = 0.95;
+                        ut.onstart = () => {
+                            isTtsSpeaking = true;
+                            updatePttState();
+                        };
+                        ut.onend = () => {
+                            isTtsSpeaking = false;
+                            updatePttState();
+                        };
+                        ut.onerror = () => {
+                            isTtsSpeaking = false;
+                            updatePttState();
+                        };
                         window.speechSynthesis.speak(ut);
                     }
                 }

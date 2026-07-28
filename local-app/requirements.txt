@@ -13,9 +13,9 @@ transformers>=4.40.0
 datasets>=2.16.0
 accelerate>=0.29.0
 peft>=0.10.0
-flask>=3.0.0
 pypdf
 pymupdf
 python-docx
 sentence-transformers
 python-multipart
+pywebview

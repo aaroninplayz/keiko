@@ -7,7 +7,7 @@ from .models_db import InterviewSession, ConversationHistory
 from .agents.question_generator import QuestionGenerator
 from .agents.central_evaluator import CentralEvaluator
 from .agents.report_generator import ReportGenerator
-from .agents.context_analyzer import ContextAnalyzer
+from .agents.context_analyzer import ContextAnalyzer, SESSIONS_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +29,7 @@ class ConversationManager:
         self.central_evaluator = CentralEvaluator()
         self.report_generator = ReportGenerator()
         self.context_analyzer = ContextAnalyzer()
+        self.sessions = {}
 
     def start_session(
         self,
@@ -211,7 +212,9 @@ class ConversationManager:
         # Persist to database
         db = SessionLocal()
         try:
-            # If session_id was explicitly provided, clean up any prior session with that ID
+            db.query(ConversationHistory).filter(
+                ConversationHistory.session_id == session_id
+            ).delete()
             existing = db.query(InterviewSession).filter(
                 InterviewSession.session_id == session_id
             ).first()

@@ -1,7 +1,6 @@
 import logging
 import os
-import threading
-import webbrowser
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,33 +15,18 @@ import time
 
 SERVER_BOOT_ID = str(int(time.time()))
 
-def _open_dashboard_browser():
-    target_url = "http://localhost:8000/static/dashboard.html?reset=true"
-    logger.info(f"Opening browser (Firefox preferred) to {target_url} in fullscreen mode...")
-    try:
-        import subprocess, sys
-        if sys.platform == "win32":
-            # Try Firefox kiosk/fullscreen mode first, then default fallback
-            try:
-                subprocess.Popen(f'start firefox -kiosk "{target_url}"', shell=True)
-            except Exception:
-                try:
-                    subprocess.Popen(f'start firefox -url "{target_url}"', shell=True)
-                except Exception:
-                    webbrowser.open(target_url)
-        else:
-            try:
-                subprocess.Popen(["firefox", "-kiosk", target_url])
-            except Exception:
-                webbrowser.open(target_url)
-    except Exception as e:
-        logger.warning(f"Failed to open browser automatically: {e}")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    auto_open_env = os.environ.get("KEIKO_AUTO_OPEN", "true").lower()
+    should_auto_open = auto_open_env not in ("false", "0", "no", "off")
+    yield
 
 def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.PROJECT_NAME,
         version=settings.VERSION,
-        openapi_url=f"{settings.API_V1_STR}/openapi.json"
+        openapi_url=f"{settings.API_V1_STR}/openapi.json",
+        lifespan=lifespan
     )
     app.state.boot_id = SERVER_BOOT_ID
 
@@ -92,15 +76,6 @@ def create_app() -> FastAPI:
     async def update_settings_alias(payload: dict = Body(...)):
         from modules.interview.router import update_system_settings
         return await update_system_settings(payload)
-
-    @app.on_event("startup")
-    def startup_event():
-        auto_open_env = os.environ.get("KEIKO_AUTO_OPEN", "true").lower()
-        should_auto_open = auto_open_env not in ("false", "0", "no", "off")
-
-        if should_auto_open:
-            threading.Timer(1.0, _open_dashboard_browser).start()
-            logger.info("Auto browser open scheduled for dashboard.html on server start/reset")
 
     return app
 

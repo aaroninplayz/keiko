@@ -68,7 +68,7 @@ echo ============================================================
 set /p CHOICE="Select an option (1-4): "
 
 if "%CHOICE%"=="1" goto :start_server
-if "%CHOICE%"=="2" goto :start_server
+if "%CHOICE%"=="2" goto :restart_server
 if "%CHOICE%"=="3" goto :run_check
 if "%CHOICE%"=="4" exit /b 0
 
@@ -78,6 +78,13 @@ goto :menu
 :run_check
 "!PYTHON_EXE!" "%SCRIPT_DIR%run.py" --check
 goto :menu
+
+:restart_server
+echo Stopping existing KEIKO python process...
+powershell -Command "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '*run.py*' } | Stop-Process -Force" >nul 2>&1
+taskkill /F /FI "COMMANDLINE eq *run.py*" >nul 2>&1
+timeout /t 1 /nobreak >nul
+goto :start_server
 
 :start_server
 echo Launching KEIKO server...

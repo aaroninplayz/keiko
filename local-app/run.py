@@ -9,11 +9,16 @@ import argparse
 import socket
 import logging
 
-# Ensure local-app directory is on sys.path
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-os.environ["HF_HUB_OFFLINE"] = "1"
-os.environ["TRANSFORMERS_OFFLINE"] = "1"
-os.environ["HF_DATASETS_OFFLINE"] = "1"
+MODELS_DIR = os.path.join(SCRIPT_DIR, "models")
+if os.path.exists(MODELS_DIR) and any(
+    entry.startswith("models--") and os.path.isdir(os.path.join(MODELS_DIR, entry))
+    for entry in os.listdir(MODELS_DIR)
+):
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+    os.environ["HF_DATASETS_OFFLINE"] = "1"
+
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 # Also add project root if running from inside local-app
@@ -117,7 +122,8 @@ def start_server(host: str, port: int, reload: bool):
     import uvicorn
     
     if is_port_in_use(port, host):
-        logger.warning(f"Port {port} is already occupied! Checking server...")
+        print(f"Port {port} is already in use. Please close the other application or use --port <number> to choose a different port.")
+        sys.exit(1)
         
     print("\n" + "=" * 65)
     print("                  KEIKO LOCAL LAB BACKEND                    ")

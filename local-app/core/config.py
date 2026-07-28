@@ -8,12 +8,20 @@ MODELS_DIR = str(Path(__file__).resolve().parent.parent / "models")
 os.makedirs(MODELS_DIR, exist_ok=True)
 os.environ["HF_HOME"] = MODELS_DIR
 os.environ["SENTENCE_TRANSFORMERS_HOME"] = MODELS_DIR
-os.environ["HF_HUB_OFFLINE"] = "1"
-os.environ["TRANSFORMERS_OFFLINE"] = "1"
-os.environ["HF_DATASETS_OFFLINE"] = "1"
+has_cached_models = os.path.exists(MODELS_DIR) and any(
+    entry.startswith("models--") and os.path.isdir(os.path.join(MODELS_DIR, entry))
+    for entry in os.listdir(MODELS_DIR)
+)
+
+if has_cached_models:
+    os.environ["HF_HUB_OFFLINE"] = "1"
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+    os.environ["HF_DATASETS_OFFLINE"] = "1"
+
+# TODO: Add model update notification check in the app's notification area
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Modular Web App"
+    PROJECT_NAME: str = "KEIKO"
     VERSION: str = "0.1.0"
     API_V1_STR: str = "/api/v1"
     
