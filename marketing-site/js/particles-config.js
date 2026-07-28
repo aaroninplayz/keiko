@@ -5,14 +5,14 @@
  */
 const PARTICLE_CONFIG = {
     // Basic settings
-    maxParticles: 1000,                    // Total number of particle nodes
-    particleRadius: 1.8,                  // Radius of each dot in pixels
+    maxParticles: 600,                    // Total number of particle nodes
+    particleRadius: 3.0,                  // Radius of each dot in pixels
     particleColor: 'rgba(210, 187, 255, 0.55)', // Color of particle dots
 
     // Wireframe Mesh Settings
-    connectionColor: 'rgba(210, 187, 255, 0.15)', // Color of connection lines
-    connectionMaxDistance: 85,            // Max distance (px) between nodes to draw lines
-    connectionMaxCount: 2,                // Max lines per particle (caps calculation complexity)
+    connectionColor: 'rgba(210, 187, 255, 0.50)', // Color of connection lines (0.50 opacity)
+    connectionMaxDistance: 100,           // Max distance (px) between nodes to draw lines
+    connectionMaxCount: 3,                // Max lines per particle (3 connections per node)
 
     // Mouse Interaction Settings
     mouseRepelDistance: 130,              // Distance (px) at which the cursor pushes particles
@@ -20,8 +20,8 @@ const PARTICLE_CONFIG = {
 
     // Animation Time States (in frames at 60 FPS)
     wanderDuration: 450,                  // How long particles stay in wandering "blanket" state (7.5 seconds)
-    transitionDuration: 120,             // How long the morphing animation takes (2 seconds)
-    shapeDuration: 420,                   // How long a shape stays formed on screen (7.0 seconds)
+    transitionDuration: 180,             // How long the morphing animation takes (3 seconds)
+    shapeDuration: 600,                   // How long a shape stays formed on screen (10.0 seconds)
 
     // Allowed Geometric Shapes (removes cylinders, hearts, cones, etc.)
     shapeList: [

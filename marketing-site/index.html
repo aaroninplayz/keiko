@@ -510,16 +510,16 @@
     // Load custom configurations or default to standard fallback values
     const cfg = window.PARTICLE_CONFIG || {
         maxParticles: 600,
-        particleRadius: 1.8,
+        particleRadius: 3.0,
         particleColor: 'rgba(210, 187, 255, 0.55)',
-        connectionColor: 'rgba(210, 187, 255, 0.15)',
-        connectionMaxDistance: 85,
-        connectionMaxCount: 2,
+        connectionColor: 'rgba(210, 187, 255, 0.50)',
+        connectionMaxDistance: 100,
+        connectionMaxCount: 3,
         mouseRepelDistance: 130,
         mouseRepelForce: 2.5,
         wanderDuration: 450,
-        transitionDuration: 120,
-        shapeDuration: 420,
+        transitionDuration: 180,
+        shapeDuration: 600,
         shapeList: ['sphere', 'cube', 'torus', 'tesseract', 'mobius', 'helix', 'infinity'],
         shapes: {
             sphere: { R: 165 },
@@ -582,7 +582,7 @@
     let currentPColor2 = { r: 113, g: 248, b: 228 };
     let currentConnectionColor = { r: 173, g: 198, b: 255 };
     let currentOpacity = 0.55;
-    let currentCLineOpacity = 0.15;
+    let currentCLineOpacity = 0.50;
     let currentRepelForce = cfg.mouseRepelForce;
     let currentWanderSpeed = 1.8;
 
@@ -991,7 +991,7 @@
         let targetPColor2 = { r: 113, g: 248, b: 228 }; // Teal
         let targetCColor = { r: 173, g: 198, b: 255 }; // Connection base
         let targetOpacity = 0.55;
-        let targetCLineOpacity = 0.15;
+        let targetCLineOpacity = 0.50;
         let targetWanderSpeed = 1.8;
         let targetRepelForce = cfg.mouseRepelForce;
 
@@ -1001,7 +1001,7 @@
             targetPColor2 = { r: 113, g: 248, b: 228 };
             targetCColor = { r: 173, g: 198, b: 255 };
             targetOpacity = 0.55;
-            targetCLineOpacity = 0.15;
+            targetCLineOpacity = 0.50;
             targetWanderSpeed = 1.8;
             targetRepelForce = cfg.mouseRepelForce;
         } 
@@ -1022,7 +1022,7 @@
             targetCColor.b = 255 + (255 - 255) * t;
 
             targetOpacity = 0.55 + (0.7 - 0.55) * t;
-            targetCLineOpacity = 0.15 + (0.28 - 0.15) * t;
+            targetCLineOpacity = 0.50 + (0.65 - 0.50) * t;
             targetWanderSpeed = 1.8 + (2.2 - 1.8) * t; 
             targetRepelForce = cfg.mouseRepelForce + (cfg.mouseRepelForce * 0.5) * t;
         }
@@ -1054,18 +1054,41 @@
             p.draw();
 
             if (inShape && !p.isAmbient) {
-                // Connect within local partition range to form separate wireframe grids
+                // Structural shape-aware connections: connects topological neighbors forming the clear outline of each shape
                 const partitionStart = (layout === 'core-boundary') ? 0 : ((i < maxParticles / 2) ? 0 : (maxParticles / 2));
                 const partitionEnd = (layout === 'core-boundary') ? maxParticles : ((i < maxParticles / 2) ? (maxParticles / 2) : maxParticles);
+                const localN = partitionEnd - partitionStart;
+                const localI = i - partitionStart;
                 
-                const startIdx = Math.max(partitionStart, i - 12);
-                const endIdx = Math.min(partitionEnd, i + 12);
-                
+                // Determine potential structural neighbor indices based on the active shape type
+                const shape = p.assignedShape;
+                const neighbors = [];
+
+                if (shape === 'cube') {
+                    // Edge neighbors along the same edge + adjacent edge points
+                    neighbors.push(i + 12, i - 12);
+                    if (localI % 12 === 0) neighbors.push(i + 1);
+                } else if (shape === 'torus') {
+                    const rings = Math.floor(Math.sqrt(localN));
+                    neighbors.push(i + 1, i + rings, i - 1, i - rings);
+                } else if (shape === 'helix') {
+                    neighbors.push(i + 2); // Same strand
+                    if (localI % 8 === 0) neighbors.push(i + 1); // DNA rung connection
+                } else if (shape === 'mobius') {
+                    neighbors.push(i + 1, i + 12);
+                } else if (shape === 'tesseract') {
+                    neighbors.push(i + 1, i + 4, i + 8);
+                } else {
+                    // Sphere / Infinity: sequential & radial neighbors
+                    neighbors.push(i + 1, i + 2);
+                }
+
                 let connectionsCount = 0;
-                for (let j = startIdx; j < endIdx; j++) {
-                    if (j === i) continue;
+                for (let k = 0; k < neighbors.length; k++) {
+                    const j = neighbors[k];
+                    if (j < partitionStart || j >= partitionEnd || j === i) continue;
                     if (connectionsCount >= cfg.connectionMaxCount) break;
-                    
+
                     const p2 = particles[j];
                     if (p2.isAmbient) continue;
 
@@ -1073,11 +1096,11 @@
                     const dy = p.currentY - p2.currentY;
                     const dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (dist < cfg.connectionMaxDistance) {
+                    if (dist < 120) {
                         ctx.beginPath();
                         ctx.moveTo(p.currentX, p.currentY);
                         ctx.lineTo(p2.currentX, p2.currentY);
-                        ctx.strokeStyle = `rgba(${Math.round(currentConnectionColor.r)}, ${Math.round(currentConnectionColor.g)}, ${Math.round(currentConnectionColor.b)}, ${currentCLineOpacity * (1 - dist / cfg.connectionMaxDistance)})`;
+                        ctx.strokeStyle = `rgba(${Math.round(currentConnectionColor.r)}, ${Math.round(currentConnectionColor.g)}, ${Math.round(currentConnectionColor.b)}, ${currentCLineOpacity * (1 - dist / 120)})`;
                         ctx.stroke();
                         connectionsCount++;
                     }
