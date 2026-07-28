@@ -53,6 +53,7 @@ set "HF_HUB_OFFLINE=1"
 set "TRANSFORMERS_OFFLINE=1"
 set "HF_DATASETS_OFFLINE=1"
 
+if "%~1"=="" goto :start_server
 if "%~1"=="--restart" goto :start_server
 
 :menu
