@@ -97,12 +97,15 @@ class ConfidenceMetric:
         # Bound score between 0.0 and 100.0
         final_score = max(0.0, min(100.0, modified_score))
 
-        # Calculate composure (Feature 33)
+        # Calculate composure
         deviation = e_details.get("deviation", 0.0) if (e_details.get("detected") and e_details.get("iris_available")) else 0.0
-        gaze_penalty = min(20.0, deviation * 100.0)
+        gaze_penalty = min(25.0, deviation * 120.0)
         hand_activity = b_details.get("hand_activity_raw", 0.0) if b_details.get("detected") else 0.0
-        fidget_penalty_comp = min(20.0, hand_activity * 200.0)
-        composure_val = max(0.0, min(100.0, e_score - gaze_penalty - fidget_penalty_comp))
+        fidget_penalty_comp = min(25.0, hand_activity * 250.0)
+        slouch_penalty = 15.0 if p_details.get("is_slouching") else 0.0
+
+        # Base composure combines eye poise, body stability, and upright posture
+        composure_val = max(0.0, min(100.0, (e_score * 0.5 + p_score * 0.3 + b_score * 0.2) - gaze_penalty - fidget_penalty_comp - slouch_penalty))
 
         # Calculate stress resilience (Feature 33)
         slouch_penalty = 20.0 if p_details.get("is_slouching") else 0.0

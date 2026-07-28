@@ -28,6 +28,7 @@ class InterviewSession(Base):
     # State & Metrics Trackers
     interviewer_interest = Column(Float, nullable=False, default=50.0) # 0-100
     job_fit_score = Column(Float, nullable=False, default=50.0)        # 0-100
+    conversation_summary = Column(Text, nullable=True)                 # Compressed conversation history (every 5 turns)
     
     # Cached context objects (enables full session recovery without local files)
     resume_profile = Column(JSON, nullable=True)     # Extracted candidate profile details
@@ -210,6 +211,8 @@ def ensure_db_schema():
                     conn.execute(text("ALTER TABLE interview_sessions ADD COLUMN interviewer_interest FLOAT DEFAULT 50.0"))
                 if "job_fit_score" not in columns:
                     conn.execute(text("ALTER TABLE interview_sessions ADD COLUMN job_fit_score FLOAT DEFAULT 50.0"))
+                if "conversation_summary" not in columns:
+                    conn.execute(text("ALTER TABLE interview_sessions ADD COLUMN conversation_summary TEXT"))
     except Exception as e:
         import logging
         logging.getLogger(__name__).warning(f"Could not auto-migrate DB schema: {e}")

@@ -288,7 +288,7 @@
               No work experience added yet. Type in the edit box below or upload a resume to generate cards.
             </div>
           </div>
-          <div id="workExperienceEditArea" class="space-y-1">
+          <div id="workExperienceEditArea" class="space-y-1 hidden">
             <textarea id="candidateExperience" rows="3"
               placeholder="<<<KEIKO_SECTION_START:EXPERIENCE>>>&#10;&#10;Senior Software Engineer at Tech Corp (2022-Present)&#10;- Lead API & Infrastructure engineering team...&#10;&#10;<<<KEIKO_SECTION_END:EXPERIENCE>>>"
               class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-y transition-colors"></textarea>
@@ -307,7 +307,7 @@
               No education history added yet. Type in the edit box below or upload a resume to generate cards.
             </div>
           </div>
-          <div id="educationEditArea" class="space-y-1">
+          <div id="educationEditArea" class="space-y-1 hidden">
             <textarea id="candidateEducation" rows="2"
               placeholder="<<<KEIKO_SECTION_START:EDUCATION>>>&#10;&#10;B.S. in Computer Science, Stanford University (2018-2022)&#10;&#10;<<<KEIKO_SECTION_END:EDUCATION>>>"
               class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-y transition-colors"></textarea>
@@ -326,7 +326,7 @@
               No projects or achievements added yet. Type in the edit box below or upload a resume to generate cards.
             </div>
           </div>
-          <div id="achievementsEditArea" class="space-y-1">
+          <div id="achievementsEditArea" class="space-y-1 hidden">
             <textarea id="candidateAchievements" rows="2"
               placeholder="<<<KEIKO_SECTION_START:PROJECTS>>>&#10;&#10;High-Frequency Engine: Built C++ trading engine with <1ms latency&#10;&#10;<<<KEIKO_SECTION_END:PROJECTS>>>"
               class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-primary resize-y transition-colors"></textarea>
@@ -358,84 +358,6 @@
         </div>
       </section>
 
-      <!-- Section 5: Interview Configuration (Type, Role/Domain, Question Count & Difficulty) -->
-      <section class="glass-neo-stitch p-6 space-y-6">
-        <div class="flex items-center justify-between border-b border-white/10 pb-4">
-          <h2 class="text-lg font-semibold text-white flex items-center gap-2 font-display">
-            <span class="material-symbols-outlined text-primary">tune</span>
-            5. Interview Configuration Parameters
-          </h2>
-          <span class="text-xs font-mono text-tertiary bg-tertiary/10 px-2.5 py-1 rounded border border-tertiary/20 font-semibold">Active Session Config</span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-mono text-xs">
-          <!-- Interview Type Selector -->
-          <div class="space-y-2">
-            <label for="interviewType" class="block uppercase tracking-wider text-text-secondary font-semibold">Interview Type *</label>
-            <select id="interviewType" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-primary transition-colors">
-              <option value="Tech" selected>Tech (Technical Architecture & Coding)</option>
-              <option value="HR">HR (Behavioral & Cultural Alignment)</option>
-              <option value="Situational">Situational (Problem Solving & Case Study)</option>
-            </select>
-          </div>
-
-          <!-- Role / Domain Input -->
-          <div class="space-y-2">
-            <label for="roleDomain" class="block uppercase tracking-wider text-text-secondary font-semibold">Role / Domain *</label>
-            <input id="roleDomain" type="text" placeholder="e.g. Senior Backend Engineer" value="Software Engineer"
-              class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-primary transition-colors" />
-          </div>
-
-          <!-- Question Count Selection & Custom Input -->
-          <div class="space-y-2 md:col-span-2">
-            <label class="block uppercase tracking-wider text-text-secondary font-semibold">Question Count *</label>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <label class="cursor-pointer">
-                <input type="radio" name="questionCountOption" value="5" class="sr-only peer" />
-                <div class="p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-center peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary transition-all font-bold">
-                  5 Questions
-                </div>
-              </label>
-              <label class="cursor-pointer">
-                <input type="radio" name="questionCountOption" value="10" checked class="sr-only peer" />
-                <div class="p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-center peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary transition-all font-bold">
-                  10 Questions
-                </div>
-              </label>
-              <label class="cursor-pointer">
-                <input type="radio" name="questionCountOption" value="15" class="sr-only peer" />
-                <div class="p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-center peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary transition-all font-bold">
-                  15 Questions
-                </div>
-              </label>
-              <label class="cursor-pointer">
-                <input type="radio" name="questionCountOption" value="custom" class="sr-only peer" />
-                <div class="p-3 rounded-xl border border-white/10 bg-[#1c1b1c] text-center peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary transition-all font-bold">
-                  Custom Count
-                </div>
-              </label>
-            </div>
-
-            <!-- Custom Question Count Numerical Input Field -->
-            <div class="pt-2">
-              <label for="customQuestionCount" class="block text-[11px] text-text-secondary mb-1">Custom Question Count (Enabled when "Custom Count" is selected)</label>
-              <input id="customQuestionCount" type="number" min="1" max="50" placeholder="Enter custom count (e.g. 8)" disabled
-                class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed" />
-            </div>
-          </div>
-
-          <!-- Difficulty Mode Selector -->
-          <div class="space-y-2 md:col-span-2">
-            <label for="difficultyMode" class="block uppercase tracking-wider text-text-secondary font-semibold">Difficulty Level *</label>
-            <select id="difficultyMode" class="w-full bg-[#1c1b1c] border border-white/10 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-primary transition-colors">
-              <option value="Adaptive" selected>Adaptive (Dynamic Difficulty Scaling)</option>
-              <option value="Beginner">Beginner (Foundational)</option>
-              <option value="Intermediate">Intermediate (Mid-Level)</option>
-              <option value="Advanced">Advanced (Senior / Architect)</option>
-            </select>
-          </div>
-        </div>
-      </section>
 
       <!-- Action Bar: Guest vs Save & Start -->
       <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-white/10">
@@ -1089,10 +1011,10 @@
       // Toggle Edit Form vs Interactive Component Cards View
       const toggleEditBtn = document.getElementById('toggleProfileEditBtn');
       const toggleEditLabel = document.getElementById('toggleProfileEditLabel');
-      let isEditMode = true;
+      let isEditMode = false;
 
       if (toggleEditBtn) {
-        if (toggleEditLabel) toggleEditLabel.textContent = 'Hide Edit Form';
+        if (toggleEditLabel) toggleEditLabel.textContent = 'Show Edit Form';
         toggleEditBtn.addEventListener('click', () => {
           isEditMode = !isEditMode;
           document.getElementById('workExperienceEditArea').classList.toggle('hidden', !isEditMode);
@@ -1444,41 +1366,53 @@
               localStorage.setItem('keiko_saved_profiles', JSON.stringify(profiles));
             }
 
-            // ── Read Interview Configuration Parameters ─────
-            const selectedType = document.getElementById('interviewType')?.value || 'Tech';
-            const selectedDifficulty = document.getElementById('difficultyMode')?.value || 'Adaptive';
-            const targetRole = document.getElementById('roleDomain')?.value.trim() || document.getElementById('targetRole')?.value.trim() || "Software Engineer";
+            // ── Read Interview Configuration Parameters from Active Settings ─────
+            let sysDefaults = {
+              interview_type: 'Tech',
+              difficulty_mode: 'Adaptive',
+              insane_mode: false,
+              question_count: 10
+            };
 
-            let questionCountMode = '10';
-            const qRadios = document.getElementsByName('questionCountOption');
-            for (const r of qRadios) {
-              if (r.checked) {
-                questionCountMode = r.value;
-                break;
+            try {
+              const sysRes = await fetch('/api/v1/interview/system/settings');
+              if (sysRes.ok) {
+                const sysData = await sysRes.json();
+                if (sysData.interview_defaults) {
+                  sysDefaults = { ...sysDefaults, ...sysData.interview_defaults };
+                }
               }
+            } catch (e) {
+              console.warn("Could not fetch settings from API, checking localStorage", e);
             }
 
-            let durationVal = 10;
-            const customInputEl = document.getElementById('customQuestionCount');
-            if (questionCountMode === 'custom') {
-              const customVal = parseInt(customInputEl?.value, 10);
-              durationVal = (!isNaN(customVal) && customVal > 0) ? customVal : 10;
-            } else {
-              durationVal = parseInt(questionCountMode, 10) || 10;
+            const localSettingsStr = localStorage.getItem('keiko_system_settings');
+            if (localSettingsStr) {
+              try {
+                const parsed = JSON.parse(localSettingsStr);
+                if (parsed.interview_defaults) {
+                  sysDefaults = { ...sysDefaults, ...parsed.interview_defaults };
+                }
+              } catch(ex){}
             }
+
+            const targetRole = document.getElementById('targetRole')?.value.trim() || "Software Engineer";
+            const selectedType = sysDefaults.interview_type || 'Tech';
+            const selectedDifficulty = sysDefaults.difficulty_mode || 'Adaptive';
+            const insaneMode = !!sysDefaults.insane_mode;
+
+            let durationType = insaneMode ? 'unlimited' : 'questions';
+            let durationVal = insaneMode ? 999 : (parseInt(sysDefaults.question_count, 10) || 10);
 
             // Save selected configuration to localStorage key keiko_interview_config
             const interviewConfigPayload = {
               interview_type: selectedType,
               role_domain: targetRole,
               question_count: durationVal,
-              question_count_mode: questionCountMode,
-              custom_question_count: customInputEl?.value || '',
+              insane_mode: insaneMode,
               difficulty: selectedDifficulty
             };
             localStorage.setItem('keiko_interview_config', JSON.stringify(interviewConfigPayload));
-
-            let durationType = 'questions';
 
             // Gather candidate context and job description text before starting session
             const jdText = document.getElementById('jdText').value.trim();

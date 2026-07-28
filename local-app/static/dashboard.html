@@ -159,12 +159,8 @@
     <a href="dashboard.html" class="hover:opacity-90 transition-opacity"><img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-10 md:h-12"></a>
     <div class="hidden md:flex items-center space-x-6">
       <a id="nav-dashboard" class="text-sm text-primary font-bold transition-colors" href="dashboard.html">Dashboard</a>
-      <a id="nav-resume" class="text-sm text-gray-400 hover:text-white transition-colors" href="resume-intelligence.html">Resume Intel</a>
-      <a id="nav-jd" class="text-sm text-gray-400 hover:text-white transition-colors" href="job-intelligence.html">JD Intel</a>
-      <a id="nav-video" class="text-sm text-gray-400 hover:text-white transition-colors" href="video-intelligence.html">Video Intel</a>
-      <a id="nav-audio" class="text-sm text-gray-400 hover:text-white transition-colors" href="audio-intelligence.html">Audio Intel</a>
-      <a id="nav-engine" class="text-sm text-gray-400 hover:text-white transition-colors" href="evaluation-engine.html">Central Engine</a>
       <a id="nav-setup" class="text-sm text-gray-400 hover:text-white transition-colors" href="interview-setup.html">Setup</a>
+      <a id="nav-settings" class="text-sm text-gray-400 hover:text-white transition-colors" href="settings.html">Settings</a>
     </div>
     <a class="bg-accent-gradient text-white px-6 py-2 rounded-full font-bold text-sm transition-all hover:scale-105 hover:opacity-90 active:scale-95 shadow-lg shadow-purple-500/20" href="interview-setup.html">Start Setup</a>
   </div>
@@ -177,139 +173,135 @@
   <header class="py-4 mb-8 border-b border-white/10 flex items-center justify-between z-30">
     <div class="flex items-center gap-3 text-text-supporting font-mono text-xs uppercase tracking-wider">
       <span class="text-primary font-bold">KEIKO SYSTEM</span>
-      <span class="material-symbols-outlined text-sm">chevron_right</span>
-      <span class="text-text-primary">PORTAL DASHBOARD</span>
+      <span>/</span>
+      <span>DASHBOARD</span>
     </div>
-    <div class="flex items-center gap-6">
-      <div class="relative w-64 hidden lg:block">
-        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-supporting text-sm">search</span>
-        <input class="w-full bg-[#141416] border border-white/10 rounded-xl py-2 pl-9 pr-4 text-xs focus:border-primary focus:outline-none transition-colors text-text-primary placeholder:text-text-supporting font-mono" placeholder="Query Intelligence..." type="text"/>
-      </div>
-      <button class="text-text-supporting hover:text-primary transition-colors">
-        <span class="material-symbols-outlined">notifications</span>
-      </button>
-      <div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-white/10">
-        <div class="w-full h-full bg-accent-gradient flex items-center justify-center font-bold text-xs text-white">KA</div>
+    <div class="flex items-center gap-4">
+      <div id="searchContainer" class="relative hidden sm:block">
+        <span class="material-symbols-outlined absolute left-3 top-2.5 text-text-supporting text-sm">search</span>
+        <input id="candidateSearchInput" oninput="filterDashboardTable()" type="text" placeholder="Search candidate records..." class="bg-surface-raised border border-white/10 rounded-full pl-9 pr-4 py-1.5 text-xs font-mono text-text-primary focus:border-tertiary focus:outline-none transition-all w-64">
       </div>
     </div>
   </header>
 
-  <!-- Workspace Grid -->
-  <div class="grid grid-cols-1 xl:grid-cols-4 gap-8">
-    
-    <!-- Central Main Column (3 Cols) -->
-    <div class="xl:col-span-3 space-y-8">
-      
-      <!-- Welcome Section (Stitch Style) -->
-      <section class="glass-neo-stitch p-8 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div class="relative z-10 space-y-2">
-          <div class="inline-flex items-center gap-2 text-xs font-mono text-tertiary uppercase tracking-widest">
-            <span class="w-2 h-2 rounded-full bg-tertiary"></span>
-            System Status: Operational
-          </div>
-          <h2 class="text-3xl font-bold font-display text-white">Welcome, <span id="welcomeUserName" class="gradient-text">Candidate</span>.</h2>
-          <p id="welcomeSummaryText" class="text-text-secondary text-sm max-w-lg leading-relaxed">
-            Neural telemetry nodes ready. All local sensors & AI pipeline online.
-          </p>
-        </div>
-        <div class="relative z-10 flex flex-wrap items-center gap-3">
-          <a href="interview-setup.html" class="bg-accent-gradient text-white px-6 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-2 hover:shadow-[0_0_25px_rgba(124,58,237,0.45)] transition-all hover:scale-105 active:scale-95">
-            <span class="material-symbols-outlined text-base">play_arrow</span>
-            Start New Interview
-          </a>
-        </div>
-      </section>
+  <div class="space-y-8">
 
-      <!-- Stats Row (Real Metrics Only) -->
-      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div class="glass-neo-stitch p-6 flex flex-col gap-2">
-          <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">COMPLETED INTERVIEWS</span>
-          <span id="statCompletedCount" class="font-mono text-3xl font-bold text-text-primary">0</span>
-          <span id="statCompletedSub" class="text-xs font-mono text-text-supporting">No sessions completed yet</span>
+    <!-- Welcome Hero Card with System Status -->
+    <section class="glass-neo-stitch p-8 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="relative z-10 space-y-2">
+        <div class="inline-flex items-center gap-2 text-xs font-mono text-tertiary uppercase tracking-widest">
+          <span class="w-2 h-2 rounded-full bg-tertiary"></span>
+          System Status: Operational
         </div>
-        <div class="glass-neo-stitch p-6 flex flex-col gap-2">
-          <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">AVG PERFORMANCE</span>
-          <span id="statAvgPerformance" class="font-mono text-3xl font-bold text-text-primary">0.0%</span>
-          <span id="statAvgSub" class="text-xs font-mono text-text-supporting">Metric based on completed evaluations</span>
-        </div>
-        <div class="glass-neo-stitch p-6 flex flex-col gap-2">
-          <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">SAVED PROFILES</span>
-          <span id="statProfilesCount" class="font-mono text-3xl font-bold text-text-primary">0</span>
-          <span id="statProfilesSub" class="text-xs font-mono text-text-supporting">Candidate context profiles</span>
-        </div>
-      </section>
-
-      <!-- Recent Operations Table -->
-      <section class="glass-neo-stitch p-6 space-y-6">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-bold font-display text-text-primary">Recent Operations</h3>
-          <span id="sessionsCountBadge" class="text-xs font-mono text-text-supporting">0 sessions recorded</span>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="border-b border-white/10">
-                <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">CANDIDATE</th>
-                <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">TARGET ROLE</th>
-                <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">TYPE / MODE</th>
-                <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">STATUS</th>
-                <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider text-right">ACTION</th>
-              </tr>
-            </thead>
-            <tbody id="recentSessionsTableBody" class="text-xs">
-              <tr>
-                <td colspan="5" class="py-8 text-center text-text-supporting font-mono">
-                  <div class="flex flex-col items-center justify-center gap-2">
-                    <span class="material-symbols-outlined text-3xl text-gray-600">inbox</span>
-                    <span>No completed interview sessions recorded yet.</span>
-                    <a href="interview-setup.html" class="text-primary hover:underline text-xs mt-1">Click here to launch your first session</a>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-    </div>
-
-    <!-- Right Sidebar (Candidate Profiles Workspace & Neural Observations) -->
-    <aside class="space-y-6">
-      <div class="glass-neo-stitch p-6 space-y-5">
-        <div class="flex items-center justify-between border-b border-white/10 pb-4">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">badge</span>
-            <h3 class="text-base font-bold font-display text-text-primary">Candidate Profiles</h3>
-          </div>
-          <button id="addProfileBtn" class="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold flex items-center gap-1 transition-all">
-            <span class="material-symbols-outlined text-sm">add</span>
-            <span>New Profile</span>
-          </button>
-        </div>
-
-        <!-- Saved Profiles Switcher Container -->
-        <div id="sidebarProfilesList" class="space-y-3 max-h-[420px] overflow-y-auto pr-1">
-          <!-- Dynamically populated profile items -->
-        </div>
-      </div>
-
-      <!-- Neural Observations (Sarcastic & Dark Humoured Insights) -->
-      <div class="glass-neo-stitch p-6 space-y-4 relative overflow-hidden">
-        <div class="flex items-center justify-between border-b border-white/10 pb-3">
-          <h4 class="font-mono text-xs text-primary font-bold uppercase tracking-wider flex items-center gap-2">
-            <span class="material-symbols-outlined text-sm animate-pulse">psychology</span>
-            NEURAL OBSERVATIONS
-          </h4>
-          <button id="nextTipBtn" class="text-text-supporting hover:text-primary transition-colors flex items-center gap-1 font-mono text-[10px]" title="Next Observation">
-            <span>Refresh</span>
-            <span class="material-symbols-outlined text-xs">refresh</span>
-          </button>
-        </div>
-        <p id="tipTextDisplay" class="text-xs text-text-secondary leading-relaxed min-h-[56px] transition-opacity duration-300 italic">
-          Loading observation...
+        <h2 class="text-3xl font-bold font-display text-white">Welcome, <span id="welcomeUserName" class="gradient-text">Candidate</span>.</h2>
+        <p id="welcomeSummaryText" class="text-text-secondary text-sm max-w-lg leading-relaxed">
+          Neural telemetry nodes ready. All local sensors & AI pipeline online.
         </p>
       </div>
-    </aside>
+      <div class="relative z-10 flex flex-wrap items-center gap-3">
+        <a href="interview-setup.html" class="bg-accent-gradient text-white px-6 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-2 hover:shadow-[0_0_25px_rgba(124,58,237,0.45)] transition-all hover:scale-105 active:scale-95">
+          <span class="material-symbols-outlined text-base">play_arrow</span>
+          Start New Interview
+        </a>
+      </div>
+    </section>
+
+    <!-- Content Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+      <!-- Left / Main Column: Stats & Operations -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Stats Row (Real Metrics Only) -->
+        <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="glass-neo-stitch p-6 flex flex-col gap-2">
+            <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">COMPLETED INTERVIEWS</span>
+            <span id="statCompletedCount" class="font-mono text-3xl font-bold text-text-primary">0</span>
+            <span id="statCompletedSub" class="text-xs font-mono text-text-supporting">No sessions completed yet</span>
+          </div>
+          <div class="glass-neo-stitch p-6 flex flex-col gap-2">
+            <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">AVG PERFORMANCE</span>
+            <span id="statAvgPerformance" class="font-mono text-3xl font-bold text-text-primary">0.0%</span>
+            <span id="statAvgSub" class="text-xs font-mono text-text-supporting">Metric based on completed evaluations</span>
+          </div>
+          <div class="glass-neo-stitch p-6 flex flex-col gap-2">
+            <span class="font-mono text-xs text-text-supporting tracking-wider uppercase">SAVED PROFILES</span>
+            <span id="statProfilesCount" class="font-mono text-3xl font-bold text-text-primary">0</span>
+            <span id="statProfilesSub" class="text-xs font-mono text-text-supporting">Candidate context profiles</span>
+          </div>
+        </section>
+
+        <!-- Recent Operations Table -->
+        <section class="glass-neo-stitch p-6 space-y-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-bold font-display text-text-primary">Recent Operations</h3>
+            <span id="sessionsCountBadge" class="text-xs font-mono text-text-supporting">0 sessions recorded</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-white/10">
+                  <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">CANDIDATE</th>
+                  <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">TARGET ROLE</th>
+                  <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">TYPE / MODE</th>
+                  <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider">STATUS</th>
+                  <th class="pb-4 font-mono text-xs text-text-supporting font-semibold uppercase tracking-wider text-right">ACTION</th>
+                </tr>
+              </thead>
+              <tbody id="recentSessionsTableBody" class="text-xs">
+                <tr>
+                  <td colspan="5" class="py-8 text-center text-text-supporting font-mono">
+                    <div class="flex flex-col items-center justify-center gap-2">
+                      <span class="material-symbols-outlined text-3xl text-gray-600">inbox</span>
+                      <span>No completed interview sessions recorded yet.</span>
+                      <a href="interview-setup.html" class="text-primary hover:underline text-xs mt-1">Click here to launch your first session</a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Sidebar (Candidate Profiles Workspace & Neural Observations) -->
+      <aside class="space-y-6">
+        <div class="glass-neo-stitch p-6 space-y-5">
+          <div class="flex items-center justify-between border-b border-white/10 pb-4">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">badge</span>
+              <h3 class="text-base font-bold font-display text-text-primary">Candidate Profiles</h3>
+            </div>
+            <button id="addProfileBtn" class="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold flex items-center gap-1 transition-all">
+              <span class="material-symbols-outlined text-sm">add</span>
+              <span>New Profile</span>
+            </button>
+          </div>
+
+          <!-- Saved Profiles Switcher Container -->
+          <div id="sidebarProfilesList" class="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+            <!-- Dynamically populated profile items -->
+          </div>
+        </div>
+
+        <!-- Neural Observations (Sarcastic & Dark Humoured Insights) -->
+        <div class="glass-neo-stitch p-6 space-y-4 relative overflow-hidden">
+          <div class="flex items-center justify-between border-b border-white/10 pb-3">
+            <h4 class="font-mono text-xs text-primary font-bold uppercase tracking-wider flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm animate-pulse">psychology</span>
+              NEURAL OBSERVATIONS
+            </h4>
+            <button id="nextTipBtn" class="text-text-supporting hover:text-primary transition-colors flex items-center gap-1 font-mono text-[10px]" title="Next Observation">
+              <span>Refresh</span>
+              <span class="material-symbols-outlined text-xs">refresh</span>
+            </button>
+          </div>
+          <p id="tipTextDisplay" class="text-xs text-text-secondary leading-relaxed min-h-[56px] transition-opacity duration-300 italic">
+            Loading observation...
+          </p>
+        </div>
+      </aside>
+
+    </div>
 
   </div>
 </main>
@@ -341,14 +333,17 @@
       </div>
     </div>
 
-    <div class="relative flex items-center my-2">
-      <div class="flex-grow border-t border-white/10"></div>
-      <span class="flex-shrink mx-3 text-[10px] font-mono text-text-supporting uppercase">OR REVIEW & MANUALLY ENTER DETAILS</span>
-      <div class="flex-grow border-t border-white/10"></div>
-    </div>
+    <button type="button" id="toggleAddProfileFormBtn" class="w-full relative flex items-center my-2 cursor-pointer group focus:outline-none">
+      <div class="flex-grow border-t border-white/10 group-hover:border-primary/50 transition-colors"></div>
+      <span class="flex-shrink mx-3 text-[10px] font-mono text-text-supporting uppercase flex items-center gap-1 group-hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-xs">edit_note</span>
+        <span id="toggleAddProfileFormLabel">OR REVIEW & MANUALLY ENTER DETAILS</span>
+      </span>
+      <div class="flex-grow border-t border-white/10 group-hover:border-primary/50 transition-colors"></div>
+    </button>
 
     <!-- Comprehensive Candidate Profile Form -->
-    <form id="addProfileForm" class="space-y-4 font-mono text-xs">
+    <form id="addProfileForm" class="space-y-4 font-mono text-xs hidden">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="block text-text-secondary uppercase mb-1">Full Name *</label>
@@ -741,9 +736,19 @@
     window.addEventListener('focus', renderSidebarProfiles);
 
     // Modal Add Profile Controls & Lenient Resume Auto-parsing
-    addProfileBtn.addEventListener('click', () => addProfileModal.classList.remove('hidden'));
+    addProfileBtn.addEventListener('click', () => {
+      addProfileForm.classList.add('hidden');
+      addProfileModal.classList.remove('hidden');
+    });
     closeAddProfileModal.addEventListener('click', () => addProfileModal.classList.add('hidden'));
     cancelAddProfileBtn.addEventListener('click', () => addProfileModal.classList.add('hidden'));
+
+    const toggleAddProfileFormBtn = document.getElementById('toggleAddProfileFormBtn');
+    if (toggleAddProfileFormBtn) {
+      toggleAddProfileFormBtn.addEventListener('click', () => {
+        addProfileForm.classList.toggle('hidden');
+      });
+    }
 
     if (modalResumeDropzone && modalResumeFile) {
       modalResumeDropzone.addEventListener('click', () => modalResumeFile.click());
@@ -819,6 +824,7 @@
           }
 
           modalResumeStatus.textContent = `Parsed details from ${file.name}! Review and edit fields below before saving.`;
+          addProfileForm.classList.remove('hidden');
         } else {
           modalResumeStatus.textContent = `Selected: ${file.name}`;
         }

@@ -500,19 +500,61 @@
             document.getElementById('barAudioPacing').style.width = `${audioMetrics.pacing_score || 86}%`;
             document.getElementById('barAudioFillers').style.width = `90%`;
 
-            // 3. Video Metrics
-            const videoScore = Math.round(videoMetrics.composure || 90);
-            const eyeVal = Math.round(videoMetrics.eye_contact_pct || 92);
-            const postureVal = Math.round(videoMetrics.posture_stability || 88);
-            const composureVal = Math.round(videoMetrics.composure || 86);
+            // 3. Video Metrics (Check if webcam was active)
+            const isCamOff = videoMetrics.camera_active === false || videoMetrics.eye_contact_pct === "N/A" || videoMetrics.eye_contact_pct === null;
 
-            document.getElementById('videoOverallScore').textContent = `${videoScore}%`;
-            document.getElementById('videoEyeContactVal').textContent = `${eyeVal}% Gaze`;
-            document.getElementById('barVideoEye').style.width = `${eyeVal}%`;
-            document.getElementById('videoPostureVal').textContent = `${postureVal}% Alignment`;
-            document.getElementById('barVideoPosture').style.width = `${postureVal}%`;
-            document.getElementById('videoComposureVal').textContent = `${composureVal}% Calm`;
-            document.getElementById('barVideoComposure').style.width = `${composureVal}%`;
+            if (isCamOff) {
+                document.getElementById('videoOverallScore').textContent = "N/A";
+                document.getElementById('videoEyeContactVal').textContent = "N/A (Off)";
+                document.getElementById('barVideoEye').style.width = "0%";
+                document.getElementById('videoPostureVal').textContent = "N/A (Off)";
+                document.getElementById('barVideoPosture').style.width = "0%";
+                document.getElementById('videoComposureVal').textContent = "N/A (Off)";
+                document.getElementById('barVideoComposure').style.width = "0%";
+                const demeanorEl = document.getElementById('videoDemeanorSummary');
+                if (demeanorEl) demeanorEl.textContent = videoMetrics.demeanor_summary || "Webcam was turned off during this session. Video telemetry was unmonitored.";
+            } else {
+                const videoScore = Math.round(videoMetrics.composure || 90);
+                const eyeVal = Math.round(videoMetrics.eye_contact_pct || 92);
+                const postureVal = Math.round(videoMetrics.posture_stability || 88);
+                const composureVal = Math.round(videoMetrics.composure || 86);
+
+                document.getElementById('videoOverallScore').textContent = `${videoScore}%`;
+                document.getElementById('videoEyeContactVal').textContent = `${eyeVal}% Gaze`;
+                document.getElementById('barVideoEye').style.width = `${eyeVal}%`;
+                document.getElementById('videoPostureVal').textContent = `${postureVal}% Alignment`;
+                document.getElementById('barVideoPosture').style.width = `${postureVal}%`;
+                document.getElementById('videoComposureVal').textContent = `${composureVal}% Calm`;
+                document.getElementById('barVideoComposure').style.width = `${composureVal}%`;
+
+                // Dynamic Non-verbal Cue Summary (No fake static text)
+                let demeanorText = videoMetrics.demeanor_summary;
+                if (!demeanorText) {
+                    if (composureVal < 50) {
+                        if (postureVal < 60) {
+                            demeanorText = `Exhibited noticeable tension (${composureVal}% composure) with posture slouching (${postureVal}% alignment); eye contact was ${eyeVal}%.`;
+                        } else {
+                            demeanorText = `Appeared tense or nervous under pressure (${composureVal}% composure) despite maintaining upright posture (${postureVal}% alignment).`;
+                        }
+                    } else if (postureVal < 60) {
+                        demeanorText = `Maintained calm facial composure (${composureVal}%) but exhibited frequent posture slouching (${postureVal}% alignment).`;
+                    } else if (eyeVal < 60) {
+                        demeanorText = `Maintained composed demeanor (${composureVal}%) and erect posture (${postureVal}%), but eye contact stability was low (${eyeVal}%).`;
+                    } else {
+                        demeanorText = `Maintained calm facial expressions (${composureVal}%), erect posture (${postureVal}%), and direct camera alignment (${eyeVal}%) throughout.`;
+                    }
+                }
+                const demeanorEl = document.getElementById('videoDemeanorSummary');
+                if (demeanorEl) demeanorEl.textContent = demeanorText;
+            }
+
+            let intonationText = audioMetrics.intonation_summary;
+            if (!intonationText) {
+                const fillersText = audioMetrics.filler_word_frequency || 'Low fillers';
+                intonationText = `Speech delivered with ${fillersText} and steady vocal intonation.`;
+            }
+            const intonationEl = document.getElementById('audioIntonationSummary');
+            if (intonationEl) intonationEl.textContent = intonationText;
 
             // Executive Matrix: Strengths & Priorities
             renderList('verifiedStrengthsList', strengths, 'emerald');
@@ -730,11 +772,11 @@
                             <div class="grid grid-cols-3 gap-2 text-[10px]">
                                 <div class="bg-white/5 p-2 rounded-lg text-center">
                                     <span class="text-text-secondary block">Eye Contact</span>
-                                    <span class="text-emerald-400 font-bold">${item.eye_contact_score || 88}%</span>
+                                    <span class="text-emerald-400 font-bold">${(item.eye_contact_score !== null && item.eye_contact_score !== undefined) ? item.eye_contact_score + '%' : 'N/A (Off)'}</span>
                                 </div>
                                 <div class="bg-white/5 p-2 rounded-lg text-center">
                                     <span class="text-text-secondary block">Posture</span>
-                                    <span class="text-tertiary font-bold">${item.posture_score || 85}%</span>
+                                    <span class="text-tertiary font-bold">${(item.posture_score !== null && item.posture_score !== undefined) ? item.posture_score + '%' : 'N/A (Off)'}</span>
                                 </div>
                                 <div class="bg-white/5 p-2 rounded-lg text-center">
                                     <span class="text-text-secondary block">Demeanor</span>

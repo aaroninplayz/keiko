@@ -99,9 +99,9 @@
         <span class="material-symbols-outlined text-sm">chevron_right</span>
         <span class="text-text-primary">SETTINGS & CONFIGURATION</span>
       </div>
-      <div class="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/30 px-4 py-1.5 rounded-full">
-        <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
-        <span class="text-xs font-mono text-emerald-300 font-semibold uppercase">100% Offline Mode Active</span>
+      <div class="flex items-center gap-3 bg-purple-500/10 border border-purple-500/30 px-4 py-1.5 rounded-full">
+        <div class="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse"></div>
+        <span id="activeModelHeaderBadge" class="text-xs font-mono text-purple-300 font-semibold uppercase">Engine: Detecting...</span>
       </div>
     </header>
 
@@ -111,12 +111,37 @@
         System Settings & <span class="gradient-text">Parameters</span>
       </h1>
       <p class="text-text-secondary text-sm">
-        Configure interview modes, telemetry sensor weights, data reset controls, and local backend server lifecycle.
+        Configure interview modes, telemetry sensor weights, data reset controls, and view live active AI model engine status.
       </p>
     </div>
 
     <!-- Toast Alert Container -->
     <div id="toastAlert" class="hidden p-4 rounded-xl text-sm font-mono transition-all"></div>
+
+    <!-- Active AI Model Engine Status Card -->
+    <section class="glass-neo-stitch p-5 space-y-4 border-purple-500/30 bg-purple-900/10">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-purple-400 text-xl">memory</span>
+          <h2 class="text-base font-semibold text-white font-display">Active AI Model Engine Status</h2>
+        </div>
+        <span id="engineBadge" class="text-xs font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1 rounded-full font-bold">Detecting Engine...</span>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
+        <div class="bg-[#1c1b1c] p-3.5 rounded-xl border border-white/10 space-y-1">
+          <span class="text-text-secondary text-[10px] uppercase block">Active AI Model Engine</span>
+          <span id="activeModelName" class="text-sm font-bold text-white block truncate">Detecting...</span>
+        </div>
+        <div class="bg-[#1c1b1c] p-3.5 rounded-xl border border-white/10 space-y-1">
+          <span class="text-text-secondary text-[10px] uppercase block">LLM Provider</span>
+          <span id="activeProviderName" class="text-sm font-bold text-tertiary block truncate">Detecting...</span>
+        </div>
+        <div class="bg-[#1c1b1c] p-3.5 rounded-xl border border-white/10 space-y-1">
+          <span class="text-text-secondary text-[10px] uppercase block">API Key Storage Status</span>
+          <span id="activeKeyStatus" class="text-xs font-bold text-emerald-300 block truncate">Zero Disk Storage</span>
+        </div>
+      </div>
+    </section>
 
     <!-- Section 1: Interview Parameters & Mode Configuration -->
     <section class="glass-neo-stitch p-6 space-y-6">
@@ -463,62 +488,92 @@
     }
 
     async function loadSettings() {
+      let data = null;
       try {
-        let res = await fetch('/api/settings');
+        let res = await fetch('/api/v1/interview/system/settings');
         if (!res.ok) {
-          res = await fetch('/api/v1/interview/system/settings');
+          res = await fetch('/api/settings');
         }
         if (res.ok) {
-          const data = await res.json();
-          if (data.telemetry_weights) {
-            const w = data.telemetry_weights;
-            if (w.posture !== undefined) document.getElementById('slidePosture').value = Math.round(w.posture * 100);
-            if (w.eye_contact !== undefined) document.getElementById('slideEyeContact').value = Math.round(w.eye_contact * 100);
-            if (w.body_language !== undefined) document.getElementById('slideBodyLanguage').value = Math.round(w.body_language * 100);
-            if (w.attire !== undefined) document.getElementById('slideAttire').value = Math.round(w.attire * 100);
-            if (w.confidence !== undefined) document.getElementById('slideConfidence').value = Math.round(w.confidence * 100);
-            if (w.facial_expression !== undefined) document.getElementById('slideFacial').value = Math.round(w.facial_expression * 100);
-            const voiceVal = w.voice_dynamics !== undefined ? w.voice_dynamics : w.voice;
-            if (voiceVal !== undefined) document.getElementById('slideVoice').value = Math.round(voiceVal * 100);
-            if (w.engagement !== undefined) document.getElementById('slideEngagement').value = Math.round(w.engagement * 100);
-            if (w.professional_presence !== undefined) document.getElementById('slidePresence').value = Math.round(w.professional_presence * 100);
-          }
+          data = await res.json();
+        }
+      } catch(e) {
+        console.warn("Could not fetch settings from API, using localStorage fallback:", e);
+      }
 
-          if (data.interview_defaults) {
-            const defs = data.interview_defaults;
-            if (defs.interview_type) {
-              const rad = document.querySelector(`input[name="interviewType"][value="${defs.interview_type}"]`);
-              if (rad) rad.checked = true;
+      if (!data) {
+        const local = localStorage.getItem('keiko_system_settings');
+        if (local) {
+          try { data = JSON.parse(local); } catch(ex){}
+        }
+      }
+
+      if (data) {
+        if (data.system) {
+          const sys = data.system;
+          const modelName = sys.active_model || 'Ollama Local (qwen2.5:7b)';
+          const provider = sys.llm_provider || 'Ollama';
+          const keyStat = sys.key_status || 'Zero Disk Storage';
+
+          const mEl = document.getElementById('activeModelName');
+          const pEl = document.getElementById('activeProviderName');
+          const kEl = document.getElementById('activeKeyStatus');
+          const bEl = document.getElementById('engineBadge');
+          const hEl = document.getElementById('activeModelHeaderBadge');
+
+          if (mEl) mEl.textContent = modelName;
+          if (pEl) pEl.textContent = provider.toUpperCase();
+          if (kEl) kEl.textContent = keyStat;
+          if (bEl) bEl.textContent = `${provider.toUpperCase()} ACTIVE`;
+          if (hEl) hEl.textContent = `ENGINE: ${modelName}`;
+        }
+
+        if (data.telemetry_weights) {
+          const w = data.telemetry_weights;
+          if (w.posture !== undefined) document.getElementById('slidePosture').value = Math.round(w.posture * 100);
+          if (w.eye_contact !== undefined) document.getElementById('slideEyeContact').value = Math.round(w.eye_contact * 100);
+          if (w.body_language !== undefined) document.getElementById('slideBodyLanguage').value = Math.round(w.body_language * 100);
+          if (w.attire !== undefined) document.getElementById('slideAttire').value = Math.round(w.attire * 100);
+          if (w.confidence !== undefined) document.getElementById('slideConfidence').value = Math.round(w.confidence * 100);
+          if (w.facial_expression !== undefined) document.getElementById('slideFacial').value = Math.round(w.facial_expression * 100);
+          const voiceVal = w.voice_dynamics !== undefined ? w.voice_dynamics : w.voice;
+          if (voiceVal !== undefined) document.getElementById('slideVoice').value = Math.round(voiceVal * 100);
+          if (w.engagement !== undefined) document.getElementById('slideEngagement').value = Math.round(w.engagement * 100);
+          if (w.professional_presence !== undefined) document.getElementById('slidePresence').value = Math.round(w.professional_presence * 100);
+        }
+
+        if (data.interview_defaults) {
+          const defs = data.interview_defaults;
+          if (defs.interview_type) {
+            const rad = document.querySelector(`input[name="interviewType"][value="${defs.interview_type}"]`);
+            if (rad) rad.checked = true;
+          }
+          if (defs.difficulty_mode) {
+            const rad = document.querySelector(`input[name="difficultyMode"][value="${defs.difficulty_mode}"]`);
+            if (rad) rad.checked = true;
+          }
+          if (defs.insane_mode !== undefined) {
+            const chk = document.getElementById('insaneModeToggle');
+            if (chk) chk.checked = !!defs.insane_mode;
+            if (chk && chk.checked) {
+              const qContainer = document.getElementById('questionCountContainer');
+              if (qContainer) qContainer.classList.add('opacity-50', 'pointer-events-none');
             }
-            if (defs.difficulty_mode) {
-              const rad = document.querySelector(`input[name="difficultyMode"][value="${defs.difficulty_mode}"]`);
-              if (rad) rad.checked = true;
-            }
-            if (defs.insane_mode !== undefined) {
-              const chk = document.getElementById('insaneModeToggle');
-              if (chk) chk.checked = !!defs.insane_mode;
-              if (chk && chk.checked) {
-                const qContainer = document.getElementById('questionCountContainer');
-                if (qContainer) qContainer.classList.add('opacity-50', 'pointer-events-none');
-              }
-            }
-            if (defs.question_count !== undefined) {
-              const radCount = document.querySelector(`input[name="lengthPreset"][value="${defs.question_count}"]`);
-              if (radCount) {
-                radCount.checked = true;
-              } else if (defs.question_count) {
-                const customRad = document.getElementById('len_custom');
-                if (customRad) customRad.checked = true;
-                const custInput = document.getElementById('customQuestionCount');
-                if (custInput) custInput.value = defs.question_count;
-                const custBox = document.getElementById('customCountBox');
-                if (custBox) custBox.classList.remove('hidden');
-              }
+          }
+          if (defs.question_count !== undefined) {
+            const radCount = document.querySelector(`input[name="lengthPreset"][value="${defs.question_count}"]`);
+            if (radCount) {
+              radCount.checked = true;
+            } else if (defs.question_count) {
+              const customRad = document.getElementById('len_custom');
+              if (customRad) customRad.checked = true;
+              const custInput = document.getElementById('customQuestionCount');
+              if (custInput) custInput.value = defs.question_count;
+              const custBox = document.getElementById('customCountBox');
+              if (custBox) custBox.classList.remove('hidden');
             }
           }
         }
-      } catch(e) {
-        console.error("Failed to load settings:", e);
       }
       updateWeightsUI();
     }
@@ -568,14 +623,17 @@
         }
       };
 
+      // Always save synchronously to localStorage for immediate UI persistence
+      localStorage.setItem('keiko_system_settings', JSON.stringify(payload));
+
       try {
-        let res = await fetch('/api/settings', {
+        let res = await fetch('/api/v1/interview/system/settings', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(payload)
         });
         if (!res.ok) {
-          res = await fetch('/api/v1/interview/system/settings', {
+          res = await fetch('/api/settings', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
@@ -584,10 +642,10 @@
         if (res.ok) {
           showToast('Global settings & telemetry weights saved successfully!', 'success');
         } else {
-          showToast('Failed to save settings.', 'error');
+          showToast('Settings saved locally. Server endpoint unreachable.', 'warning');
         }
       } catch(err) {
-        showToast('Error connecting to server', 'error');
+        showToast('Settings saved locally. (Offline mode)', 'warning');
       }
     }
 
@@ -605,12 +663,43 @@
       modal.classList.remove('flex');
     }
 
+    async function pollHealthAndRedirect(targetUrl, openNewTab = false) {
+      const maxRetries = 30;
+      let attempts = 0;
+      
+      const pollInterval = setInterval(async () => {
+        attempts++;
+        try {
+          const res = await fetch('/health', { cache: 'no-store' });
+          if (res.ok) {
+            clearInterval(pollInterval);
+            if (openNewTab) {
+              try { window.open(targetUrl, '_blank'); } catch(e) {}
+            }
+            window.location.href = targetUrl;
+            return;
+          }
+        } catch(e) {
+          // Server still booting up...
+        }
+        if (attempts >= maxRetries) {
+          clearInterval(pollInterval);
+          window.location.href = targetUrl;
+        }
+      }, 800);
+    }
+
     async function executeClearData() {
       hideClearModal();
       try {
         const res = await fetch('/api/v1/interview/system/clear_data', { method: 'DELETE' });
         if (res.ok) {
-          showToast('All candidate records and session files erased!', 'success');
+          sessionStorage.clear();
+          localStorage.removeItem('keiko_last_user_name');
+          showToast('All candidate records erased! Opening fresh dashboard...', 'success');
+          setTimeout(() => {
+            pollHealthAndRedirect('dashboard.html?reset=true', true);
+          }, 600);
         } else {
           showToast('Failed to erase candidate data.', 'error');
         }
@@ -624,20 +713,20 @@
       btn.disabled = true;
       btn.textContent = 'Initiating Server Restart...';
 
+      sessionStorage.clear();
+
       try {
-        const res = await fetch('/api/v1/interview/system/restart', { method: 'POST' });
-        if (res.ok) {
-          showToast('Server restart initiated! Reloading in 4 seconds...', 'success');
-          setTimeout(() => { window.location.reload(); }, 4000);
-        } else {
-          showToast('Failed to trigger server restart.', 'error');
-          btn.disabled = false;
-          btn.textContent = 'Restart Server Now';
-        }
+        await fetch('/api/v1/interview/system/restart', { method: 'POST' });
       } catch(err) {
-        showToast('Server is restarting... Reloading shortly.', 'success');
-        setTimeout(() => { window.location.reload(); }, 4000);
+        // Expected when server reboots
       }
+
+      showToast('KEIKO Server restarting! Reopening dashboard boot sequence once ready...', 'success');
+      btn.textContent = 'Rebooting Engine...';
+
+      setTimeout(() => {
+        pollHealthAndRedirect('dashboard.html?reset=true', true);
+      }, 1000);
     }
 
     async function shutdownServer() {

@@ -101,10 +101,12 @@ class BodyLanguageAnalyzer:
             if has_hands:
                 current_wrists = {}
                 if result.left_hand_landmarks and len(result.left_hand_landmarks) > 0:
-                    w = result.left_hand_landmarks[0][0]  # wrist is index 0
+                    left_lms = result.left_hand_landmarks[0] if isinstance(result.left_hand_landmarks[0], (list, tuple)) else result.left_hand_landmarks
+                    w = left_lms[0]  # wrist is index 0
                     current_wrists["left"] = (w.x, w.y)
                 if result.right_hand_landmarks and len(result.right_hand_landmarks) > 0:
-                    w = result.right_hand_landmarks[0][0]
+                    right_lms = result.right_hand_landmarks[0] if isinstance(result.right_hand_landmarks[0], (list, tuple)) else result.right_hand_landmarks
+                    w = right_lms[0]
                     current_wrists["right"] = (w.x, w.y)
 
                 if self._prev_wrists:

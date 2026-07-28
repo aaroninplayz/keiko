@@ -22,18 +22,18 @@ class LLMClient:
 
     def detect_provider(self) -> Optional[str]:
         """
-        Determines the active provider based on configured API keys or local Ollama presence.
-        Priority: OpenAI -> Gemini -> Anthropic -> Groq -> Ollama (Local 1B-3B model)
+        Determines the active provider based on environment variables or configured settings.
+        Priority: Gemini -> OpenAI -> Anthropic -> Groq -> Ollama (Local model)
         """
         if os.getenv("KEIKO_OFFLINE_LLM") == "1":
             return None
-        if settings.OPENAI_API_KEY:
-            return "openai"
-        if settings.GEMINI_API_KEY:
+        if os.getenv("GEMINI_API_KEY") or settings.GEMINI_API_KEY:
             return "gemini"
-        if settings.ANTHROPIC_API_KEY:
+        if os.getenv("OPENAI_API_KEY") or settings.OPENAI_API_KEY:
+            return "openai"
+        if os.getenv("ANTHROPIC_API_KEY") or settings.ANTHROPIC_API_KEY:
             return "anthropic"
-        if settings.GROQ_API_KEY:
+        if os.getenv("GROQ_API_KEY") or settings.GROQ_API_KEY:
             return "groq"
         
         # Check if local Ollama service is accessible on localhost:11434
@@ -137,13 +137,16 @@ class LLMClient:
                 return None
 
     def _call_openai(self, messages: List[Dict[str, str]], **kwargs) -> Optional[str]:
+        api_key = os.getenv("OPENAI_API_KEY") or settings.OPENAI_API_KEY
+        if not api_key:
+            return None
         url = f"{settings.OPENAI_API_BASE.rstrip('/')}/chat/completions"
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {settings.OPENAI_API_KEY}"
+            "Authorization": f"Bearer {api_key}"
         }
         payload = {
-            "model": settings.OPENAI_MODEL,
+            "model": kwargs.get("model", settings.OPENAI_MODEL),
             "messages": messages,
             "temperature": kwargs.get("temperature", 0.7),
             "max_tokens": kwargs.get("max_tokens", 800)
@@ -158,13 +161,16 @@ class LLMClient:
         return None
 
     def _call_groq(self, messages: List[Dict[str, str]], **kwargs) -> Optional[str]:
+        api_key = os.getenv("GROQ_API_KEY") or settings.GROQ_API_KEY
+        if not api_key:
+            return None
         url = "https://api.groq.com/openai/v1/chat/completions"
         headers = {
             "Content-Type": "application/json",
-            "Authorization": f"Bearer {settings.GROQ_API_KEY}"
+            "Authorization": f"Bearer {api_key}"
         }
         payload = {
-            "model": settings.GROQ_MODEL,
+            "model": kwargs.get("model", settings.GROQ_MODEL),
             "messages": messages,
             "temperature": kwargs.get("temperature", 0.7),
             "max_tokens": kwargs.get("max_tokens", 800)
@@ -179,9 +185,12 @@ class LLMClient:
         return None
 
     def _call_anthropic(self, messages: List[Dict[str, str]], **kwargs) -> Optional[str]:
+        api_key = os.getenv("ANTHROPIC_API_KEY") or settings.ANTHROPIC_API_KEY
+        if not api_key:
+            return None
         url = "https://api.anthropic.com/v1/messages"
         headers = {
-            "x-api-key": settings.ANTHROPIC_API_KEY,
+            "x-api-key": api_key,
             "anthropic-version": "2023-06-01",
             "content-type": "application/json"
         }
@@ -194,7 +203,7 @@ class LLMClient:
                 filtered_messages.append(msg)
 
         payload = {
-            "model": settings.ANTHROPIC_MODEL,
+            "model": kwargs.get("model", settings.ANTHROPIC_MODEL),
             "messages": filtered_messages,
             "max_tokens": kwargs.get("max_tokens", 1024),
             "temperature": kwargs.get("temperature", 0.7)
@@ -212,7 +221,12 @@ class LLMClient:
         return None
 
     def _call_gemini(self, messages: List[Dict[str, str]], **kwargs) -> Optional[str]:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{settings.GEMINI_MODEL}:generateContent?key={settings.GEMINI_API_KEY}"
+        api_key = os.getenv("GEMINI_API_KEY") or settings.GEMINI_API_KEY
+        if not api_key:
+            logger.error("Gemini API key not found in environment or settings.")
+            return None
+        model = kwargs.get("model") or os.getenv("GEMINI_MODEL") or settings.GEMINI_MODEL or "gemini-1.5-flash"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
         headers = {
             "Content-Type": "application/json"
         }

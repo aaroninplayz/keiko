@@ -116,7 +116,7 @@
                     <!-- Real Live Composure / Eye-Contact Kinetics Overlay -->
                     <div class="absolute top-3 left-3 bg-black/80 backdrop-blur border border-white/10 px-2.5 py-1 rounded-md text-[10px] font-mono flex items-center gap-2 text-emerald-400">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span id="postureStatus">Eye Contact: 95% | Composure: 92% | Posture: Optimal</span>
+                        <span id="postureStatus">Eye Contact: --% | Composure: --% | Posture: Initializing...</span>
                     </div>
 
                     <!-- Camera & Mic Toggle Overlay -->
@@ -173,8 +173,12 @@
                 <textarea id="transcribedAnswer" rows="3" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-white placeholder-text-secondary/50 focus:border-primary focus:outline-none transition-all font-mono leading-relaxed" placeholder="Start speaking or type your technical response..."></textarea>
 
                 <div class="flex items-center justify-between pt-1">
-                    <div class="flex items-center gap-2 font-mono text-xs text-text-secondary">
-                        <span id="sttStatusText" class="text-text-secondary font-mono">PTT Muted (Press/Hold Spacebar)</span>
+                    <div class="flex items-center gap-3">
+                        <button id="holdToTalkBtn" type="button" class="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 px-4 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all select-none cursor-pointer active:scale-95 shadow-md shadow-emerald-500/10">
+                            <span class="material-symbols-outlined text-base">mic</span>
+                            <span id="holdToTalkLabel">Hold or Click to Speak</span>
+                        </button>
+                        <span id="sttStatusText" class="text-text-secondary font-mono text-xs">PTT Muted (Hold Button or Spacebar)</span>
                     </div>
 
                     <div class="flex gap-3">
@@ -384,12 +388,12 @@
             const postureStatus = document.getElementById('postureStatus');
             if (!postureStatus || !sensors) return;
 
-            const eyeVal = Math.round(sensors.eye_contact?.score ?? 75);
+            const eyeVal = Math.round(sensors.eye_contact?.details?.eye_contact_percentage ?? sensors.eye_contact?.score ?? 75);
             const postureVal = Math.round(sensors.posture?.score ?? 75);
-            const compVal = Math.round(sensors.confidence?.details?.composure ?? 75);
-            const isSlouching = sensors.posture?.details?.is_slouching ? 'Slouching' : 'Optimal';
+            const compVal = Math.round(sensors.confidence?.details?.composure ?? sensors.composure ?? 75);
+            const postureState = sensors.posture?.details?.posture_status || (sensors.posture?.details?.is_slouching ? 'Slouching' : 'Optimal');
 
-            postureStatus.textContent = `Eye Contact: ${eyeVal}% | Composure: ${compVal}% | Posture: ${isSlouching} (${postureVal}%)`;
+            postureStatus.textContent = `Eye Contact: ${eyeVal}% | Composure: ${compVal}% | Posture: ${postureState} (${postureVal}%)`;
         }
 
         function initTelemetryWebSocket() {
@@ -401,7 +405,9 @@
 
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const host = window.location.host || 'localhost:8000';
-            const wsUrl = `${protocol}//${host}/api/v1/interview/ws/${currentSessionId}`;
+            const token = localStorage.getItem('keiko_token') || localStorage.getItem('access_token') || '';
+            const tokenQuery = token ? `?token=${encodeURIComponent(token)}` : '';
+            const wsUrl = `${protocol}//${host}/api/v1/interview/ws/${currentSessionId}${tokenQuery}`;
 
             console.log('Connecting telemetry WebSocket to:', wsUrl);
             telemetryWs = new WebSocket(wsUrl);
@@ -576,18 +582,30 @@
             const statusText = document.getElementById('sttStatusText');
             const micBadge = document.getElementById('micActivityBadge');
             const toggleBtn = document.getElementById('toggleMicBtn');
+            const holdBtn = document.getElementById('holdToTalkBtn');
+            const holdLabel = document.getElementById('holdToTalkLabel');
 
             const shouldListen = (isPttActive || isPttToggled) && !isMicMuted && !isTtsSpeaking;
 
             if (mediaStream) {
-                mediaStream.getAudioTracks().forEach(t => t.enabled = shouldListen);
+                mediaStream.getAudioTracks().forEach(t => t.enabled = shouldListen || !isMicMuted);
+            }
+
+            if (holdBtn) {
+                if (shouldListen) {
+                    holdBtn.className = 'bg-emerald-500 text-black border border-emerald-400 font-bold px-4 py-2 rounded-xl text-xs font-mono flex items-center gap-2 transition-all select-none cursor-pointer scale-105 shadow-lg shadow-emerald-500/30 animate-pulse';
+                    if (holdLabel) holdLabel.textContent = isPttToggled ? 'Listening (Click to Stop)' : 'Listening (Release to Mute)';
+                } else {
+                    holdBtn.className = 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 px-4 py-2 rounded-xl text-xs font-mono font-bold flex items-center gap-2 transition-all select-none cursor-pointer active:scale-95 shadow-md shadow-emerald-500/10';
+                    if (holdLabel) holdLabel.textContent = 'Hold or Click to Speak';
+                }
             }
 
             if (isTtsSpeaking) {
                 safeStopSpeechRecognition();
                 if (statusText) {
-                    statusText.textContent = 'AI Speaking';
-                    statusText.className = 'text-purple-400 font-semibold font-mono';
+                    statusText.textContent = 'AI Speaking...';
+                    statusText.className = 'text-purple-400 font-semibold font-mono text-xs';
                 }
                 if (micBadge) micBadge.classList.add('hidden');
                 if (toggleBtn) {
@@ -597,8 +615,8 @@
                 setAudioWaveState('ai');
             } else if (shouldListen) {
                 if (statusText) {
-                    statusText.textContent = 'PTT Active (Listening...)';
-                    statusText.className = 'text-emerald-400 font-semibold font-mono';
+                    statusText.textContent = isPttToggled ? 'Listening (Click Button/Space to Mute)' : 'Listening (Hold Button/Spacebar)';
+                    statusText.className = 'text-emerald-400 font-semibold font-mono text-xs';
                 }
                 if (micBadge) {
                     micBadge.classList.remove('hidden');
@@ -613,8 +631,8 @@
             } else {
                 safeStopSpeechRecognition();
                 if (statusText) {
-                    statusText.textContent = 'PTT Muted (Press/Hold Spacebar)';
-                    statusText.className = 'text-text-secondary font-mono';
+                    statusText.textContent = 'PTT Muted (Hold Button or Spacebar)';
+                    statusText.className = 'text-text-secondary font-mono text-xs';
                 }
                 if (micBadge) micBadge.classList.add('hidden');
                 if (toggleBtn) {
@@ -626,6 +644,39 @@
         }
 
         function initPttEventListeners() {
+            const holdBtn = document.getElementById('holdToTalkBtn');
+            if (holdBtn) {
+                const startPress = (e) => {
+                    e.preventDefault();
+                    if (!isPttActive) {
+                        isPttActive = true;
+                        updatePttState();
+                    }
+                };
+
+                const endPress = (e) => {
+                    e.preventDefault();
+                    if (isPttActive) {
+                        isPttActive = false;
+                        updatePttState();
+                    }
+                };
+
+                holdBtn.addEventListener('mousedown', startPress);
+                holdBtn.addEventListener('mouseup', endPress);
+                holdBtn.addEventListener('mouseleave', endPress);
+
+                holdBtn.addEventListener('touchstart', startPress, { passive: false });
+                holdBtn.addEventListener('touchend', endPress, { passive: false });
+                holdBtn.addEventListener('touchcancel', endPress, { passive: false });
+
+                holdBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    isPttToggled = !isPttToggled;
+                    updatePttState();
+                });
+            }
+
             window.addEventListener('keydown', (e) => {
                 if (e.code === 'Space') {
                     const target = e.target;
@@ -979,13 +1030,16 @@
 
                 if (res.ok) {
                     const data = await res.json();
-                    if (data.session_completed) {
+                    if (data.session_completed || data.status === 'completed' || data.phase === 'Completed' || (sessionDurationType === 'questions' && historyTurns.length >= sessionDurationValue && !data.next_question)) {
                         finishInterview();
                         return;
                     }
                     if (data.next_question) {
                         appendTranscriptBubble('KEIKO AI Interviewer', data.next_question);
                         updateQuestionDisplay(data.next_question);
+                    } else {
+                        finishInterview();
+                        return;
                     }
                 } else {
                     generateNextFallbackQuestion(answerText);
@@ -1014,22 +1068,45 @@
         ];
 
         function generateNextFallbackQuestion(userAns) {
-            const turnNum = historyTurns.length + 1;
-            if (turnNum > 15) {
+            const turnNum = historyTurns.length;
+            if (sessionDurationType === 'questions' && turnNum >= sessionDurationValue) {
+                finishInterview();
+                return;
+            }
+            if (turnNum >= 15) {
                 finishInterview();
                 return;
             }
 
+            let bank = FALLBACK_QUESTION_BANK;
+            if (interviewType === 'HR') {
+                bank = [
+                    "What motivated you to apply for this position, and what are your primary career goals?",
+                    "Could you describe a situation where you had to work with a colleague whose communication style was very different from yours?",
+                    "Tell me about a time when you received constructive criticism from a team member or manager.",
+                    "How do you maintain work-life balance while meeting tight deadlines and high expectations?",
+                    "Describe a scenario where you championed team collaboration or helped resolve an interpersonal conflict."
+                ];
+            } else if (interviewType === 'Situational') {
+                bank = [
+                    "Imagine you are given a project with tight deadlines and shifting stakeholder requirements. How do you prioritize your tasks?",
+                    "Tell me about a time when a critical project ran into unexpected roadblocks. How did you manage the situation?",
+                    "Suppose a key dependency fails right before a release. What step-by-step process do you follow to mitigate the risk?",
+                    "How do you handle a scenario where you have incomplete information but must make a critical decision?",
+                    "Describe a situation where you had to convince a skeptical stakeholder to approve your approach."
+                ];
+            }
+
             const askedQuestions = historyTurns.map(t => (t.question || "").toLowerCase());
-            const unasked = FALLBACK_QUESTION_BANK.filter(q => !askedQuestions.includes(q.toLowerCase()));
+            const unasked = bank.filter(q => !askedQuestions.some(aq => aq.includes(q.toLowerCase().substring(0, 20))));
 
             let nextQ = "";
             if (unasked.length > 0) {
                 const idx = (turnNum - 1) % unasked.length;
                 nextQ = unasked[idx];
             } else {
-                const idx = Math.floor(Math.random() * FALLBACK_QUESTION_BANK.length);
-                nextQ = FALLBACK_QUESTION_BANK[idx];
+                finishInterview();
+                return;
             }
 
             appendTranscriptBubble('KEIKO AI Interviewer', nextQ);

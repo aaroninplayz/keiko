@@ -87,6 +87,22 @@ class CentralEvaluator:
         learning_potential_score = None
         cultural_fit_score = None
 
+        # Check if candidate asked a question back
+        answer_clean = answer.strip().lower()
+        is_candidate_question = (
+            "?" in answer or 
+            any(re.search(pat, answer_clean) for pat in [
+                r"\bwhat (is|are|about|does|do|can|tech|stack|culture|role)\b",
+                r"\bhow (do|does|is|are|can)\b",
+                r"\bcan you (tell|explain|share|elaborate)\b",
+                r"\bcould you (tell|explain|share|elaborate)\b",
+                r"\bdo you (have|use|offer|work)\b",
+                r"\bis there\b",
+                r"\bwhat's\b",
+                r"\btell me (about|more)\b"
+            ])
+        )
+
         # Tier 1: Try External LLM API
         active_provider = self._llm_client.detect_provider()
         if active_provider:
@@ -94,11 +110,14 @@ class CentralEvaluator:
                 logger.info(f"Evaluating answer via external LLM client ({active_provider})...")
                 system_message = (
                     "You are an expert technical interviewer and evaluator. Your task is to evaluate the candidate's answer "
-                    "to a specific question in the context of the interview. "
+                    "to a specific question in the context of the interview.\n"
+                    "NOTE: If the candidate is asking a question back to the interviewer (e.g., about the company, team, culture, role, tech stack, or next steps), "
+                    "do NOT penalize their score. Grade communication and behavioral high (85-95), set quality to 'Candidate Inquiry', "
+                    "and in the feedback field start with 'CANDIDATE_ASKED_QUESTION: Candidate asked: ...'.\n"
                     "Analyze the answer for completeness, accuracy, and technical competence.\n"
                     "Output your evaluation in strict JSON format with the following keys:\n"
                     '- "score": a numeric score from 0 to 100\n'
-                    '- "quality": a short string representation of quality, e.g., "Low", "Medium", "High"\n'
+                    '- "quality": a short string representation of quality, e.g., "Low", "Medium", "High", "Candidate Inquiry"\n'
                     '- "feedback": constructive feedback and guidelines for the next question.\n'
                     '- "keywords": a list of matched technical keywords mentioned in the answer.\n'
                     '- "technical_competency": a numeric score from 0 to 100 assessing precision and depth.\n'
@@ -110,7 +129,7 @@ class CentralEvaluator:
                 
                 user_message = (
                     f"Question Asked: {question}\n"
-                    f"Candidate's Answer: {answer}\n"
+                    f"Candidate's Response: {answer}\n"
                     f"Please evaluate the response and provide JSON output."
                 )
                 
@@ -151,28 +170,48 @@ class CentralEvaluator:
         # Tier 2: Local Heuristic Fallback
         if score is None:
             word_count = len(answer.split())
-            for word in ["python", "fastapi", "docker", "kubernetes", "sql", "git", "cloud", "aws", "gcp", "postgres"]:
-                if word in answer.lower():
-                    tech_keywords_matched.append(word.title())
-
-            # Simple completeness heuristics
-            if word_count < 10:
-                quality = "Low (Extremely brief)"
-                score = 40.0
-                feedback = "The candidate answered very briefly. Instruct QuestionGenerator to probe further on this specific topic."
-            elif word_count < 25:
-                quality = "Medium"
-                score = 70.0
-                feedback = "The answer was concise but could be elaborated. Suggest probing for architectural choices."
+            if is_candidate_question:
+                quality = "Candidate Inquiry"
+                score = 88.0
+                feedback = f"CANDIDATE_ASKED_QUESTION: Candidate asked: '{answer}'. Please directly answer their question first in 1-2 friendly sentences."
+                communication_quality_score = 92.0
+                behavioral_assessment_score = 90.0
+                technical_competency_score = 80.0
+                learning_potential_score = 88.0
+                cultural_fit_score = 90.0
             else:
-                quality = "High"
-                score = 90.0
-                feedback = f"Great response! Verified keywords: {', '.join(tech_keywords_matched)}. Proceed to the next topic."
+                # Expanded domain & technical keyword extraction
+                tech_words_map = {
+                    "python": "Python", "fastapi": "FastAPI", "docker": "Docker", "kubernetes": "Kubernetes",
+                    "sql": "SQL", "git": "Git", "cloud": "Cloud Infrastructure", "aws": "AWS", "gcp": "GCP",
+                    "postgres": "PostgreSQL", "esp32": "ESP32", "microcontroller": "Microcontrollers",
+                    "hardware": "Hardware Engineering", "cybersecurity": "Cybersecurity", "ai": "Artificial Intelligence",
+                    "automation": "Python Automation", "server": "Cloud Servers", "react": "React", "typescript": "TypeScript"
+                }
+                for key_term, label in tech_words_map.items():
+                    if key_term in answer.lower():
+                        if label not in tech_keywords_matched:
+                            tech_keywords_matched.append(label)
 
-            # Adjust score if technical keywords were required but missing
-            if score > 50.0 and len(tech_keywords_matched) == 0 and any(t in question.lower() for t in ["python", "fastapi", "docker", "kubernetes", "postgres"]):
-                score -= 15.0
-                feedback += " The candidate answered but did not mention technical details. Probe for implementation specifics."
+                # Simple completeness heuristics with rich contextual feedback
+                kw_str = ", ".join(tech_keywords_matched) if tech_keywords_matched else "Core Engineering & Technical Concepts"
+                if word_count < 10:
+                    quality = "Low (Extremely brief)"
+                    score = 45.0
+                    feedback = f"Candidate response was very brief ({word_count} words). Probed for specific technical details and implementation experience."
+                elif word_count < 25:
+                    quality = "Medium"
+                    score = 72.0
+                    feedback = f"Concise answer covering {kw_str}. Candidate addressed the prompt well; follow up on architectural choices."
+                else:
+                    quality = "High"
+                    score = 90.0
+                    feedback = f"Strong response demonstrating solid technical clarity and domain alignment with {kw_str}."
+
+                # Adjust score if technical keywords were required but missing
+                if score > 50.0 and len(tech_keywords_matched) == 0 and any(t in question.lower() for t in ["python", "fastapi", "docker", "kubernetes", "postgres"]):
+                    score -= 15.0
+                    feedback += " Candidate answered directly but did not elaborate on specific implementation tools."
 
             # 1. Communication Quality
             vocab_richness = len(set(answer.lower().split())) / max(1.0, word_count)

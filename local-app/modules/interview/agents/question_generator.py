@@ -100,9 +100,11 @@ SIGNOFF_TEMPLATES = [
 
 class QuestionGenerator:
     """
-    Hybrid LLM/NLP Question Generator. Ingests full resume text, job description text,
-    normalized Candidate Profile, skill gaps, interview history, and evaluator guidelines.
-    Uses a small local instruct model if available, falling back to a deterministic NLP template engine.
+    Hybrid LLM/NLP Question Generator.
+    Supports distinct HR, Technical, and Situational interview personas.
+    Ingests live sensor tracking (eye contact, posture, composure, tone, confidence),
+    uses context compression (summarizes history every 5 questions),
+    and enforces a sliding window context with strict non-repetition rules.
     """
 
     def __init__(self):
@@ -122,7 +124,6 @@ class QuestionGenerator:
         self._local_llm_attempted = True
         try:
             from transformers import pipeline
-            # Use Qwen2.5-0.5B-Instruct: tiny, lightweight instruct model (~950MB) running cleanly on CPU
             logger.info("Attempting to load local instruction LLM 'Qwen/Qwen2.5-0.5B-Instruct'...")
             self._generator = pipeline(
                 "text-generation", 
@@ -135,6 +136,122 @@ class QuestionGenerator:
             logger.warning(f"Could not load local LLM, falling back to robust NLP template generator: {e}")
             self._generator = None
 
+    def summarize_history(self, history: List[Dict[str, Any]]) -> str:
+        """
+        Compresses preceding Q&A conversation history into a concise 2-3 sentence summary.
+        Called every 5 questions to keep prompt context compact.
+        """
+        if not history:
+            return ""
+
+        active_provider = self._llm_client.detect_provider()
+        formatted_turns = []
+        for i, turn in enumerate(history, start=1):
+            q = turn.get('question', '')
+            a = turn.get('answer', '')[:250]
+            formatted_turns.append(f"Turn {i} - Q: {q} | A: {a}")
+
+        transcript_text = "\n".join(formatted_turns)
+        prompt = (
+            "Summarize the following interview conversation history into a concise 2-3 sentence overview. "
+            "Focus on candidate highlights, demonstrated capabilities, and general performance trajectory. "
+            "Keep it under 60 words:\n\n"
+            f"{transcript_text}"
+        )
+
+        if active_provider:
+            try:
+                res = self._llm_client.complete([{"role": "user", "content": prompt}], provider=active_provider, temperature=0.3, max_tokens=100)
+                if res:
+                    clean = re.sub(r'[\r\n]+', ' ', res).strip()
+                    return clean
+            except Exception as e:
+                logger.warning(f"Context compression via LLM failed: {e}")
+
+        # Fallback summarizer if LLM is unavailable
+        num_turns = len(history)
+        avg_score = sum(float(h.get('accuracy_score', 70.0) or 70.0) for h in history) / max(1, num_turns)
+        return f"Candidate completed {num_turns} turns with an average score of {avg_score:.1f}%. Key responses covered background, technical/behavioral concepts, and problem solving."
+
+    def _build_system_prompt(
+        self,
+        interview_type: str,
+        difficulty: str,
+        first_name: str,
+        phase_label: str,
+        sensor_info: str,
+        interviewer_interest: float,
+        asked_questions: List[str]
+    ) -> str:
+        """
+        Constructs explicit system prompt rules customized for interview type (HR, Tech, Situational)
+        and difficulty tier (Beginner, Intermediate, Advanced, Adaptive).
+        Rules are included on EVERY single prompt request.
+        """
+        # Persona & Type Directives
+        if interview_type == 'HR':
+            persona = (
+                "You are Keiko, an experienced Human Resources (HR) Talent Acquisition Lead.\n"
+                "FOCUS AREAS: Soft skills, motivation, company culture fit, team collaboration, leadership, work environment, career aspirations, and communication.\n"
+                "STRICTLY FORBIDDEN: DO NOT ask any coding syntax, software engineering theory, system design, framework, or technical CS questions."
+            )
+        elif interview_type == 'Situational':
+            persona = (
+                "You are Keiko, a Senior Operations Manager conducting a Situational & Scenario Interview.\n"
+                "FOCUS AREAS: Scenario-based hypothetical workplace decision-making under pressure, crisis management, priority trade-offs, conflict resolution, and adaptability to unexpected changes.\n"
+                "STRICTLY FORBIDDEN: DO NOT ask standard coding or CS theory questions."
+            )
+        else:
+            persona = (
+                "You are Keiko, a Senior Technical Architect conducting a Technical Engineering Interview.\n"
+                "FOCUS AREAS: Code architecture, system design, data structures, APIs, database trade-offs, debugging, performance optimization, and engineering practices.\n"
+                "STRICTLY FORBIDDEN: DO NOT ask generic HR behavioral questions."
+            )
+
+        # Difficulty Directives
+        if difficulty == 'Beginner':
+            diff_text = "DIFFICULTY LEVEL: Beginner (Ask entry-level, foundational questions focusing on core concepts)."
+        elif difficulty == 'Advanced':
+            diff_text = "DIFFICULTY LEVEL: Advanced (Ask senior/architect-level questions covering high scale, edge cases, system trade-offs, and resilience)."
+        elif difficulty == 'Adaptive':
+            diff_text = "DIFFICULTY LEVEL: Adaptive (Dynamically adjust complexity based on candidate score and interest score)."
+        else:
+            diff_text = "DIFFICULTY LEVEL: Intermediate (Ask mid-level industry standard questions with trade-off analysis)."
+
+        # Interest Level Guidance
+        interest_guidance = ""
+        if interviewer_interest >= 75.0:
+            interest_guidance = f"INTERVIEWER INTEREST: HIGH ({interviewer_interest:.1f}/100). Candidate is performing exceptionally well. Offer encouraging tone and dive deeper into complex aspects."
+        elif interviewer_interest <= 40.0:
+            interest_guidance = f"INTERVIEWER INTEREST: LOW ({interviewer_interest:.1f}/100). Candidate gave brief or off-target response. Ask a clear, encouraging question to help candidate clarify."
+        else:
+            interest_guidance = f"INTERVIEWER INTEREST: NORMAL ({interviewer_interest:.1f}/100). Maintain steady professional engagement."
+
+        # Asked Questions List for Non-Repetition
+        asked_str = ""
+        if asked_questions:
+            formatted_q = "\n".join(f"- {q}" for q in asked_questions)
+            asked_str = f"\nALREADY ASKED QUESTIONS (DO NOT REPEAT):\n{formatted_q}\n"
+
+        system_prompt = (
+            f"{persona}\n\n"
+            f"Candidate Name: {first_name}\n"
+            f"Current Phase: {phase_label}\n"
+            f"{diff_text}\n"
+            f"{interest_guidance}\n"
+            f"{sensor_info}\n"
+            f"{asked_str}\n"
+            "MAIN MANDATORY RULES (ENFORCE ON EVERY SINGLE QUESTION):\n"
+            "1. STRICT NON-REPETITION: DO NOT ask any question that is semantically or lexically similar to any question in the Already Asked Questions list above.\n"
+            "2. CONVERSATIONAL HR/INTERVIEWER TONE: Start with a brief, natural acknowledgment of the candidate's last answer (1-2 sentences).\n"
+            "3. CANDIDATE QUESTIONS: If the candidate asked a question back (about role, tech stack, team, or culture), DIRECTLY ANSWER IT in 1-2 friendly sentences BEFORE asking your next question.\n"
+            "4. TARGETED NEXT QUESTION: Ask your next question matching the exact interview type and difficulty level.\n"
+            "5. LENGTH LIMIT: Keep total response concise (under 70 words).\n"
+            "6. PERSONALIZATION: Use the candidate's name occasionally and cross-reference resume context when relevant."
+        )
+
+        return system_prompt
+
     def generate(
         self,
         resume_text: str,
@@ -145,108 +262,105 @@ class QuestionGenerator:
         evaluator_feedback: Optional[str] = None,
         interview_type: str = 'Tech',
         difficulty: str = 'Intermediate',
-        sensor_data: Optional[Dict[str, Any]] = None
+        sensor_data: Optional[Dict[str, Any]] = None,
+        interviewer_interest: float = 50.0,
+        conversation_summary: Optional[str] = None,
+        window_size: int = 3
     ) -> str:
         """
-        Generates the next interview question using multi-stage context, 10-Q phase thresholding,
-        live emotion/composure ingestion, and resume discrepancy cross-referencing.
+        Generates the next interview question using multi-stage context,
+        sliding window memory (last 3 turns), 5-question context compression,
+        and live sensor tracking telemetry (eye contact, posture, composure, tone, emotions).
         """
         turn_count = len(history) + 1
         raw_name = candidate_profile.get('full_name') or candidate_profile.get('name') or 'Candidate'
         first_name = raw_name.strip().split()[0] if raw_name and raw_name != 'Candidate' else 'Candidate'
         target_role = candidate_profile.get('target_role') or 'Target Role'
 
+        # Extract all previously asked questions to enforce non-repetition
+        asked_questions = [h.get('question', '') for h in history if h.get('question')]
+
         # Turn 1: Onboarding with natural pleasantries
         if turn_count == 1:
             return f"Hello {first_name}! Welcome to your {interview_type} interview today for the {target_role} position. How are you doing, and could you briefly introduce yourself and walk me through your background?"
 
-        # Stage/Phase Thresholding
-        phase_label = "Phase 1: Onboarding & Background" if turn_count <= 10 else ("Phase 2: Technical Deep Dive" if turn_count <= 20 else "Phase 3: System Architecture")
+        # Phase thresholding
+        phase_label = "Phase 1: Onboarding & Background" if turn_count <= 5 else ("Phase 2: Deep Dive" if turn_count <= 15 else "Phase 3: Advanced Architecture & Leadership")
 
-        # Tier 1: Try LLM Client (OpenAI, Gemini, Anthropic, Groq, or local Ollama qwen2.5:1.5b)
+        # Tier 1: Try LLM Client
         active_provider = self._llm_client.detect_provider()
         if active_provider:
             try:
-                logger.info(f"Generating question via LLM provider ({active_provider}) for Turn {turn_count} ({phase_label})...")
-                
-                last_turn_str = ""
-                if history:
-                    last_turn = history[-1]
-                    last_turn_str = f"Last Interviewer Question: {last_turn.get('question')}\nCandidate Answer: {last_turn.get('answer')[:350]}\n"
+                logger.info(f"Generating question via LLM ({active_provider}) for Turn {turn_count} ({interview_type}/{difficulty})...")
 
                 # Extract live emotion & sensor telemetry
                 sensor_info = ""
                 if sensor_data:
-                    comp = sensor_data.get('composure', 75)
-                    eye = sensor_data.get('eye_contact', 80)
-                    tone = sensor_data.get('tone', 'confident')
-                    sensor_info = f"Candidate Live Composure: {comp}%, Eye Contact: {eye}%, Tone: {tone}.\n"
-                    if comp < 50:
-                        sensor_info += "STRESS DETECTED: Keep question encouraging, concise, and clear.\n"
-                    elif comp > 85:
-                        sensor_info += "HIGH CONFIDENCE: Escalate technical challenge.\n"
+                    eye_obj = sensor_data.get('eye_contact', {})
+                    eye = eye_obj.get('score', 80.0) if isinstance(eye_obj, dict) else float(eye_obj)
 
-                system_message = (
-                    "You are Keiko, a professional and personable AI technical interviewer.\n\n"
-                    f"Candidate's first name: {first_name}\n"
-                    f"Current Phase: {phase_label} | Mode: {interview_type} | Level: {difficulty}\n"
-                    f"{sensor_info}\n"
-                    "ALWAYS:\n"
-                    "1. Start with a brief, natural acknowledgment of the candidate's last answer (1-2 sentences).\n"
-                    "2. Then ask your next question.\n"
-                    "3. Be conversational but professional.\n"
-                    "4. If the candidate asks you something, respond naturally.\n"
-                    "5. If the candidate is rude or unprofessional, calmly redirect while noting it.\n"
-                    f"6. Use the candidate's name ({first_name}) occasionally.\n"
-                    "7. Keep total response under 60 words.\n"
-                    "8. Cross-reference answers with their resume — if they claim something contradictory, politely ask for clarification.\n\n"
-                    "NEVER:\n"
-                    "1. Skip acknowledging the candidate's answer.\n"
-                    "2. Be robotic or formulaic.\n"
-                    "3. Repeat questions that have already been asked.\n"
-                    "4. Ignore what the candidate said."
+                    posture_obj = sensor_data.get('posture', {})
+                    posture = posture_obj.get('score', 80.0) if isinstance(posture_obj, dict) else float(posture_obj)
+
+                    conf_obj = sensor_data.get('confidence', {})
+                    conf_details = conf_obj.get('details', {}) if isinstance(conf_obj, dict) else {}
+                    comp = conf_details.get('composure', sensor_data.get('composure', 75.0))
+
+                    tone = sensor_data.get('tone', 'confident')
+                    sensor_info = f"LIVE TRACKING PARAMETERS -> Eye Contact: {eye:.1f}%, Posture: {posture:.1f}%, Composure: {comp:.1f}%, Tone: {tone}.\n"
+                    if comp < 50 or eye < 50:
+                        sensor_info += "SENSOR TELEMETRY ALERT: Stress or gaze deviation detected. Keep question clear, encouraging, and focused.\n"
+                    elif comp > 85 and eye > 80:
+                        sensor_info += "SENSOR TELEMETRY ALERT: High confidence & eye contact detected. Candidate is engaged.\n"
+
+                system_message = self._build_system_prompt(
+                    interview_type=interview_type,
+                    difficulty=difficulty,
+                    first_name=first_name,
+                    phase_label=phase_label,
+                    sensor_info=sensor_info,
+                    interviewer_interest=interviewer_interest,
+                    asked_questions=asked_questions
                 )
+
+                # Context Assembly: Sliding Window (last N turns) + Compressed Summary for older turns
+                window_history = history[-window_size:] if len(history) > window_size else history
                 
+                recent_turns_str = ""
+                for h in window_history:
+                    recent_turns_str += f"Interviewer Question: {h.get('question')}\nCandidate Answer: {h.get('answer', '')[:350]}\n"
+
+                summary_str = f"COMPRESSED PREVIOUS CONVERSATION SUMMARY: {conversation_summary}\n" if conversation_summary else ""
+
                 user_message = (
                     f"Candidate Name: {first_name}\n"
-                    f"Target Role & JD Context: {jd_text[:1500]}\n"
-                    f"Candidate Resume Context: {resume_text[:1500]}\n"
-                    f"Priority Skill Gaps: {', '.join(skill_gaps[:3]) if skill_gaps else 'None identified'}\n"
-                    f"{last_turn_str}"
-                    f"Evaluator Guidance: {evaluator_feedback or 'Ask next relevant question for current phase.'}\n\n"
-                    "Generate your response (1-sentence conversational acknowledgment + next question):"
+                    f"Target Role: {target_role}\n"
+                    f"Job Context: {jd_text[:1200]}\n"
+                    f"Resume Context: {resume_text[:1200]}\n"
+                    f"Skill Gaps: {', '.join(skill_gaps[:3]) if skill_gaps else 'None'}\n"
+                    f"{summary_str}"
+                    f"SLIDING WINDOW RECENT TURNS:\n{recent_turns_str}\n"
+                    f"Evaluator Feedback: {evaluator_feedback or 'Ask next relevant question for phase.'}\n\n"
+                    "Generate response (conversational acknowledgment + next unasked question):"
                 )
 
                 messages = [
                     {"role": "system", "content": system_message},
                     {"role": "user", "content": user_message}
                 ]
-                
+
                 question = self._llm_client.complete(messages, provider=active_provider, temperature=0.7, max_tokens=150)
                 if question:
                     question = re.sub(r'[\r\n]+', ' ', question).strip()
                     question = question.replace("<|im_end|>", "").replace("<|endoftext|>", "").strip()
                     question = re.sub(r"^(Interviewer|Keiko|Question):\s*", "", question, flags=re.IGNORECASE).strip()
-                    if len(question) > 10:
+                    
+                    if len(question) > 10 and not self._is_question_repeated(question, history):
                         return question
             except Exception as e:
-                logger.error(f"LLM question generation failed: {e}. Falling back to templates.")
+                logger.error(f"LLM question generation failed: {e}. Falling back to NLP template generator.")
 
-        # Turns 1-3 serve as semi-fixed natural onboarding starters using candidate's name
-        if turn_count == 1:
-            return f"Hello {first_name}! Welcome to your {interview_type} interview today for the {target_role} position. How are you doing, and could you briefly introduce yourself and walk me through your background?"
-        elif turn_count == 2:
-            if skill_gaps:
-                target_gap = skill_gaps[0]
-                return f"Thank you for sharing that overview, {first_name}! Looking at the job requirements, I see {target_gap} is a key component. Could you tell me about your experience with {target_gap}?"
-            return f"Thank you for sharing that overview, {first_name}! Could you walk me through a key project or role from your resume that best demonstrates your core capabilities?"
-        elif turn_count == 3:
-            if len(skill_gaps) > 1:
-                target_gap = skill_gaps[1]
-                return f"Got it, {first_name}. Could you also describe your familiarity or experience with {target_gap}?"
-            return "What specific programming languages, frameworks, or tools did you rely on most heavily in that role, and why were they selected?"
-
-        # Turn 4+: Rely exclusively on LLM or Tier 3 NLP Template Generator (no fixed elif chain)
+        # Fallback NLP generator
         return self._generate_nlp_fallback(candidate_profile, skill_gaps, history, evaluator_feedback, interview_type, difficulty)
 
     def generate_hint(self, question: str, candidate_answer: str, resume_text: str = "") -> str:
@@ -259,7 +373,7 @@ class QuestionGenerator:
                 prompt = (
                     f"Interviewer Question: {question}\n"
                     f"Candidate Current Draft: {candidate_answer[:200]}\n"
-                    "Provide a helpful 1-sentence technical hint to guide the candidate's answer. NO salutations, under 25 words."
+                    "Provide a helpful 1-sentence hint to guide the candidate's answer. NO salutations, under 25 words."
                 )
                 res = self._llm_client.complete([{"role": "user", "content": prompt}], provider=active_provider, temperature=0.5, max_tokens=60)
                 if res:
@@ -268,50 +382,66 @@ class QuestionGenerator:
             except Exception as e:
                 logger.warning(f"AI hint generation failed: {e}")
 
-        return "Focus on your specific individual contribution, key architectural choices, and measurable results achieved."
+        return "Focus on your specific individual contribution, key choices, and measurable results achieved."
 
-    def _build_prompt(
+    def _is_question_repeated(self, candidate_q: str, history: List[Dict[str, str]]) -> bool:
+        """
+        Strictly checks if candidate_q is semantically or lexically similar to any question in history.
+        """
+        if not candidate_q or not history:
+            return False
+
+        cand_clean = re.sub(r'[^a-zA-Z0-9\s]', '', candidate_q.lower()).strip()
+        cand_words = set(w for w in cand_clean.split() if len(w) > 3)
+
+        for turn in history:
+            prev_q = turn.get('question', '')
+            if not prev_q:
+                continue
+            prev_clean = re.sub(r'[^a-zA-Z0-9\s]', '', prev_q.lower()).strip()
+
+            if cand_clean == prev_clean:
+                return True
+            if len(cand_clean) > 15 and (cand_clean in prev_clean or prev_clean in cand_clean):
+                return True
+
+            prev_words = set(w for w in prev_clean.split() if len(w) > 3)
+            if cand_words and prev_words:
+                intersection = cand_words.intersection(prev_words)
+                union = cand_words.union(prev_words)
+                jaccard = len(intersection) / len(union) if union else 0.0
+                if jaccard >= 0.45:
+                    return True
+
+        return False
+
+    def _get_next_unasked_question(
         self,
-        resume_text: str,
-        jd_text: str,
         profile: Dict[str, Any],
         gaps: List[str],
         history: List[Dict[str, str]],
-        feedback: Optional[str],
         interview_type: str = 'Tech',
         difficulty: str = 'Intermediate'
     ) -> str:
-        history_str = ""
-        for h in history:
-            history_str += f"Interviewer: {h.get('question')}\nCandidate: {h.get('answer')}\n"
+        templates = QUESTION_TEMPLATES.get(interview_type, QUESTION_TEMPLATES['Tech'])
+        questions = templates.get(difficulty, templates.get('Intermediate', []))
 
-        prompt = (
-            "<|im_start|>system\n"
-            "You are Keiko, a professional and personable AI technical interviewer.\n"
-            f"Interview Type: {interview_type}\n"
-            f"Difficulty Level: {difficulty}\n"
-            "ALWAYS:\n"
-            "1. Start with a brief, natural acknowledgment of the candidate's last answer (1-2 sentences).\n"
-            "2. Then ask your next question.\n"
-            "3. Be conversational but professional.\n"
-            "4. Keep total response under 60 words.\n"
-            "NEVER:\n"
-            "1. Skip acknowledging the candidate's answer.\n"
-            "2. Be robotic or formulaic.\n"
-            "3. Repeat questions.\n"
-            "<|im_end|>\n"
-            "<|im_start|>user\n"
-            f"Candidate Experience Level: {profile.get('career_level')}\n"
-            f"Candidate Resume Context: {resume_text[:1500]}\n"
-            f"Job Description: {jd_text[:1500]}\n"
-            f"Skill Gaps Identified: {', '.join(gaps)}\n"
-            f"Interview History:\n{history_str}\n"
-            f"Evaluator Guidance: {feedback or 'First question, ask a main job description question.'}\n\n"
-            "Generate your response (acknowledgment + next question):\n"
-            "<|im_end|>\n"
-            "<|im_start|>assistant\n"
-        )
-        return prompt
+        for q in questions:
+            if not self._is_question_repeated(q, history):
+                return q
+
+        for diff_tier in ['Intermediate', 'Beginner', 'Advanced']:
+            for q in templates.get(diff_tier, []):
+                if not self._is_question_repeated(q, history):
+                    return q
+
+        target_role = profile.get('target_role') or 'this role'
+        if interview_type == 'HR':
+            return f"What specific qualities or values do you believe are most important for succeeding in the {target_role} position?"
+        elif interview_type == 'Situational':
+            return f"Describe how you handle unexpected project changes or conflicting stakeholder priorities in a fast-paced environment."
+        else:
+            return f"Walk me through a challenging technical problem you solved in your recent work and the key architectural trade-offs involved."
 
     def _generate_nlp_fallback(
         self,
@@ -323,14 +453,43 @@ class QuestionGenerator:
         difficulty: str = 'Intermediate'
     ) -> str:
         """
-        High-fidelity template engine. Synthesizes contextual probing and main questions.
-        Uses candidate name, interview type, skill gaps, and difficulty to select from comprehensive template banks.
+        Template generator fallback ensuring unasked question selection matching interview type.
         """
-        q_count = len(history)
         raw_name = profile.get('full_name') or profile.get('name') or 'Candidate'
         first_name = raw_name.strip().split()[0] if raw_name and raw_name != 'Candidate' else 'Candidate'
 
-        # Conversational acknowledgment prefix if candidate answered a previous question
+        last_answer = history[-1].get('answer', '') if history else ''
+        is_cand_q = False
+        if feedback and "CANDIDATE_ASKED_QUESTION" in feedback:
+            is_cand_q = True
+        elif last_answer:
+            answer_clean = last_answer.strip().lower()
+            if "?" in last_answer or any(re.search(pat, answer_clean) for pat in [
+                r"\bwhat (is|are|about|does|do|can|tech|stack|culture|role)\b",
+                r"\bhow (do|does|is|are|can)\b",
+                r"\bcan you (tell|explain|share|elaborate)\b",
+                r"\bcould you (tell|explain|share|elaborate)\b",
+                r"\bdo you (have|use|offer|work)\b",
+                r"\bis there\b",
+                r"\bwhat's\b",
+                r"\btell me (about|more)\b"
+            ]):
+                is_cand_q = True
+
+        if is_cand_q and last_answer:
+            ans_clean = last_answer.lower()
+            if any(k in ans_clean for k in ["culture", "work environment", "team", "values", "people"]):
+                response = "Our company culture is centered around collaboration, open communication, continuous learning, and work-life balance."
+            elif any(k in ans_clean for k in ["tech", "stack", "tools", "technology", "language", "framework"]):
+                response = "Our team utilizes modern, scalable technologies and industry best practices focusing on solid architecture, testing, and continuous delivery."
+            elif any(k in ans_clean for k in ["role", "responsibility", "day to day", "expectation"]):
+                response = f"In this {profile.get('target_role', 'position')}, you will work closely with cross-functional teams, driving key initiatives from concept to delivery."
+            else:
+                response = "In our organization, we prioritize transparency, employee growth, and strong cross-functional teamwork."
+
+            next_q = self._get_next_unasked_question(profile, gaps, history, interview_type, difficulty)
+            return f"{response} {next_q}"
+
         ack_prefix = ""
         if history:
             ack_options = [
@@ -342,71 +501,8 @@ class QuestionGenerator:
             ]
             ack_prefix = random.choice(ack_options) + " "
 
-        # 1. Handle Evaluator Feedback (Probing / Adjustments)
-        if feedback:
-            lower_fb = feedback.lower()
-            # If evaluator instructs to probe a specific topic or skill
-            for gap in gaps:
-                if gap.lower() in lower_fb:
-                    return f"{ack_prefix}I noticed a gap in {gap} on your resume. Could you describe your familiarity with {gap} or any experience learning similar technologies?"
-
-            # If evaluator wants details on projects
-            if "project" in lower_fb and profile.get("project_expertise"):
-                proj = profile["project_expertise"][0]
-                return f"{ack_prefix}You worked on the project '{proj}'. Could you detail your specific engineering contributions and the technical stack you used?"
-
-            # When probing is requested AND skill gaps exist, target the gaps first
-            if "probe" in lower_fb and gaps:
-                asked_topics = set()
-                for h in history:
-                    q_lower = h.get('question', '').lower()
-                    for gap in gaps:
-                        if gap.lower() in q_lower:
-                            asked_topics.add(gap)
-                unasked_gaps = [g for g in gaps if g not in asked_topics]
-                if unasked_gaps:
-                    target_gap = unasked_gaps[0]
-                    return f"{ack_prefix}Looking at the job requirements, I see {target_gap} is a key component. Can you walk me through your experience with {target_gap} or related tools?"
-
-            # General probing fallback based on feedback
-            if "probe" in lower_fb:
-                cand_skills = []
-                for cat, skills in profile.get("skills", {}).items():
-                    for s in skills:
-                        if isinstance(s, dict):
-                            cand_skills.append(s.get('name', ''))
-                        else:
-                            cand_skills.append(str(s))
-                if cand_skills:
-                    return f"{ack_prefix}Can you explain a challenging problem you solved using {cand_skills[0]} and how you optimized your solution?"
-
-        # 2. Skill Gap Targeting: If gaps exist and haven't been addressed yet, ask about them
-        if gaps and q_count > 0:
-            asked_topics = set()
-            for h in history:
-                q_lower = h.get('question', '').lower()
-                for gap in gaps:
-                    if gap.lower() in q_lower:
-                        asked_topics.add(gap)
-            unasked_gaps = [g for g in gaps if g not in asked_topics]
-            if unasked_gaps:
-                target_gap = unasked_gaps[0]
-                return f"{ack_prefix}Looking at the job requirements, I see {target_gap} is a key component. Can you walk me through your experience with {target_gap} or related tools?"
-
-        # 3. Dynamic Template-based question selection avoiding duplicates
-        templates = QUESTION_TEMPLATES.get(interview_type, QUESTION_TEMPLATES['Tech'])
-        questions = templates.get(difficulty, templates['Intermediate'])
-        
-        # Filter out already asked questions
-        history_questions = {h.get('question', '').strip().lower() for h in history}
-        available_questions = [q for q in questions if q.strip().lower() not in history_questions]
-        
-        if not available_questions:
-            available_questions = questions
-
-        index = q_count % len(available_questions)
-        selected_q = available_questions[index]
-        return f"{ack_prefix}{selected_q}"
+        next_q = self._get_next_unasked_question(profile, gaps, history, interview_type, difficulty)
+        return f"{ack_prefix}{next_q}"
 
     def generate_concluding(self, interview_type: str = 'Tech') -> str:
         """Returns a random concluding question to wrap up the interview."""

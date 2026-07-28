@@ -275,8 +275,26 @@ class ConversationManager:
             if not session:
                 raise LookupError(f"Session not found: {session_id}")
 
-            if session.phase == 'Completed':
-                raise ValueError(f"Session {session_id} is already completed.")
+            if session.phase == 'Completed' or session.status == 'completed':
+                final_report = session.final_report or {}
+                if not final_report:
+                    try:
+                        history_records = db.query(ConversationHistory).filter(ConversationHistory.session_id == session_id).all()
+                        h_dicts = [{'question': h.question, 'answer': h.answer, 'accuracy_score': h.evaluation_score} for h in history_records]
+                        final_report = self._generate_final_report(session_id, session, h_dicts)
+                    except Exception:
+                        pass
+                return {
+                    'session_id': session_id,
+                    'phase': 'Completed',
+                    'status': 'completed',
+                    'current_index': session.current_index,
+                    'next_question': None,
+                    'session_completed': True,
+                    'interviewer_interest': getattr(session, 'interviewer_interest', 50.0),
+                    'job_fit_score': getattr(session, 'job_fit_score', 50.0),
+                    'final_report': final_report
+                }
 
             current_question = session.current_question or ''
 
@@ -303,8 +321,21 @@ class ConversationManager:
                 ConversationHistory.session_id == session_id
             ).all()
 
-            is_greeting_only = bool(re.match(r"^(hello|hi|hey|my name is|i am)\b", answer_clean))
-            if len(history_records) >= 2 and (len(answer_clean.split()) < 3 or is_greeting_only):
+            word_count = len(answer_clean.split())
+            is_greeting_pattern = bool(re.match(r"^(hello|hi|hey|my name is [a-z]+|i am [a-z]+)$", answer_clean))
+            is_greeting_only = (word_count <= 3) and is_greeting_pattern
+
+            is_cand_question = "?" in answer or any(re.search(pat, answer_clean) for pat in [
+                r"\bwhat (is|are|about|does|do|can|tech|stack|culture|role)\b",
+                r"\bhow (do|does|is|are|can)\b",
+                r"\bcan you (tell|explain|share|elaborate)\b",
+                r"\bcould you (tell|explain|share|elaborate)\b",
+                r"\bdo you (have|use|offer|work)\b",
+                r"\bis there\b",
+                r"\bwhat's\b",
+                r"\btell me (about|more)\b"
+            ])
+            if len(history_records) >= 2 and not is_cand_question and (word_count < 3 and is_greeting_only):
                 redirection_msg = f"Your answer was too brief or off-topic. Could you elaborate on your experience regarding: '{current_question}'?"
                 return {
                     "session_id": session_id,
@@ -356,7 +387,7 @@ class ConversationManager:
                 # Prepend profanity context to evaluator feedback for question generation
                 feedback = profanity_context + " " + feedback if feedback else profanity_context
 
-            def extract_score(metrics, key, default=70.0):
+            def extract_score(metrics, key, default=None):
                 if not metrics:
                     return default
                 val = metrics.get(key, default)
@@ -374,8 +405,8 @@ class ConversationManager:
                 quality_tier=quality,
                 word_count=len(answer.split()),
                 matched_keywords=matched_keywords,
-                posture_score=extract_score(current_metrics, 'posture', 70.0),
-                eye_contact_score=extract_score(current_metrics, 'eye_contact', 70.0),
+                posture_score=extract_score(current_metrics, 'posture', None),
+                eye_contact_score=extract_score(current_metrics, 'eye_contact', None),
                 emotions=current_metrics.get('emotions', ['neutral']) if current_metrics else ['neutral'],
                 metrics_raw=raw_metrics,
                 timestamp=time.time()
@@ -460,25 +491,53 @@ class ConversationManager:
             new_interest = round(max(0.0, min(100.0, current_interest + interest_delta)), 1)
             session.interviewer_interest = new_interest
 
-            # Dynamic job fit score calculation (0-100)
+            # Dynamic job fit score calculation synthesizing ALL collected metrics
             scores = [h.get('accuracy_score', 70.0) for h in history_dicts if h.get('accuracy_score') is not None]
             avg_acc = sum(scores) / len(scores) if scores else score
+
             tech_comp = raw_metrics.get('technical_competency', score)
             comm_qual = raw_metrics.get('communication_quality', score)
+            behav_assess = raw_metrics.get('behavioral_assessment', score)
+            learn_pot = raw_metrics.get('learning_potential', score)
+            cult_fit = raw_metrics.get('cultural_fit', score)
             match_score = (session.match_results or {}).get('role_alignment_score', 75.0) or 75.0
 
-            job_fit_score = round(max(0.0, min(100.0, (avg_acc * 0.35) + (tech_comp * 0.25) + (comm_qual * 0.15) + (match_score * 0.15) + (new_interest * 0.10))), 1)
+            eye_score = extract_score(raw_metrics, 'eye_contact', 70.0)
+            posture_score = extract_score(raw_metrics, 'posture', 70.0)
+            conf_score = extract_score(raw_metrics, 'confidence', 70.0)
+            voice_score = extract_score(raw_metrics, 'voice', 70.0)
+            sensor_avg = (eye_score + posture_score + conf_score + voice_score) / 4.0
+
+            job_fit_score = round(max(0.0, min(100.0, 
+                (avg_acc * 0.20) + 
+                (tech_comp * 0.15) + 
+                (behav_assess * 0.15) + 
+                (comm_qual * 0.15) + 
+                (cult_fit * 0.10) + 
+                (match_score * 0.15) + 
+                (sensor_avg * 0.10)
+            )), 1)
             session.job_fit_score = job_fit_score
+
+            # Context compression: Every 5 questions, generate/update compressed summary
+            if len(history_dicts) > 0 and len(history_dicts) % 5 == 0:
+                try:
+                    compressed_summary = self.question_generator.summarize_history(history_dicts)
+                    session.conversation_summary = compressed_summary
+                    db.commit()
+                except Exception as ex:
+                    logger.warning(f"Could not generate compressed conversation summary: {ex}")
 
             # Phase transition logic
             next_question = None
             final_report = None
             resume_text, jd_text = self._get_profile_summaries(session)
+            conv_summary = getattr(session, 'conversation_summary', None)
 
-            if new_interest < 25.0:
-                # Interest dropped below 25 -> Natural Exit
+            # Early exit on low interest applies ONLY to unlimited or adaptive mode, NOT fixed question count
+            if new_interest < 25.0 and (session.duration_type == 'unlimited' or session.difficulty_mode == 'Adaptive'):
                 session.phase = 'Concluding'
-                next_question = "Thank you for your time today. We have enough information for our initial review and will be in touch."
+                next_question = "Thank you for your time today. We have gathered sufficient details for our evaluation and will be in touch."
 
             if session.phase == 'Concluding':
                 # The candidate answered the concluding question -> Complete
@@ -495,7 +554,7 @@ class ConversationManager:
                     final_report = {'error': str(e)}
 
             elif session.duration_type == 'questions' and session.current_index >= session.duration_value:
-                # Reached question limit -> transition to Concluding
+                # HARD QUESTION COUNT LIMIT REACHED (e.g. 5, 10, 50, 100 questions) -> transition to Concluding
                 session.phase = 'Concluding'
                 next_question = self.question_generator.generate_concluding(session.interview_type)
 
@@ -523,27 +582,29 @@ class ConversationManager:
                         evaluator_feedback=feedback,
                         interview_type=session.interview_type,
                         difficulty=effective_difficulty,
-                        sensor_data=current_metrics
+                        sensor_data=current_metrics,
+                        interviewer_interest=new_interest,
+                        conversation_summary=conv_summary,
+                        window_size=3
                     )
 
             elif session.duration_type == 'unlimited':
-                # Insane Mode (Unlimited AI evaluation length)
-                # Never auto-transition based on question count
+                # Insane Mode (Unlimited AI evaluation length guided by Evaluator Interest)
                 num_questions = len(history_dicts)
                 scores = [h.get('accuracy_score', 70.0) for h in history_dicts if h.get('accuracy_score') is not None]
                 avg_score = sum(scores) / len(scores) if scores else 70.0
 
-                # Assess whether candidate has been sufficiently evaluated (minimum 5 questions)
-                if num_questions >= 5 and avg_score >= 82.0:
-                    # Candidate clearly qualified -> transition to Concluding
+                # Assess whether candidate has been sufficiently evaluated (minimum 5 questions) based on interest & performance
+                if num_questions >= 5 and avg_score >= 82.0 and new_interest >= 75.0:
+                    # Candidate clearly qualified & high interest -> transition to Concluding
                     session.phase = 'Concluding'
                     next_question = "Thank you! You have demonstrated exceptional technical depth across all our evaluation areas. Before we wrap up, do you have any final questions for our team?"
-                elif num_questions >= 5 and avg_score < 55.0:
-                    # Candidate clearly unqualified -> transition to Concluding
+                elif num_questions >= 5 and (avg_score < 55.0 or new_interest < 30.0):
+                    # Candidate clearly unqualified or low interest -> transition to Concluding
                     session.phase = 'Concluding'
                     next_question = "Thank you very much for your time today. We have gathered sufficient evaluation details for your profile and our team will be in touch regarding next steps."
                 else:
-                    # Continue asking progressively harder/more specific questions
+                    # Continue asking dynamically generated questions
                     if session.phase == 'Warmup':
                         session.phase = 'Main'
 
@@ -560,7 +621,10 @@ class ConversationManager:
                         evaluator_feedback=feedback,
                         interview_type=session.interview_type,
                         difficulty=effective_difficulty,
-                        sensor_data=current_metrics
+                        sensor_data=current_metrics,
+                        interviewer_interest=new_interest,
+                        conversation_summary=conv_summary,
+                        window_size=3
                     )
 
             else:
@@ -568,7 +632,6 @@ class ConversationManager:
                 if session.phase == 'Warmup':
                     session.phase = 'Main'
 
-                # Load profile context
                 candidate_profile = session.candidate_profile or {}
                 match_results = session.match_results or {}
                 skill_gaps = match_results.get('skill_gap') or match_results.get('skill_gaps') or []
@@ -582,12 +645,15 @@ class ConversationManager:
                     evaluator_feedback=feedback,
                     interview_type=session.interview_type,
                     difficulty=effective_difficulty,
-                    sensor_data=current_metrics
+                    sensor_data=current_metrics,
+                    interviewer_interest=new_interest,
+                    conversation_summary=conv_summary,
+                    window_size=3
                 )
 
             # Interest-Driven Interviewer Behaviors for next question
             if session.phase not in ['Concluding', 'Completed'] and next_question:
-                is_imperfect_answer = (score < 60.0 or quality == 'Low' or len(answer.split()) < 15 or is_factual_mistake)
+                is_imperfect_answer = (score < 60.0 or quality == 'Low' or len(answer.split()) < 15 or is_factual_mistake) and quality != 'Candidate Inquiry'
                 if is_imperfect_answer:
                     if current_interest >= 70.0:
                         # High Interest (>= 70): Gently nudge candidate to give them a chance to self-correct
@@ -687,6 +753,7 @@ class ConversationManager:
                 'interviewer_interest': getattr(session, 'interviewer_interest', 50.0),
                 'job_fit_score': getattr(session, 'job_fit_score', 50.0),
                 'next_question_feedback': session.next_question_feedback,
+                'conversation_summary': getattr(session, 'conversation_summary', None),
                 'history': history,
                 'final_report': session.final_report,
             }
@@ -722,8 +789,9 @@ class ConversationManager:
 
     def _get_effective_difficulty(self, session, history_dicts: List[Dict]) -> str:
         """
-        For Adaptive mode or Insane mode, compute difficulty based on running average score.
-        For fixed modes, return the configured difficulty.
+        For Adaptive mode or Insane mode, compute dynamic difficulty based on candidate score
+        and live interviewer interest telemetry.
+        For fixed modes (Beginner, Intermediate, Advanced), return the configured difficulty.
         """
         if not session:
             return 'Intermediate'
@@ -739,10 +807,14 @@ class ConversationManager:
 
         recent_scores = scores[-3:]
         avg_score = sum(recent_scores) / len(recent_scores)
+        interest = getattr(session, 'interviewer_interest', 50.0) or 50.0
 
-        if avg_score >= 78.0:
+        # Combine performance score and interviewer interest telemetry
+        combined_metric = (avg_score * 0.7) + (interest * 0.3)
+
+        if combined_metric >= 76.0:
             return 'Advanced'
-        elif avg_score >= 55.0:
+        elif combined_metric >= 55.0:
             return 'Intermediate'
         else:
             return 'Beginner'
