@@ -1,525 +1,62 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
+<html class="dark" lang="en">
+<head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Resume Intelligence - Keiko Intelligence</title>
+<title>Resume Intelligence — KEIKO</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "secondary-fixed-dim": "#adc6ff",
-                      "inverse-primary": "#732ee4",
-                      "text-secondary": "#A1A1AA",
-                      "outline": "#958da1",
-                      "inverse-on-surface": "#313031",
-                      "background": "#131314",
-                      "surface-tint": "#d2bbff",
-                      "on-primary-fixed-variant": "#5a00c6",
-                      "tertiary-fixed-dim": "#4fdbc8",
-                      "primary-fixed": "#eaddff",
-                      "on-secondary-fixed-variant": "#004395",
-                      "on-error": "#690005",
-                      "surface-container-lowest": "#0e0e0f",
-                      "surface-base": "#0A0A0B",
-                      "secondary-container": "#0566d9",
-                      "tertiary-fixed": "#71f8e4",
-                      "on-primary-container": "#ede0ff",
-                      "primary-fixed-dim": "#d2bbff",
-                      "danger": "#EF4444",
-                      "secondary-fixed": "#d8e2ff",
-                      "accent-gradient": "linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #14B8A6 100%)",
-                      "on-surface": "#e5e2e3",
-                      "surface-dim": "#131314",
-                      "surface-container-high": "#2a2a2b",
-                      "surface-bright": "#3a393a",
-                      "on-error-container": "#ffdad6",
-                      "surface": "#131314",
-                      "on-tertiary-fixed-variant": "#005048",
-                      "inverse-surface": "#e5e2e3",
-                      "surface-glass": "rgba(20, 20, 22, 0.7)",
-                      "outline-variant": "#4a4455",
-                      "error": "#ffb4ab",
-                      "text-supporting": "#71717A",
-                      "on-tertiary": "#003731",
-                      "surface-container-low": "#1c1b1c",
-                      "on-primary-fixed": "#25005a",
-                      "on-secondary-fixed": "#001a42",
-                      "surface-container-highest": "#353436",
-                      "on-tertiary-container": "#75fce8",
-                      "tertiary": "#4fdbc8",
-                      "on-background": "#e5e2e3",
-                      "on-tertiary-fixed": "#00201c",
-                      "on-secondary": "#002e6a",
-                      "text-primary": "#F4F4F5",
-                      "surface-variant": "#353436",
-                      "on-primary": "#3f008e",
-                      "primary-container": "#7c3aed",
-                      "surface-container": "#201f20",
-                      "secondary": "#adc6ff",
-                      "tertiary-container": "#007468",
-                      "on-secondary-container": "#e6ecff",
-                      "surface-raised": "#141416",
-                      "primary": "#d2bbff",
-                      "on-surface-variant": "#ccc3d8",
-                      "error-container": "#93000a"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.25rem",
-                      "lg": "0.5rem",
-                      "xl": "0.75rem",
-                      "full": "9999px"
-              },
-              "spacing": {
-                      "section-mobile": "96px",
-                      "margin-desktop": "64px",
-                      "section-desktop": "160px",
-                      "gutter": "24px",
-                      "base": "8px",
-                      "section-tablet": "120px",
-                      "micro": "4px"
-              },
-              "fontFamily": {
-                      "body-small": ["Inter"],
-                      "display-xl": ["Space Grotesk"],
-                      "heading-l": ["Space Grotesk"],
-                      "display-xl-mobile": ["Space Grotesk"],
-                      "heading-xl": ["Space Grotesk"],
-                      "display-l": ["Space Grotesk"],
-                      "mono-label": ["IBM Plex Mono"],
-                      "heading-m": ["Space Grotesk"],
-                      "body-large": ["Inter"],
-                      "body": ["Inter"]
-              },
-              "fontSize": {
-                      "body-small": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
-                      "display-xl": ["72px", { "lineHeight": "80px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
-                      "heading-l": ["24px", { "lineHeight": "32px", "fontWeight": "500" }],
-                      "display-xl-mobile": ["40px", { "lineHeight": "48px", "fontWeight": "700" }],
-                      "heading-xl": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
-                      "display-l": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-                      "mono-label": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
-                      "heading-m": ["20px", { "lineHeight": "28px", "fontWeight": "500" }],
-                      "body-large": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
-                      "body": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
-              }
-      },
-          },
-        }
-    </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-        body { background-color: #131314; color: #F4F4F5; overflow-x: hidden; }
-        .glass-panel {
-            background: rgba(28, 27, 28, 0.4);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(210, 187, 255, 0.1);
-        }
-        .glass-panel:hover {
-            border-color: rgba(124, 58, 237, 0.4);
-            box-shadow: 0 0 20px rgba(124, 58, 237, 0.1);
-        }
-        .text-gradient {
-            background: linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #14B8A6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-        .pulse-border { animation: pulseBorder 3s infinite; }
-        @keyframes pulseBorder {
-            0% { border-color: rgba(79, 219, 200, 0.2); }
-            50% { border-color: rgba(79, 219, 200, 0.6); }
-            100% { border-color: rgba(79, 219, 200, 0.2); }
-        }
-    </style>
+body { background-color: #0a0b10; font-family: 'Inter', sans-serif; color: #F4F4F5; }
+.font-display { font-family: 'Space Grotesk', sans-serif; }
+.font-mono { font-family: 'IBM Plex Mono', monospace; }
+.glass-panel { background: rgba(18, 21, 30, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+.glass-card { background: rgba(26, 30, 43, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); }
+</style>
 </head>
-<body class="font-body text-body bg-background antialiased selection:bg-primary-container selection:text-white">
-<!-- TopNavBar Component -->
-<!-- KEIKO TopNavBar -->
-<nav class="fixed top-0 w-full z-50 bg-[#050506]/50 backdrop-blur-lg border-b border-white/5 h-20">
-  <div class="flex justify-between items-center h-full px-8 max-w-[1440px] mx-auto w-full">
-    <a href="/" class="hover:opacity-90 transition-opacity"><img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-10"></a>
-    <div class="hidden md:flex items-center space-x-8">
-      <a id="nav-about" class="text-sm text-gray-400 hover:text-white transition-colors" href="about">About</a>
-      <a id="nav-interview-journey" class="text-sm text-gray-400 hover:text-white transition-colors" href="interview-journey">Journey</a>
-      <a id="nav-features" class="text-sm text-gray-400 hover:text-white transition-colors" href="features">Features</a>
-      <a id="nav-architecture" class="text-sm text-gray-400 hover:text-white transition-colors" href="architecture">Architecture</a>
-      <a id="nav-download" class="text-sm text-gray-400 hover:text-white transition-colors" href="download">Download</a>
-    </div>
-    <a class="bg-[#7c3aed] text-white px-6 py-2 rounded-full font-bold text-sm transition-all hover:scale-105 hover:opacity-90 active:scale-95 shadow-lg shadow-purple-500/20" href="experience">
-      Experience KEIKO
+<body class="min-h-screen flex flex-col">
+
+<header class="glass-panel sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-white/10">
+    <a href="index.html" class="flex items-center gap-2 text-cyan-400 font-display text-xl font-bold tracking-wider">
+        <span class="material-symbols-outlined text-2xl">description</span> KEIKO INTELLIGENCE
     </a>
-  </div>
-</nav>
-<!-- Hero Section -->
-<header class="relative w-full min-h-[90vh] flex items-center justify-center pt-24 overflow-hidden">
-<!-- STITCH_SHADER_START:ANIMATION_62 class="absolute inset-0 w-full h-full opacity-40 mix-blend-screen" -->
-<div class="absolute inset-0 w-full h-full opacity-40 mix-blend-screen" style="display:block;">
-<canvas id="shader-canvas-ANIMATION_62" style="display:block;width:100%;height:100%"></canvas>
-<script>
-(function() {
-  const canvas = document.getElementById('shader-canvas-ANIMATION_62');
-
-  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
-  // This fires on initial layout and whenever the element is resized.
-  function syncSize() {
-    const w = canvas.clientWidth  || 1280;
-    const h = canvas.clientHeight || 720;
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width  = w;
-      canvas.height = h;
-    }
-  }
-  if (typeof ResizeObserver !== 'undefined') {
-    new ResizeObserver(syncSize).observe(canvas);
-  }
-  syncSize();
-
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-  if (!gl) return;
-  const vs = `attribute vec2 a_position;
-varying vec2 v_texCoord;
-void main() {
-  v_texCoord = a_position * 0.5 + 0.5;
-  gl_Position = vec4(a_position, 0.0, 1.0);
-}`;
-  const fs = `precision highp float;
-uniform float u_time;
-uniform vec2 u_resolution;
-uniform vec2 u_mouse;
-varying vec2 v_texCoord;
-
-float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-}
-
-float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    f = f * f * (3.0 - 2.0 * f);
-    return mix(mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), f.x),
-               mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
-}
-
-void main() {
-    vec2 uv = v_texCoord;
-    vec2 mouse = u_mouse / u_resolution;
-    
-    // Background color #131314
-    vec3 color = vec3(0.0745, 0.0745, 0.0784);
-    
-    // Scanning line representing data extraction
-    float scanPos = fract(u_time * 0.15);
-    float scanLine = smoothstep(0.01, 0.0, abs(uv.y - scanPos));
-    color += scanLine * vec3(0.486, 0.227, 0.929) * 0.15; // Violet scan
-    
-    // Floating data clusters (particles)
-    float n = noise(uv * 8.0 + u_time * 0.1);
-    float particles = smoothstep(0.48, 0.5, n) * 0.04;
-    color += particles * vec3(0.08, 0.72, 0.65); // Teal particles
-    
-    // Technical Grid
-    vec2 grid = fract(uv * 30.0);
-    float g = (smoothstep(0.03, 0.0, grid.x) + smoothstep(0.03, 0.0, grid.y)) * 0.02;
-    color += g;
-    
-    // Interaction Glow
-    float dist = distance(uv, mouse);
-    float glow = smoothstep(0.5, 0.0, dist) * 0.08;
-    color += glow * vec3(0.486, 0.227, 0.929);
-    
-    gl_FragColor = vec4(color, 1.0);
-}`;
-  function cs(type, src) {
-    const s = gl.createShader(type);
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    return s;
-  }
-  const prog = gl.createProgram();
-  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
-  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
-  gl.linkProgram(prog);
-  gl.useProgram(prog);
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-  const pos = gl.getAttribLocation(prog, 'a_position');
-  gl.enableVertexAttribArray(pos);
-  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-  const uTime = gl.getUniformLocation(prog, 'u_time');
-  const uRes = gl.getUniformLocation(prog, 'u_resolution');
-  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
-
-  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
-  // Shaders that need normalized coords should use: u_mouse / u_resolution.
-  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
-  window.addEventListener('mousemove', (event) => {
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width && rect.height) {
-      const nx = (event.clientX - rect.left) / rect.width;
-      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
-      mouse.x = nx * canvas.width;
-      mouse.y = ny * canvas.height;
-    }
-  });
-
-  function render(t) {
-    if (typeof ResizeObserver === 'undefined') syncSize();
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    if (uTime) gl.uniform1f(uTime, t * 0.001);
-    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
-    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    requestAnimationFrame(render);
-  }
-  render(0);
-})();
-</script>
-</div>
-<!-- STITCH_SHADER_END:ANIMATION_62 -->
-<div class="relative z-10 w-full max-w-[1280px] mx-auto px-gutter grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-<div class="flex flex-col gap-6 reveal active">
-<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-surface-container-high bg-surface-raised w-fit">
-<span class="material-symbols-outlined text-[14px] text-tertiary">memory</span>
-<span class="font-mono-label text-mono-label text-text-supporting tracking-wider uppercase">Module 01 // Analysis</span>
-</div>
-<h1 class="font-display-xl-mobile md:font-display-xl text-display-xl-mobile md:text-display-xl text-text-primary">
-                    Every Great Interview Starts With <span class="text-gradient">Understanding.</span>
-</h1>
-<p class="font-body-large text-body-large text-text-secondary max-w-xl">
-                    Before asking a single question, KEIKO meticulously studies the candidate's resume to build a profound understanding of their experience, skills, education, projects, and achievements.
-                </p>
-</div>
-<div class="relative w-full aspect-square md:aspect-auto md:h-[600px] reveal active delay-200">
-<img alt="Abstract 3D visualization of layered glass plates with glowing circuitry representing data extraction from a resume structure in a dark, high-tech environment." class="w-full h-full object-contain rounded-2xl" src="https://lh3.googleusercontent.com/aida/AP1WRLvDz1rNisnz079_ff0dUXT4yGgmOmtH_8-bzSlGfChA60VKhrCejsaY4hbh1pv8396nkz7Pvy-idy0rbq2pcZJGOsn6GdfIHFqeedGuJLSpdQDiuFu7U6fX8UBco4nvyYNoe7_curW0rvfXsgBGFsl3eWqqGuFVlitBTSshhH4QGKZoVgVBfhAWH_muxEP2eF-rkaDjuo_evgfw7gkFNxYiDlOLnwRmuEpTPQrBp1dZn7EfUbc1fG9suH8"/>
-</div>
-</div>
+    <div class="flex items-center gap-4 text-sm">
+        <a href="resume-intelligence.html" class="text-cyan-400 font-semibold">Resume Intel</a>
+        <a href="job-intelligence.html" class="text-text-secondary hover:text-white transition">JD Intel</a>
+        <a href="video-intelligence.html" class="text-text-secondary hover:text-white transition">Video Intel</a>
+        <a href="audio-intelligence.html" class="text-text-secondary hover:text-white transition">Audio Intel</a>
+        <a href="interview-intelligence.html" class="text-text-secondary hover:text-white transition">Central Engine</a>
+    </div>
 </header>
-<!-- Chapter 1: Context Creates Better Conversations -->
-<section class="py-section-mobile md:py-section-desktop w-full relative">
-<div class="max-w-[1280px] mx-auto px-gutter reveal">
-<div class="mb-16 max-w-3xl">
-<h2 class="font-display-l text-display-l text-text-primary mb-6">Context Creates Better Conversations</h2>
-<p class="font-body-large text-body-large text-text-secondary">
-                    Interviews fail when they feel like generic interrogations. KEIKO transforms the dynamic by deeply ingesting the applicant's history, allowing for highly relevant, targeted discussions that respect the candidate's actual background.
-                </p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
-<div class="glass-panel rounded-2xl p-8 flex flex-col gap-4">
-<div class="flex items-center gap-3 text-text-supporting mb-4">
-<span class="material-symbols-outlined text-outline">robot_2</span>
-<span class="font-mono-label text-mono-label uppercase">Standard Systems</span>
-</div>
-<ul class="flex flex-col gap-4">
-<li class="flex items-start gap-3">
-<span class="material-symbols-outlined text-danger text-[20px] mt-1">close</span>
-<span class="font-body text-body text-text-secondary">Ask generic, pre-programmed questions.</span>
-</li>
-<li class="flex items-start gap-3">
-<span class="material-symbols-outlined text-danger text-[20px] mt-1">close</span>
-<span class="font-body text-body text-text-secondary">Ignore specific project details and nuanced experience.</span>
-</li>
-<li class="flex items-start gap-3">
-<span class="material-symbols-outlined text-danger text-[20px] mt-1">close</span>
-<span class="font-body text-body text-text-secondary">Treat all candidates for a role identically.</span>
-</li>
-</ul>
-</div>
-<div class="glass-panel rounded-2xl p-8 flex flex-col gap-4 border-primary/30 pulse-border relative overflow-hidden">
-<div class="absolute inset-0 bg-gradient-to-br from-primary-container/10 to-transparent pointer-events-none"></div>
-<div class="flex items-center gap-3 text-primary mb-4 relative z-10">
-<span class="material-symbols-outlined">psychology</span>
-<span class="font-mono-label text-mono-label uppercase">KEIKO Intelligence</span>
-</div>
-<ul class="flex flex-col gap-4 relative z-10">
-<li class="flex items-start gap-3">
-<span class="material-symbols-outlined text-tertiary text-[20px] mt-1">check</span>
-<span class="font-body text-body text-text-primary">Generates bespoke questions based on actual resume claims.</span>
-</li>
-<li class="flex items-start gap-3">
-<span class="material-symbols-outlined text-tertiary text-[20px] mt-1">check</span>
-<span class="font-body text-body text-text-primary">Probes deeply into specific past projects and architectural choices.</span>
-</li>
-<li class="flex items-start gap-3">
-<span class="material-symbols-outlined text-tertiary text-[20px] mt-1">check</span>
-<span class="font-body text-body text-text-primary">Adapts the conversation flow dynamically to the candidate's unique profile.</span>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</section>
-<!-- Chapter 2: Understanding the Candidate (Bento Grid) -->
-<section class="py-section-mobile md:py-section-desktop bg-surface-container-low w-full border-t border-surface-container-high/50">
-<div class="max-w-[1280px] mx-auto px-gutter reveal">
-<div class="mb-16 text-center max-w-2xl mx-auto">
-<h2 class="font-heading-xl text-heading-xl text-text-primary mb-4">Multi-Dimensional Extraction</h2>
-<p class="font-body text-body text-text-secondary">KEIKO deconstructs documents into structured semantic layers, identifying the hidden relationships between discrete pieces of information.</p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-4 h-auto md:h-[600px]">
-<div class="glass-panel rounded-2xl p-6 md:col-span-2 md:row-span-1 group relative overflow-hidden flex flex-col justify-end">
-<div class="absolute inset-0 bg-[url('placeholder')] bg-cover bg-center opacity-20 group-hover:opacity-40 transition-opacity duration-500" data-alt="A dark, sleek interface visualization showing interconnected nodes representing complex project architecture and team structures, illuminated by subtle teal and violet lines."></div>
-<div class="relative z-10">
-<span class="material-symbols-outlined text-tertiary mb-2">work_history</span>
-<h3 class="font-heading-m text-heading-m text-text-primary mb-2">Experience &amp; Trajectory</h3>
-<p class="font-body-small text-body-small text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">Analyzing career progression, role scope, and tenure to understand professional maturity and adaptability over time.</p>
-</div>
-</div>
-<div class="glass-panel rounded-2xl p-6 md:col-span-1 md:row-span-1 group relative overflow-hidden flex flex-col justify-end bg-surface-raised">
-<div class="relative z-10">
-<span class="material-symbols-outlined text-primary mb-2">school</span>
-<h3 class="font-heading-m text-heading-m text-text-primary mb-2">Academic Foundation</h3>
-<p class="font-body-small text-body-small text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">Validating degrees, certifications, and specialized coursework relevant to the targeted technical domain.</p>
-</div>
-</div>
-<div class="glass-panel rounded-2xl p-6 md:col-span-1 md:row-span-1 group relative overflow-hidden flex flex-col justify-end bg-surface-raised">
-<div class="relative z-10">
-<span class="material-symbols-outlined text-secondary mb-2">build_circle</span>
-<h3 class="font-heading-m text-heading-m text-text-primary mb-2">Technical Artifacts</h3>
-<p class="font-body-small text-body-small text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">Extracting specific repositories, portfolio links, and tangible outputs that demonstrate practical capability.</p>
-</div>
-</div>
-<div class="glass-panel rounded-2xl p-6 md:col-span-2 md:row-span-1 group relative overflow-hidden flex flex-col justify-end">
-<div class="absolute inset-0 bg-gradient-to-t from-background to-transparent z-0"></div>
-<div class="relative z-10">
-<span class="material-symbols-outlined text-inverse-primary mb-2">hub</span>
-<h3 class="font-heading-m text-heading-m text-text-primary mb-2">Core Competencies</h3>
-<p class="font-body-small text-body-small text-text-secondary opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">Mapping explicit and implicit skills, categorizing them by proficiency, recency of use, and relevance to the role.</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- Chapter 6 & 7: Architecture & Ethics -->
-<section class="py-section-mobile md:py-section-desktop w-full relative overflow-hidden">
-<div class="max-w-[1280px] mx-auto px-gutter reveal">
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-section-tablet">
-<div class="order-2 lg:order-1 relative w-full rounded-2xl overflow-hidden glass-panel h-[400px] flex items-center justify-center p-8">
-<img alt="A conceptual 3D render showing a robotic arm scanning transparent data panels, glowing with vivid violet and blue fiber optic connections representing data processing in a minimalist tech setting." class="w-full h-full object-cover mix-blend-lighten opacity-80 rounded-xl" src="https://lh3.googleusercontent.com/aida/AP1WRLtd1mM25fvweBuFXuJmOkKj2MNab-MWZL0d9931Y7hbjjzNqxf5iqEuRIriuGMGt1mq6fryjP8GBOaTNt1ePbMwkWWfp6blljijqsa014AvQvbqElnGmEee2ZUjjKlmHEkmXgmR3t6UE8nqDEIf2l4ExzrjjDitg8WQVnn-sQ83HZo19DAgJZJ5VB_o8PytWWgsdKeoTDdduga7gKfPr5FobZ994vX1cUwKdHtYze3OSTKMXwHiQ9nbUlRp"/>
-</div>
-<div class="order-1 lg:order-2 flex flex-col gap-6">
-<h2 class="font-heading-xl text-heading-xl text-text-primary">Centralized Intelligence</h2>
-<p class="font-body-large text-body-large text-text-secondary">
-                        Resume parsing is not a siloed step. The generated Intelligence Profile acts as the central nervous system for the entire evaluation process, feeding context directly to the Interview and Evaluation modules in real-time.
-                    </p>
-<div class="flex flex-col gap-3 mt-4">
-<div class="flex items-center gap-4 bg-surface-container-high/30 p-4 rounded-lg">
-<span class="material-symbols-outlined text-primary">arrow_forward</span>
-<span class="font-mono-label text-mono-label text-text-primary">Job Intelligence Module</span>
-</div>
-<div class="flex items-center gap-4 bg-surface-container-high/30 p-4 rounded-lg">
-<span class="material-symbols-outlined text-tertiary">arrow_forward</span>
-<span class="font-mono-label text-mono-label text-text-primary">Interview Reasoning Engine</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Ethics Banner -->
-<div class="w-full glass-panel border-l-4 border-l-tertiary rounded-r-2xl p-8 md:p-12 relative overflow-hidden mt-16">
-<div class="absolute right-0 top-0 w-64 h-64 bg-tertiary/5 blur-[100px] rounded-full pointer-events-none"></div>
-<div class="relative z-10 flex flex-col md:flex-row gap-8 items-start md:items-center">
-<div class="flex-shrink-0 bg-surface-raised p-4 rounded-full border border-surface-container-high">
-<span class="material-symbols-outlined text-[32px] text-tertiary">gavel</span>
-</div>
-<div>
-<h3 class="font-heading-l text-heading-l text-text-primary mb-3">Designed for Understanding, Not Judgment</h3>
-<p class="font-body text-body text-text-secondary max-w-3xl">
-                            KEIKO explicitly does not auto-reject candidates or determine final outcomes autonomously. The Intelligence Profile is designed solely to equip the interviewer (whether human or AI) with the deepest possible context to conduct a fair, rigorous, and relevant conversation.
-                        </p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- CTA Section -->
-<section class="py-section-desktop w-full relative flex items-center justify-center text-center">
-<div class="absolute inset-0 bg-gradient-to-b from-transparent to-surface-container-lowest z-0 pointer-events-none"></div>
-<div class="relative z-10 flex flex-col items-center gap-8 reveal">
-<h2 class="font-display-l text-display-l text-text-primary max-w-2xl">Ready to see how context powers the conversation?</h2>
-<a class="inline-flex items-center justify-center gap-2 bg-primary-container text-white px-8 py-4 rounded-full font-body-large text-body-large hover:shadow-[0_0_30px_rgba(124,58,237,0.3)] transition-all duration-300" href="#">
-                Continue to Job Intelligence
-                <span class="material-symbols-outlined">arrow_forward</span>
-</a>
-</div>
-</section>
-<!-- Footer Component -->
-<!-- KEIKO Footer -->
-<footer class="bg-[#0A0A0B] border-t border-white/10 w-full py-16 mt-32">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-8 max-w-[1440px] mx-auto">
-    <div class="lg:col-span-1">
-      <div><img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-12 mb-4"></div>
-      <p class="text-sm text-gray-500 mb-6 max-w-xs" style="font-family:'Inter',sans-serif">Engineering-grade intelligence for the modern technical interview.</p>
-      <p class="text-xs text-gray-600" style="font-family:'Inter',sans-serif">&copy; 2026 KEIKO Intelligence. All rights reserved.</p>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Platform</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="about">About Us</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="interview-journey">Interview Journey</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="features">Features</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="architecture">Architecture</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="download">Download Engine</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="experience">Experience KEIKO</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Resources</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation">Documentation</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation">API Configuration</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#changelogs">Roadmap</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#opensource">Open Source</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#faq">FAQ</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="documentation.html#changelogs">Changelog</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Legal</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Privacy Policy</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Terms of Service</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Contact Research</a></li>
-      </ul>
-    </div>
-  </div>
-</footer>
-<script>
-        // Simple reveal on scroll script
-        document.addEventListener("DOMContentLoaded", () => {
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1
-            };
 
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
+<main class="flex-1 p-6 space-y-6 max-w-[1600px] mx-auto w-full">
+    <div class="glass-panel p-6 rounded-2xl">
+        <h1 class="font-display text-3xl font-bold text-white flex items-center gap-3">
+            <span class="material-symbols-outlined text-cyan-400 text-4xl">badge</span> Resume Intelligence Module
+        </h1>
+        <p class="text-gray-400 mt-1">Automated CV parser, skill extraction matrix, experience timeline scoring, and red-flag detection engine.</p>
+    </div>
 
-            document.querySelectorAll('.reveal').forEach((element) => {
-                observer.observe(element);
-            });
-        });
-    </script>
-<script>
-(function(){
-  var p = window.location.pathname.split('/').pop() || 'index.html';
-  var m = {'about.html':'nav-about','interview-journey.html':'nav-journey','features.html':'nav-features','architecture.html':'nav-architecture'};
-  var id = m[p];
-  if(id){var el=document.getElementById(id);if(el){el.style.color='#d2bbff';el.style.fontWeight='bold';el.style.borderBottom='2px solid #d2bbff';el.style.paddingBottom='4px';}}
-})();
-</script>
-</body></html>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="glass-card p-5 rounded-xl">
+            <span class="text-xs font-mono text-gray-400 uppercase">Total Resumes</span>
+            <div class="font-display text-3xl font-bold text-white mt-1">1,284</div>
+        </div>
+        <div class="glass-card p-5 rounded-xl">
+            <span class="text-xs font-mono text-gray-400 uppercase">Avg Score</span>
+            <div class="font-display text-3xl font-bold text-cyan-400 mt-1">88.5</div>
+        </div>
+        <div class="glass-card p-5 rounded-xl">
+            <span class="text-xs font-mono text-gray-400 uppercase">Match Rate</span>
+            <div class="font-display text-3xl font-bold text-emerald-400 mt-1">92.0%</div>
+        </div>
+        <div class="glass-card p-5 rounded-xl">
+            <span class="text-xs font-mono text-gray-400 uppercase">Parsing Speed</span>
+            <div class="font-display text-3xl font-bold text-purple-400 mt-1">120 ms</div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

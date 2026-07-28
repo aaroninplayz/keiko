@@ -1,577 +1,440 @@
 <!DOCTYPE html>
-
-<html class="dark" lang="en"><head>
+<html class="dark" lang="en">
+<head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Evaluation Engine — KEIKO</title>
+<title>Central Evaluation Engine — KEIKO Master Candidate Intelligence</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "on-tertiary-container": "#75fce8",
-                      "tertiary-fixed": "#71f8e4",
-                      "on-error": "#690005",
-                      "surface-variant": "#353436",
-                      "surface-tint": "#d2bbff",
-                      "background": "#131314",
-                      "secondary-fixed": "#d8e2ff",
-                      "error": "#ffb4ab",
-                      "text-secondary": "#A1A1AA",
-                      "on-error-container": "#ffdad6",
-                      "primary-fixed-dim": "#d2bbff",
-                      "secondary": "#adc6ff",
-                      "primary-container": "#7c3aed",
-                      "on-secondary-fixed-variant": "#004395",
-                      "on-background": "#e5e2e3",
-                      "text-primary": "#F4F4F5",
-                      "on-primary-fixed": "#25005a",
-                      "tertiary": "#4fdbc8",
-                      "surface-container-lowest": "#0e0e0f",
-                      "inverse-on-surface": "#313031",
-                      "surface": "#131314",
-                      "on-secondary": "#002e6a",
-                      "on-surface": "#e5e2e3",
-                      "inverse-primary": "#732ee4",
-                      "surface-bright": "#3a393a",
-                      "accent-gradient": "linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #14B8A6 100%)",
-                      "tertiary-fixed-dim": "#4fdbc8",
-                      "surface-container-low": "#1c1b1c",
-                      "error-container": "#93000a",
-                      "on-tertiary": "#003731",
-                      "on-primary-fixed-variant": "#5a00c6",
-                      "surface-dim": "#131314",
-                      "danger": "#EF4444",
-                      "text-supporting": "#71717A",
-                      "surface-container-highest": "#353436",
-                      "surface-base": "#0A0A0B",
-                      "tertiary-container": "#007468",
-                      "on-secondary-fixed": "#001a42",
-                      "surface-container-high": "#2a2a2b",
-                      "outline": "#958da1",
-                      "on-tertiary-fixed-variant": "#005048",
-                      "on-surface-variant": "#ccc3d8",
-                      "secondary-container": "#0566d9",
-                      "on-secondary-container": "#e6ecff",
-                      "primary-fixed": "#eaddff",
-                      "on-tertiary-fixed": "#00201c",
-                      "surface-container": "#201f20",
-                      "secondary-fixed-dim": "#adc6ff",
-                      "on-primary": "#3f008e",
-                      "surface-raised": "#141416",
-                      "primary": "#d2bbff",
-                      "inverse-surface": "#e5e2e3",
-                      "surface-glass": "rgba(20, 20, 22, 0.7)",
-                      "outline-variant": "#4a4455",
-                      "on-primary-container": "#ede0ff"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.25rem",
-                      "lg": "0.5rem",
-                      "xl": "0.75rem",
-                      "full": "9999px"
-              },
-              "spacing": {
-                      "section-desktop": "160px",
-                      "base": "8px",
-                      "section-mobile": "96px",
-                      "margin-desktop": "64px",
-                      "gutter": "24px",
-                      "section-tablet": "120px",
-                      "micro": "4px"
-              },
-              "fontFamily": {
-                      "display-l": ["Space Grotesk"],
-                      "body-large": ["Inter"],
-                      "body": ["Inter"],
-                      "mono-label": ["IBM Plex Mono"],
-                      "display-xl-mobile": ["Space Grotesk"],
-                      "body-small": ["Inter"],
-                      "heading-xl": ["Space Grotesk"],
-                      "heading-m": ["Space Grotesk"],
-                      "heading-l": ["Space Grotesk"],
-                      "display-xl": ["Space Grotesk"]
-              },
-              "fontSize": {
-                      "display-l": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
-                      "body-large": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
-                      "body": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
-                      "mono-label": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
-                      "display-xl-mobile": ["40px", {"lineHeight": "48px", "fontWeight": "700"}],
-                      "body-small": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
-                      "heading-xl": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
-                      "heading-m": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
-                      "heading-l": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
-                      "display-xl": ["72px", {"lineHeight": "80px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
-              }
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                "background": "#0a0b10",
+                "surface": "#12151e",
+                "surface-container": "#1a1e2b",
+                "primary": "#00f2fe",
+                "secondary": "#4facfe",
+                "accent": "#7f00ff",
+                "text-primary": "#F4F4F5",
+                "text-secondary": "#A1A1AA",
+                "border-subtle": "rgba(255, 255, 255, 0.08)"
             }
-          }
         }
-    </script>
+    }
+}
+</script>
 <style>
-        body {
-            background-color: #131314;
-            color: #F4F4F5;
-        }
-        .glass-card {
-            background: rgba(20, 20, 22, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(74, 68, 85, 0.2);
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #14B8A6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .cyber-line {
-            position: relative;
-        }
-        .cyber-line::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.3), transparent);
-            transform: translateY(-50%);
-            z-index: -1;
-        }
-    </style>
+body { background-color: #0a0b10; font-family: 'Inter', sans-serif; color: #F4F4F5; }
+.font-display { font-family: 'Space Grotesk', sans-serif; }
+.font-mono { font-family: 'IBM Plex Mono', monospace; }
+.glass-panel { background: rgba(18, 21, 30, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+.glass-card { background: rgba(26, 30, 43, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); }
+.badge-recommend { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+</style>
 </head>
-<body class="font-body text-body antialiased relative min-h-screen flex flex-col overflow-x-hidden">
-<!-- Global Background Shader -->
-<div class="fixed inset-0 z-[-1] pointer-events-none opacity-40">
-<!-- STITCH_SHADER_START:ANIMATION_65 class="absolute inset-0 w-full h-full" -->
-<div class="absolute inset-0 w-full h-full" style="display:block;">
-<canvas id="shader-canvas-ANIMATION_65" style="display:block;width:100%;height:100%"></canvas>
-<script>
-(function() {
-  const canvas = document.getElementById('shader-canvas-ANIMATION_65');
+<body class="min-h-screen flex flex-col">
 
-  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
-  // This fires on initial layout and whenever the element is resized.
-  function syncSize() {
-    const w = canvas.clientWidth  || 1280;
-    const h = canvas.clientHeight || 720;
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width  = w;
-      canvas.height = h;
-    }
-  }
-  if (typeof ResizeObserver !== 'undefined') {
-    new ResizeObserver(syncSize).observe(canvas);
-  }
-  syncSize();
-
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-  if (!gl) return;
-  const vs = `attribute vec2 a_position;
-varying vec2 v_texCoord;
-void main() {
-  v_texCoord = a_position * 0.5 + 0.5;
-  gl_Position = vec4(a_position, 0.0, 1.0);
-}`;
-  const fs = `precision highp float;
-uniform float u_time;
-uniform vec2 u_resolution;
-uniform vec2 u_mouse;
-varying vec2 v_texCoord;
-
-float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-}
-
-float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    f = f * f * (3.0 - 2.0 * f);
-    return mix(mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), f.x),
-               mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
-}
-
-void main() {
-    vec2 uv = v_texCoord;
-    vec2 mouse = u_mouse / u_resolution;
-    
-    // Obsidian background #131314
-    vec3 color = vec3(0.0745, 0.0745, 0.0784);
-    
-    // Convergence flow: multiple points moving toward center
-    vec2 center = vec2(0.5, 0.5);
-    vec2 toCenter = center - uv;
-    float dist = length(toCenter);
-    
-    // Technical Grid
-    vec2 grid = fract(uv * 20.0);
-    float g = (smoothstep(0.03, 0.0, grid.x) + smoothstep(0.03, 0.0, grid.y)) * 0.03;
-    color += g;
-    
-    // Pulse field
-    float n = noise(uv * 4.0 + u_time * 0.1);
-    float pulse = smoothstep(0.4, 0.5, n) * 0.04;
-    color += pulse * vec3(0.486, 0.227, 0.929); // Violet
-    
-    // Convergence "data" streams
-    float scan = smoothstep(0.1, 0.0, abs(dist - fract(u_time * 0.2) * 0.8));
-    color += scan * vec3(0.08, 0.72, 0.65) * 0.1; // Teal scan
-    
-    // Mouse interaction
-    float dMouse = distance(uv, mouse);
-    float glow = smoothstep(0.4, 0.0, dMouse) * 0.06;
-    color += glow * vec3(0.23, 0.51, 0.96); // Blue
-    
-    gl_FragColor = vec4(color, 1.0);
-}`;
-  function cs(type, src) {
-    const s = gl.createShader(type);
-    gl.shaderSource(s, src);
-    gl.compileShader(s);
-    return s;
-  }
-  const prog = gl.createProgram();
-  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
-  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
-  gl.linkProgram(prog);
-  gl.useProgram(prog);
-  const buf = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-  const pos = gl.getAttribLocation(prog, 'a_position');
-  gl.enableVertexAttribArray(pos);
-  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
-  const uTime = gl.getUniformLocation(prog, 'u_time');
-  const uRes = gl.getUniformLocation(prog, 'u_resolution');
-  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
-
-  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
-  // Shaders that need normalized coords should use: u_mouse / u_resolution.
-  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
-  window.addEventListener('mousemove', (event) => {
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width && rect.height) {
-      const nx = (event.clientX - rect.left) / rect.width;
-      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
-      mouse.x = nx * canvas.width;
-      mouse.y = ny * canvas.height;
-    }
-  });
-
-  function render(t) {
-    if (typeof ResizeObserver === 'undefined') syncSize();
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    if (uTime) gl.uniform1f(uTime, t * 0.001);
-    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
-    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    requestAnimationFrame(render);
-  }
-  render(0);
-})();
-</script>
-</div>
-<!-- STITCH_SHADER_END:ANIMATION_65 -->
-</div>
-<!-- Top Navigation (Shared Component) -->
-<!-- KEIKO TopNavBar -->
-<nav class="fixed top-0 w-full z-50 bg-[#131314]/85 backdrop-blur-md border-b border-white/10 h-20">
-  <div class="flex justify-between items-center h-full px-8 max-w-[1440px] mx-auto w-full">
-    <a href="dashboard.html" class="hover:opacity-90 transition-opacity"><img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-10 md:h-12"></a>
-    <div class="hidden md:flex items-center space-x-8">
-      <a class="text-sm text-gray-400 hover:text-white transition-colors" href="dashboard.html" style="font-family:'Inter',sans-serif">Dashboard</a>
-      <a class="text-sm text-gray-400 hover:text-white transition-colors" href="interview-setup.html" style="font-family:'Inter',sans-serif">Setup Session</a>
-      <a class="text-sm text-gray-400 hover:text-white transition-colors" href="settings.html" style="font-family:'Inter',sans-serif">Settings</a>
+<!-- Top Navigation Bar -->
+<header class="glass-panel sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-border-subtle">
+    <div class="flex items-center gap-4">
+        <a href="dashboard.html" class="flex items-center gap-2 text-primary font-display text-xl font-bold tracking-wider">
+            <span class="material-symbols-outlined text-2xl">psychology</span> KEIKO INTELLIGENCE
+        </a>
+        <span class="text-text-secondary">/</span>
+        <span class="font-display font-semibold text-text-primary text-lg">Central Evaluation Engine</span>
     </div>
-    <a class="bg-[#7c3aed] text-white px-6 py-2 rounded-full font-bold text-sm transition-all hover:scale-105 hover:opacity-90 active:scale-95" href="interview-setup.html" style="font-family:'Inter',sans-serif">Return to Portal</a>
-  </div>
-</nav>
-<main class="flex-grow pt-32 pb-section-desktop">
-<!-- Hero Section -->
-<section class="max-w-[1440px] mx-auto px-margin-desktop mb-section-desktop relative">
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-section-tablet items-center">
-<div class="space-y-gutter">
-<h1 class="font-display-xl text-display-xl-mobile md:text-display-xl text-on-surface">
-                        Evidence Before <br/><span class="gradient-text">Evaluation.</span>
-</h1>
-<p class="font-body-large text-body-large text-text-secondary max-w-xl">
-                        Every interview observation contributes to a structured, explainable evaluation. KEIKO prioritizes transparency, consistency, and meaningful feedback over unexplained scores.
-                    </p>
-<div class="pt-8">
-<a class="inline-flex items-center justify-center bg-primary-container text-on-primary-container px-8 py-4 rounded-full font-body text-body font-medium hover:bg-inverse-primary transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)]" href="#action">
-                            Explore the Engine
-                        </a>
-</div>
-</div>
-<div class="relative rounded-2xl overflow-hidden glass-card p-2 aspect-square flex items-center justify-center">
-<img alt="A detailed digital rendering of a central glowing processor core receiving multiple streams of neon light through transparent conduits, symbolizing data convergence. High contrast, dark obsidian background with vibrant purple and cyan accents, highly technical and precise aesthetic." class="object-cover w-full h-full rounded-xl opacity-80 mix-blend-screen" src="https://lh3.googleusercontent.com/aida/AP1WRLtzL3q0TsX6DeIlzrmNknPhEo6bPBIAKuoH_CvN9G66xF925oFv-Y3uc30rFurhDnfYGGOqzLJ2wsBN6yRdpiPhSknAlbDZ5CxP3VF3QKw4t1PM-2yjjK04g5tmL1m2dFAequsTlv0YOhfpKrsyoMTsgyRZmmZBR7o6MQO2Lai3kqhaW2ur-RRTA3jwPseubmlL5aiwYSHDNlXWx1IyFt2t_Ws260rL6CVCl1DzG6pmaTMS75lB0GFBEak1"/>
-</div>
-</div>
-</section>
-<!-- Section 1: Collecting Evidence -->
-<section class="max-w-[1440px] mx-auto px-margin-desktop mb-section-desktop">
-<div class="text-center mb-16">
-<h2 class="font-heading-xl text-heading-xl text-on-surface mb-4">The Evidence Pool</h2>
-<p class="font-body text-body text-text-secondary max-w-2xl mx-auto">Five specialized systems extract structured data to form a comprehensive understanding of the candidate.</p>
-</div>
-<div class="relative flex flex-col md:flex-row items-center justify-center gap-8 py-12 cyber-line">
-<!-- Input Nodes -->
-<div class="flex flex-col gap-4 z-10">
-<div class="glass-card px-6 py-4 rounded-xl flex items-center gap-4 w-64">
-<span class="material-symbols-outlined text-tertiary">description</span>
-<span class="font-mono-label text-mono-label text-on-surface">Resume Data</span>
-</div>
-<div class="glass-card px-6 py-4 rounded-xl flex items-center gap-4 w-64">
-<span class="material-symbols-outlined text-secondary">work</span>
-<span class="font-mono-label text-mono-label text-on-surface">Job Context</span>
-</div>
-<div class="glass-card px-6 py-4 rounded-xl flex items-center gap-4 w-64">
-<span class="material-symbols-outlined text-primary">forum</span>
-<span class="font-mono-label text-mono-label text-on-surface">Interview Transcript</span>
-</div>
-</div>
-<!-- Central Nexus -->
-<div class="glass-card p-8 rounded-full border border-primary/30 z-10 shadow-[0_0_40px_rgba(124,58,237,0.15)] flex flex-col items-center justify-center w-48 h-48">
-<span class="material-symbols-outlined text-display-l text-primary mb-2" style="font-variation-settings: 'FILL' 1;">database</span>
-<span class="font-heading-m text-heading-m text-on-surface text-center">Evidence<br/>Core</span>
-</div>
-<!-- More Inputs -->
-<div class="flex flex-col gap-4 z-10">
-<div class="glass-card px-6 py-4 rounded-xl flex items-center gap-4 w-64">
-<span class="material-symbols-outlined text-secondary-fixed">videocam</span>
-<span class="font-mono-label text-mono-label text-on-surface">Video Analytics</span>
-</div>
-<div class="glass-card px-6 py-4 rounded-xl flex items-center gap-4 w-64">
-<span class="material-symbols-outlined text-tertiary-fixed">graphic_eq</span>
-<span class="font-mono-label text-mono-label text-on-surface">Audio Patterns</span>
-</div>
-</div>
-</div>
-</section>
-<!-- Section 2: Multi-Dimensional Evaluation -->
-<section class="bg-surface-raised border-y border-outline-variant/10 py-section-desktop mb-section-desktop">
-<div class="max-w-[1440px] mx-auto px-margin-desktop">
-<div class="mb-16">
-<h2 class="font-heading-xl text-heading-xl text-on-surface mb-4">Multi-Dimensional Evaluation</h2>
-<p class="font-body text-body text-text-secondary max-w-2xl">Analysis across six critical vectors, synthesized from the raw evidence pool.</p>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-<!-- Cards -->
-<div class="glass-card p-6 rounded-2xl flex flex-col gap-4 hover:border-primary/50 transition-colors">
-<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-primary">code</span>
-</div>
-<h3 class="font-heading-m text-heading-m text-on-surface">Technical Understanding</h3>
-<p class="font-body-small text-body-small text-text-supporting flex-grow">Assesses depth of knowledge, accuracy of technical terms, and architectural reasoning.</p>
-<span class="font-mono-label text-mono-label text-primary bg-primary/10 px-3 py-1 rounded w-fit">VECTOR_01</span>
-</div>
-<div class="glass-card p-6 rounded-2xl flex flex-col gap-4 hover:border-secondary/50 transition-colors">
-<div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-secondary">record_voice_over</span>
-</div>
-<h3 class="font-heading-m text-heading-m text-on-surface">Communication</h3>
-<p class="font-body-small text-body-small text-text-supporting flex-grow">Evaluates clarity, structure of explanations, and ability to articulate complex concepts.</p>
-<span class="font-mono-label text-mono-label text-secondary bg-secondary/10 px-3 py-1 rounded w-fit">VECTOR_02</span>
-</div>
-<div class="glass-card p-6 rounded-2xl flex flex-col gap-4 hover:border-tertiary/50 transition-colors">
-<div class="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-tertiary">psychology</span>
-</div>
-<h3 class="font-heading-m text-heading-m text-on-surface">Problem Solving</h3>
-<p class="font-body-small text-body-small text-text-supporting flex-grow">Analyzes approach to novel challenges, analytical breakdown, and solution formulation.</p>
-<span class="font-mono-label text-mono-label text-tertiary bg-tertiary/10 px-3 py-1 rounded w-fit">VECTOR_03</span>
-</div>
-<div class="glass-card p-6 rounded-2xl flex flex-col gap-4 hover:border-primary-container/50 transition-colors">
-<div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-primary-container">work_history</span>
-</div>
-<h3 class="font-heading-m text-heading-m text-on-surface">Experience Alignment</h3>
-<p class="font-body-small text-body-small text-text-supporting flex-grow">Maps past experiences to required role competencies and project scales.</p>
-<span class="font-mono-label text-mono-label text-primary-container bg-primary-container/10 px-3 py-1 rounded w-fit">VECTOR_04</span>
-</div>
-<div class="glass-card p-6 rounded-2xl flex flex-col gap-4 hover:border-secondary-container/50 transition-colors">
-<div class="w-12 h-12 rounded-full bg-secondary-container/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-secondary-container">timeline</span>
-</div>
-<h3 class="font-heading-m text-heading-m text-on-surface">Interview Progress</h3>
-<p class="font-body-small text-body-small text-text-supporting flex-grow">Tracks momentum, engagement levels, and dynamic shifts throughout the session.</p>
-<span class="font-mono-label text-mono-label text-secondary-container bg-secondary-container/10 px-3 py-1 rounded w-fit">VECTOR_05</span>
-</div>
-<div class="glass-card p-6 rounded-2xl flex flex-col gap-4 hover:border-tertiary-container/50 transition-colors">
-<div class="w-12 h-12 rounded-full bg-tertiary-container/10 flex items-center justify-center">
-<span class="material-symbols-outlined text-tertiary-container">trending_up</span>
-</div>
-<h3 class="font-heading-m text-heading-m text-on-surface">Growth During Interview</h3>
-<p class="font-body-small text-body-small text-text-supporting flex-grow">Measures adaptability, response to hints, and learning speed in real-time.</p>
-<span class="font-mono-label text-mono-label text-tertiary-container bg-tertiary-container/10 px-3 py-1 rounded w-fit">VECTOR_06</span>
-</div>
-</div>
-</div>
-</section>
-<!-- Section 3: Explainability Framework -->
-<section class="max-w-[1440px] mx-auto px-margin-desktop mb-section-desktop">
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-section-tablet items-center">
-<div>
-<h2 class="font-heading-xl text-heading-xl text-on-surface mb-6">The Explainability Chain</h2>
-<p class="font-body text-body text-text-secondary mb-8">
-                        No black boxes. Every insight is traceable back to a specific observation. The logic is explicit, ensuring fair and defensible evaluations.
-                    </p>
-<div class="flex flex-col gap-2 relative">
-<div class="absolute left-6 top-6 bottom-6 w-px bg-outline-variant/30"></div>
-<div class="flex gap-6 items-start">
-<div class="w-12 h-12 rounded-full bg-surface-raised border border-outline-variant/50 flex items-center justify-center z-10 shrink-0">
-<span class="material-symbols-outlined text-text-secondary">visibility</span>
-</div>
-<div class="glass-card p-4 rounded-xl flex-grow mb-4">
-<h4 class="font-mono-label text-mono-label text-primary mb-1">STEP 1: OBSERVATION</h4>
-<p class="font-body-small text-body-small text-on-surface">Candidate hesitated for 12 seconds before explaining database indexing.</p>
-</div>
-</div>
-<div class="flex gap-6 items-start">
-<div class="w-12 h-12 rounded-full bg-surface-raised border border-outline-variant/50 flex items-center justify-center z-10 shrink-0">
-<span class="material-symbols-outlined text-text-secondary">attach_file</span>
-</div>
-<div class="glass-card p-4 rounded-xl flex-grow mb-4">
-<h4 class="font-mono-label text-mono-label text-secondary mb-1">STEP 2: EVIDENCE</h4>
-<p class="font-body-small text-body-small text-on-surface">Audio transcript timestamp 14:22. Video analysis shows averted gaze.</p>
-</div>
-</div>
-<div class="flex gap-6 items-start">
-<div class="w-12 h-12 rounded-full bg-surface-raised border border-outline-variant/50 flex items-center justify-center z-10 shrink-0">
-<span class="material-symbols-outlined text-text-secondary">lightbulb</span>
-</div>
-<div class="glass-card p-4 rounded-xl flex-grow mb-4">
-<h4 class="font-mono-label text-mono-label text-tertiary mb-1">STEP 3: INSIGHT</h4>
-<p class="font-body-small text-body-small text-on-surface">Indicates potential uncertainty in core foundational concepts.</p>
-</div>
-</div>
-<div class="flex gap-6 items-start">
-<div class="w-12 h-12 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center z-10 shrink-0">
-<span class="material-symbols-outlined text-primary">arrow_forward</span>
-</div>
-<div class="glass-card p-4 rounded-xl border-primary/30 flex-grow">
-<h4 class="font-mono-label text-mono-label text-primary-fixed mb-1">STEP 4: RECOMMENDATION</h4>
-<p class="font-body-small text-body-small text-on-surface">Probe deeper on data structures in subsequent technical rounds.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="glass-card p-8 rounded-2xl bg-surface-container-lowest border-outline-variant/20">
-<pre class="font-mono-label text-mono-label text-text-secondary overflow-x-auto"><code>
-{
-  "evaluation_node": {
-    "id": "EV-892",
-    "vector": "Technical Understanding",
-    "score_delta": -0.15,
-    "chain": {
-      "observation": "Delayed response on DB indexing",
-      "evidence_refs": ["audio_1422", "vid_1422"],
-      "synthesized_insight": "Foundational gap likely",
-      "actionable_rec": "Require practical DB test"
-    }
-  }
-}
-                    </code></pre>
-</div>
-</div>
-</section>
-<!-- Section 7: Ethics Boundary -->
-<section class="max-w-4xl mx-auto px-margin-desktop mb-section-desktop text-center">
-<div class="border border-danger/30 bg-danger/5 p-8 rounded-2xl relative overflow-hidden">
-<div class="absolute top-0 left-0 w-1 h-full bg-danger"></div>
-<span class="material-symbols-outlined text-danger text-display-l mb-4" style="font-variation-settings: 'FILL' 1;">warning</span>
-<h2 class="font-heading-l text-heading-l text-on-surface mb-4">Ethics Boundary: What It Does NOT Do</h2>
-<p class="font-body text-body text-text-supporting max-w-2xl mx-auto">
-                    The Evaluation Engine is an intelligence amplifier for human recruiters. It <strong class="text-on-surface">does not</strong> make hiring decisions, it <strong class="text-on-surface">does not</strong> auto-reject candidates, and it <strong class="text-on-surface">does not</strong> replace human judgment. It provides structured evidence to support human-led decisions.
-                </p>
-</div>
-</section>
-<!-- Interactive Pipeline -->
-<section class="max-w-[1440px] mx-auto px-margin-desktop mb-section-desktop">
-<div class="flex items-center justify-between overflow-x-auto pb-8 snap-x">
-<div class="flex-shrink-0 w-64 snap-center group">
-<div class="text-text-secondary font-mono-label text-mono-label mb-2 group-hover:text-primary transition-colors">PHASE 01</div>
-<div class="h-1 w-full bg-surface-raised relative mb-4">
-<div class="absolute inset-y-0 left-0 bg-primary w-1/3"></div>
-</div>
-<h3 class="font-heading-m text-heading-m text-on-surface">Intelligence Systems</h3>
-</div>
-<div class="flex-shrink-0 w-64 snap-center group">
-<div class="text-text-secondary font-mono-label text-mono-label mb-2 group-hover:text-secondary transition-colors">PHASE 02</div>
-<div class="h-1 w-full bg-surface-raised relative mb-4">
-<div class="absolute inset-y-0 left-0 bg-secondary w-2/3"></div>
-</div>
-<h3 class="font-heading-m text-heading-m text-on-surface">Evidence Collection</h3>
-</div>
-<div class="flex-shrink-0 w-64 snap-center group">
-<div class="text-text-secondary font-mono-label text-mono-label mb-2 group-hover:text-tertiary transition-colors">PHASE 03</div>
-<div class="h-1 w-full bg-surface-raised relative mb-4">
-<div class="absolute inset-y-0 left-0 bg-tertiary w-full shadow-[0_0_10px_rgba(79,219,200,0.5)]"></div>
-</div>
-<h3 class="font-heading-m text-heading-m text-on-surface">Evaluation Engine</h3>
-</div>
-<div class="flex-shrink-0 w-64 snap-center group opacity-50">
-<div class="text-text-secondary font-mono-label text-mono-label mb-2">PHASE 04</div>
-<div class="h-1 w-full bg-surface-raised relative mb-4"></div>
-<h3 class="font-heading-m text-heading-m text-on-surface">Insights &amp; Report</h3>
-</div>
-</div>
-</section>
-<!-- Final CTA -->
-<section class="text-center pb-section-desktop" id="action">
-<button class="bg-surface-raised border border-primary/30 text-on-surface px-12 py-6 rounded-full font-heading-m text-heading-m hover:bg-primary/10 hover:border-primary transition-all duration-300 shadow-[0_0_30px_rgba(124,58,237,0.1)] group flex items-center gap-4 mx-auto">
-                Continue to Report Generation
-                <span class="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
-</button>
-</section>
+    <div class="flex items-center gap-3">
+        <a href="resume-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">badge</span> Resume
+        </a>
+        <a href="job-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">work</span> JD
+        </a>
+        <a href="video-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">videocam</span> Video
+        </a>
+        <a href="audio-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm">mic</span> Audio
+        </a>
+        <button onclick="toggleWeightModal()" class="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-black font-semibold rounded-lg shadow-lg hover:opacity-90 transition flex items-center gap-2 text-sm">
+            <span class="material-symbols-outlined text-lg">tune</span> Tune Weights
+        </button>
+    </div>
+</header>
+
+<!-- Main Container -->
+<main class="flex-1 p-6 space-y-6 max-w-[1600px] mx-auto w-full">
+
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-5 rounded-2xl">
+        <div>
+            <h1 class="font-display text-2xl font-bold tracking-tight text-white flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-3xl">psychology_alt</span>
+                Central Evaluation Engine — Master Candidate Intelligence
+            </h1>
+            <p class="text-text-secondary text-sm mt-1">Unified evaluation platform aggregating Resume CV, JD Alignment, Video Visual Telemetry, and Audio Fluency into composite score intelligence.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <select id="evalFilterDept" onchange="applyEvalFilters()" class="bg-surface-container border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary focus:outline-none">
+                <option value="ALL">All Departments</option>
+                <option value="Engineering">Engineering</option>
+                <option value="AI Research">AI Research</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Master Summary Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Total Candidates Evaluated</span>
+            <div class="font-display text-3xl font-bold text-white mt-2" id="eMetricTotal">542</div>
+            <span class="text-xs text-emerald-400 mt-1 block">+68 this month</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Avg Final Score</span>
+            <div class="font-display text-3xl font-bold text-primary mt-2" id="eMetricAvgScore">88.5</div>
+            <span class="text-xs text-text-secondary mt-1 block">Cross-modal composite</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Hire Recommendation Rate</span>
+            <div class="font-display text-3xl font-bold text-emerald-400 mt-2">42.8%</div>
+            <span class="text-xs text-emerald-400 mt-1 block">High quality threshold</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Active Evaluations</span>
+            <div class="font-display text-3xl font-bold text-white mt-2">18</div>
+            <span class="text-xs text-text-secondary mt-1 block">In recruiter pipeline</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Evaluations Completed</span>
+            <div class="font-display text-3xl font-bold text-purple-400 mt-2">68</div>
+            <span class="text-xs text-purple-400 mt-1 block">+18.4% MoM trend</span>
+        </div>
+    </div>
+
+    <!-- Dynamic Score Weight Panel -->
+    <div class="glass-panel p-5 rounded-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-border-subtle pb-3">
+            <h2 class="font-display font-bold text-lg text-white flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">sliders</span> Live Score Dimension Weight Controls
+            </h2>
+            <span class="text-xs font-mono text-text-secondary">Sliders auto-normalize to sum to 100%</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-mono">
+                    <span class="text-primary">Resume Intelligence</span>
+                    <span id="wResumeVal">25%</span>
+                </div>
+                <input type="range" id="wResume" min="0" max="100" value="25" oninput="updateWeights()" class="w-full h-1.5 bg-surface-container rounded-lg appearance-none cursor-pointer accent-primary"/>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-mono">
+                    <span class="text-secondary">JD Match</span>
+                    <span id="wJdVal">25%</span>
+                </div>
+                <input type="range" id="wJd" min="0" max="100" value="25" oninput="updateWeights()" class="w-full h-1.5 bg-surface-container rounded-lg appearance-none cursor-pointer accent-secondary"/>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-mono">
+                    <span class="text-purple-400">Video Telemetry</span>
+                    <span id="wVideoVal">25%</span>
+                </div>
+                <input type="range" id="wVideo" min="0" max="100" value="25" oninput="updateWeights()" class="w-full h-1.5 bg-surface-container rounded-lg appearance-none cursor-pointer accent-purple-400"/>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between text-xs font-mono">
+                    <span class="text-emerald-400">Audio Fluency</span>
+                    <span id="wAudioVal">25%</span>
+                </div>
+                <input type="range" id="wAudio" min="0" max="100" value="25" oninput="updateWeights()" class="w-full h-1.5 bg-surface-container rounded-lg appearance-none cursor-pointer accent-emerald-400"/>
+            </div>
+        </div>
+    </div>
+
+    <!-- Candidate Master Table & Selected Candidate Deep Dive -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Candidate Table (6 cols) -->
+        <div class="lg:col-span-6 glass-panel p-5 rounded-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-border-subtle pb-4">
+                <h2 class="font-display font-bold text-lg text-white">Candidate Master Directory</h2>
+                <input type="text" id="evalSearch" onkeyup="applyEvalFilters()" placeholder="Search candidate..." class="bg-surface-container border border-border-subtle rounded-lg px-3 py-1.5 text-xs text-text-primary focus:outline-none w-48"/>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-text-secondary text-xs uppercase font-mono border-b border-border-subtle">
+                            <th class="py-3 px-3">Candidate</th>
+                            <th class="py-3 px-3 text-center">Resume</th>
+                            <th class="py-3 px-3 text-center">JD Match</th>
+                            <th class="py-3 px-3 text-center">Video</th>
+                            <th class="py-3 px-3 text-center">Audio</th>
+                            <th class="py-3 px-3 text-center">Final</th>
+                        </tr>
+                    </thead>
+                    <tbody id="evalTableBody" class="divide-y divide-border-subtle"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right Master Deep Dive (6 cols) -->
+        <div class="lg:col-span-6 glass-panel p-5 rounded-2xl space-y-5">
+            <div class="flex items-center justify-between border-b border-border-subtle pb-4">
+                <div>
+                    <h2 class="font-display font-bold text-xl text-white" id="eCandidateName">Sarah Jenkins</h2>
+                    <p class="text-xs text-primary font-mono" id="ePosition">Senior Full-Stack Engineer • Engineering</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-text-secondary uppercase font-mono block">Final Composite</span>
+                    <span class="font-display text-3xl font-bold text-emerald-400" id="eFinalScore">88.5</span>
+                </div>
+            </div>
+
+            <!-- 4 Quadrant Grid -->
+            <div class="grid grid-cols-2 gap-3">
+                <a href="resume-intelligence.html" class="glass-card p-3 rounded-xl hover:border-primary/50 transition block">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-text-secondary">Resume Score</span>
+                        <span class="text-primary font-bold" id="eResumeScore">88.5</span>
+                    </div>
+                    <p class="text-xs text-text-secondary mt-1">Deep FastAPI & React</p>
+                </a>
+                <a href="job-intelligence.html" class="glass-card p-3 rounded-xl hover:border-secondary/50 transition block">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-text-secondary">JD Match</span>
+                        <span class="text-secondary font-bold" id="eJdMatchScore">92.0</span>
+                    </div>
+                    <p class="text-xs text-text-secondary mt-1">92% Skill Alignment</p>
+                </a>
+                <a href="video-intelligence.html" class="glass-card p-3 rounded-xl hover:border-purple-400/50 transition block">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-text-secondary">Video Score</span>
+                        <span class="text-purple-400 font-bold" id="eVideoScore">86.5</span>
+                    </div>
+                    <p class="text-xs text-text-secondary mt-1">88% Eye Contact</p>
+                </a>
+                <a href="audio-intelligence.html" class="glass-card p-3 rounded-xl hover:border-emerald-400/50 transition block">
+                    <div class="flex justify-between text-xs font-mono">
+                        <span class="text-text-secondary">Audio Score</span>
+                        <span class="text-emerald-400 font-bold" id="eAudioScore">87.0</span>
+                    </div>
+                    <p class="text-xs text-text-secondary mt-1">138 WPM Fluency</p>
+                </a>
+            </div>
+
+            <!-- Unified Radar Chart -->
+            <div class="glass-card p-4 rounded-xl space-y-2">
+                <h4 class="text-xs font-mono text-primary uppercase">Unified Cross-Modal Radar Chart</h4>
+                <div class="h-44">
+                    <canvas id="unifiedRadarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Executive Summary -->
+            <div class="glass-card p-4 rounded-xl space-y-2">
+                <h4 class="text-xs font-mono text-primary uppercase flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">auto_awesome</span> AI Executive Summary Narrative
+                </h4>
+                <p class="text-xs text-text-secondary leading-relaxed" id="eExecSummary"></p>
+            </div>
+
+            <!-- Recruiter Decision Toolbar -->
+            <div class="flex items-center gap-3">
+                <button onclick="alert('Decision logged: HIRE RECOMMENDATION')" class="flex-1 py-2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-lg text-xs font-semibold hover:bg-emerald-500/30 transition">
+                    Recommend Hire
+                </button>
+                <button onclick="alert('Decision logged: HOLD FOR SECOND ROUND')" class="flex-1 py-2 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-lg text-xs font-semibold hover:bg-amber-500/30 transition">
+                    Hold / Second Round
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Portfolio Analytics Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-panel p-5 rounded-2xl space-y-3">
+            <h3 class="font-display font-semibold text-white text-md flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-sm">filter_alt</span> Hiring Pipeline Funnel
+            </h3>
+            <div class="h-52">
+                <canvas id="funnelChart"></canvas>
+            </div>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl space-y-3">
+            <h3 class="font-display font-semibold text-white text-md flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary text-sm">grid_view</span> Cross-Metric Score Heatmap Correlation
+            </h3>
+            <div class="h-52 flex items-center justify-center text-xs font-mono text-text-secondary border border-border-subtle rounded-xl">
+                Resume (0.85) • JD Match (0.92) • Video (0.78) • Audio (0.88) High Inter-Metric Validity
+            </div>
+        </div>
+    </div>
+
 </main>
-<!-- Footer (Shared Component) -->
-<!-- KEIKO Footer -->
-<footer class="bg-[#0A0A0B] border-t border-white/10 w-full py-16 mt-32">
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-8 max-w-[1440px] mx-auto">
-    <div class="lg:col-span-1">
-      <div><img src="assets/keiko-logo-white.png" alt="KEIKO" class="h-12 mb-4"></div>
-      <p class="text-sm text-gray-500 mb-6 max-w-xs" style="font-family:'Inter',sans-serif">Engineering-grade intelligence for the modern technical interview.</p>
-      <p class="text-xs text-gray-600" style="font-family:'Inter',sans-serif">&copy; 2026 KEIKO Intelligence. All rights reserved.</p>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Platform</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="about.html">About Us</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="interview-journey.html">Interview Journey</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="features.html">Features</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="architecture.html">Architecture</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="interview.html">Experience KEIKO</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Resources</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="dashboard.html">Portal Dashboard</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="interview-setup.html">Setup Session</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="settings.html">Settings & Telemetry</a></li>
-      </ul>
-    </div>
-    <div>
-      <h5 class="text-xs text-white uppercase mb-6 tracking-widest font-semibold" style="font-family:'IBM Plex Mono',monospace">Legal</h5>
-      <ul class="space-y-4 text-sm text-gray-500" style="font-family:'Inter',sans-serif">
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Privacy Policy</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Terms of Service</a></li>
-        <li><a class="hover:text-[#d2bbff] transition-colors" href="#">Contact Research</a></li>
-      </ul>
-    </div>
-  </div>
-</footer>
+
 <script>
-(function(){
-  var p = window.location.pathname.split('/').pop() || 'index.html';
-  var m = {'about.html':'nav-about','interview-journey.html':'nav-journey','features.html':'nav-features','architecture.html':'nav-architecture'};
-  var id = m[p];
-  if(id){var el=document.getElementById(id);if(el){el.style.color='#d2bbff';el.style.fontWeight='bold';el.style.borderBottom='2px solid #d2bbff';el.style.paddingBottom='4px';}}
-})();
+let evalData = [];
+let selectedEval = null;
+let unifiedRadarObj = null;
+let funnelChartObj = null;
+
+async function fetchEvaluations() {
+    try {
+        const res = await fetch('/api/v1/intelligence/evaluations');
+        const json = await res.json();
+        if(json.status === 'success' && json.data) {
+            evalData = json.data;
+            renderEvalTable(evalData);
+            if(evalData.length > 0) selectEval(evalData[0].id);
+            initFunnelChart();
+        }
+    } catch(e) { console.error(e); }
+}
+
+function renderEvalTable(list) {
+    const tbody = document.getElementById('evalTableBody');
+    tbody.innerHTML = list.map(e => `
+        <tr onclick="selectEval(${e.id})" class="hover:bg-surface-container/60 cursor-pointer transition ${selectedEval && selectedEval.id === e.id ? 'bg-primary/10 border-l-2 border-primary' : ''}">
+            <td class="py-3 px-3">
+                <div class="font-semibold text-white">${e.candidate_name}</div>
+                <div class="text-xs text-text-secondary">${e.position_applied}</div>
+            </td>
+            <td class="py-3 px-3 text-center font-mono text-primary">${e.resume_score}</td>
+            <td class="py-3 px-3 text-center font-mono text-secondary">${e.jd_match_score}</td>
+            <td class="py-3 px-3 text-center font-mono text-purple-400">${e.video_score}</td>
+            <td class="py-3 px-3 text-center font-mono text-emerald-400">${e.audio_score}</td>
+            <td class="py-3 px-3 text-center font-mono font-bold text-emerald-400">${e.final_composite_score}</td>
+        </tr>
+    `).join('');
+}
+
+function selectEval(id) {
+    selectedEval = evalData.find(e => e.id === id);
+    if(!selectedEval) return;
+
+    renderEvalTable(evalData);
+    recalculateComposite();
+
+    document.getElementById('eCandidateName').innerText = selectedEval.candidate_name;
+    document.getElementById('ePosition').innerText = `${selectedEval.position_applied} • ${selectedEval.department}`;
+    document.getElementById('eResumeScore').innerText = selectedEval.resume_score;
+    document.getElementById('eJdMatchScore').innerText = selectedEval.jd_match_score;
+    document.getElementById('eVideoScore').innerText = selectedEval.video_score;
+    document.getElementById('eAudioScore').innerText = selectedAudioScore();
+    document.getElementById('eExecSummary').innerText = selectedEval.executive_summary;
+
+    renderUnifiedRadar();
+}
+
+function selectedAudioScore() {
+    return selectedEval ? selectedEval.audio_score : 87.0;
+}
+
+function updateWeights() {
+    let wR = parseFloat(document.getElementById('wResume').value);
+    let wJ = parseFloat(document.getElementById('wJd').value);
+    let wV = parseFloat(document.getElementById('wVideo').value);
+    let wA = parseFloat(document.getElementById('wAudio').value);
+
+    let sum = wR + wJ + wV + wA;
+    if(sum === 0) sum = 1;
+
+    let pR = Math.round((wR / sum) * 100);
+    let pJ = Math.round((wJ / sum) * 100);
+    let pV = Math.round((wV / sum) * 100);
+    let pA = Math.round((wA / sum) * 100);
+
+    document.getElementById('wResumeVal').innerText = pR + '%';
+    document.getElementById('wJdVal').innerText = pJ + '%';
+    document.getElementById('wVideoVal').innerText = pV + '%';
+    document.getElementById('wAudioVal').innerText = pA + '%';
+
+    recalculateComposite();
+}
+
+function recalculateComposite() {
+    if(!selectedEval) return;
+    let wR = parseFloat(document.getElementById('wResume').value) || 25;
+    let wJ = parseFloat(document.getElementById('wJd').value) || 25;
+    let wV = parseFloat(document.getElementById('wVideo').value) || 25;
+    let wA = parseFloat(document.getElementById('wAudio').value) || 25;
+    let sum = wR + wJ + wV + wA;
+    if(sum === 0) sum = 1;
+
+    let finalVal = (selectedEval.resume_score * (wR/sum)) +
+                   (selectedEval.jd_match_score * (wJ/sum)) +
+                   (selectedEval.video_score * (wV/sum)) +
+                   (selectedEval.audio_score * (wA/sum));
+
+    document.getElementById('eFinalScore').innerText = finalVal.toFixed(1);
+}
+
+function renderUnifiedRadar() {
+    if(!selectedEval) return;
+    const ctx = document.getElementById('unifiedRadarChart').getContext('2d');
+    if(unifiedRadarObj) unifiedRadarObj.destroy();
+    unifiedRadarObj = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Resume', 'JD Match', 'Eye Contact', 'Posture', 'Speaking Rate', 'Clarity'],
+            datasets: [{
+                label: selectedEval.candidate_name,
+                data: [selectedEval.resume_score, selectedEval.jd_match_score, selectedEval.video_score, 90, selectedEval.audio_score, 92],
+                backgroundColor: 'rgba(0, 242, 254, 0.25)',
+                borderColor: '#00f2fe',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { r: { angleLines: { color: 'rgba(255,255,255,0.1)' }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#A1A1AA', font: { size: 10 } }, ticks: { display: false } } },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+function initFunnelChart() {
+    const ctx = document.getElementById('funnelChart').getContext('2d');
+    if(funnelChartObj) funnelChartObj.destroy();
+    funnelChartObj = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Applied (1280)', 'Parsed (1120)', 'Screened (540)', 'Evaluated (310)', 'Offered (68)'],
+            datasets: [{
+                data: [1280, 1120, 540, 310, 68],
+                backgroundColor: ['rgba(0,242,254,0.6)', 'rgba(79,172,254,0.6)', 'rgba(127,0,255,0.6)', 'rgba(16,185,129,0.6)', 'rgba(245,158,11,0.6)']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { grid: { display: false }, ticks: { color: '#A1A1AA' } }, y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#A1A1AA' } } }
+        }
+    });
+}
+
+function applyEvalFilters() {
+    const dept = document.getElementById('evalFilterDept').value;
+    const search = document.getElementById('evalSearch').value.toLowerCase();
+
+    const filtered = evalData.filter(e => {
+        const matchesDept = dept === 'ALL' || e.department === dept;
+        const matchesSearch = e.candidate_name.toLowerCase().includes(search) || e.position_applied.toLowerCase().includes(search);
+        return matchesDept && matchesSearch;
+    });
+    renderEvalTable(filtered);
+}
+
+document.addEventListener('DOMContentLoaded', fetchEvaluations);
 </script>
-</body></html>
+</body>
+</html>

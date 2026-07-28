@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Audio Intelligence — KEIKO Candidate Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="tailwind-config">
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                "background": "#0a0b10",
+                "surface": "#12151e",
+                "surface-container": "#1a1e2b",
+                "primary": "#00f2fe",
+                "secondary": "#4facfe",
+                "accent": "#7f00ff",
+                "text-primary": "#F4F4F5",
+                "text-secondary": "#A1A1AA",
+                "border-subtle": "rgba(255, 255, 255, 0.08)"
+            }
+        }
+    }
+}
+</script>
+<style>
+body { background-color: #0a0b10; font-family: 'Inter', sans-serif; color: #F4F4F5; }
+.font-display { font-family: 'Space Grotesk', sans-serif; }
+.font-mono { font-family: 'IBM Plex Mono', monospace; }
+.glass-panel { background: rgba(18, 21, 30, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+.glass-card { background: rgba(26, 30, 43, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- Top Navigation -->
+<header class="glass-panel sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-border-subtle">
+    <div class="flex items-center gap-4">
+        <a href="dashboard.html" class="flex items-center gap-2 text-primary font-display text-xl font-bold tracking-wider">
+            <span class="material-symbols-outlined text-2xl">graphic_eq</span> KEIKO INTELLIGENCE
+        </a>
+        <span class="text-text-secondary">/</span>
+        <span class="font-display font-semibold text-text-primary text-lg">Audio Intelligence</span>
+    </div>
+    <div class="flex items-center gap-3">
+        <a href="resume-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition">Resume Intelligence</a>
+        <a href="job-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition">JD Intelligence</a>
+        <a href="video-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition">Video Intelligence</a>
+        <a href="evaluation-engine.html" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-primary/10 text-primary border border-primary/30 rounded-lg hover:bg-primary/20 transition">Central Engine</a>
+    </div>
+</header>
+
+<main class="flex-1 p-6 space-y-6 max-w-[1600px] mx-auto w-full">
+
+    <!-- Header Bar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-5 rounded-2xl">
+        <div>
+            <h1 class="font-display text-2xl font-bold tracking-tight text-white flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-3xl">mic</span>
+                Vocal & Speech Pattern Audio Intelligence
+            </h1>
+            <p class="text-text-secondary text-sm mt-1">Speaking rate WPM, pitch modulation, Whisper STT clarity, sentiment trajectory, and filler word frequency tracking.</p>
+        </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Total Audio Recordings</span>
+            <div class="font-display text-3xl font-bold text-white mt-2">420</div>
+            <span class="text-xs text-emerald-400 mt-1 block">100% transcribed</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Avg Audio Score</span>
+            <div class="font-display text-3xl font-bold text-primary mt-2">87.0</div>
+            <span class="text-xs text-text-secondary mt-1 block">Vocal fluency score</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Avg Speaking Clarity</span>
+            <div class="font-display text-3xl font-bold text-emerald-400 mt-2">92.0%</div>
+            <span class="text-xs text-emerald-400 mt-1 block">Optimal STT confidence</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Avg Speaking Rate</span>
+            <div class="font-display text-3xl font-bold text-white mt-2">138 WPM</div>
+            <span class="text-xs text-text-secondary mt-1 block">Ideal range: 130-150 WPM</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Filler Word Count</span>
+            <div class="font-display text-3xl font-bold text-emerald-400 mt-2">2.5</div>
+            <span class="text-xs text-emerald-400 mt-1 block">Per response average</span>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Audio List -->
+        <div class="lg:col-span-4 glass-panel p-5 rounded-2xl space-y-4">
+            <h2 class="font-display font-bold text-lg text-white border-b border-border-subtle pb-3">Processed Audio Streams</h2>
+            <div class="space-y-3" id="audioListContainer"></div>
+        </div>
+
+        <!-- Right Audio Deep Analysis -->
+        <div class="lg:col-span-8 glass-panel p-5 rounded-2xl space-y-5">
+            <div class="flex items-center justify-between border-b border-border-subtle pb-4">
+                <div>
+                    <h2 class="font-display font-bold text-xl text-white" id="aCandidateName">Sarah Jenkins</h2>
+                    <p class="text-xs text-primary font-mono" id="aMeta">35 Mins • Processed 2026-07-28</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-text-secondary uppercase font-mono block">Audio Score</span>
+                    <span class="font-display text-3xl font-bold text-primary" id="aScore">87.0</span>
+                </div>
+            </div>
+
+            <!-- Waveform Visualizer -->
+            <div class="glass-card p-4 rounded-xl space-y-3 border border-primary/30">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-mono text-primary uppercase">Audio Waveform & Pitch Telemetry</span>
+                    <span class="text-xs font-mono text-emerald-400">138 WPM (Optimal)</span>
+                </div>
+                <div class="h-20 flex items-center justify-center gap-1 overflow-hidden">
+                    <!-- Simulated Waveform Bars -->
+                    <div class="w-1 bg-primary/60 h-8 rounded-full"></div>
+                    <div class="w-1 bg-primary/80 h-14 rounded-full animate-pulse"></div>
+                    <div class="w-1 bg-primary h-18 rounded-full"></div>
+                    <div class="w-1 bg-secondary h-10 rounded-full"></div>
+                    <div class="w-1 bg-primary h-16 rounded-full animate-pulse"></div>
+                    <div class="w-1 bg-purple-500 h-12 rounded-full"></div>
+                    <div class="w-1 bg-primary h-6 rounded-full"></div>
+                    <div class="w-1 bg-primary/40 h-14 rounded-full"></div>
+                    <div class="w-1 bg-primary h-18 rounded-full animate-pulse"></div>
+                    <div class="w-1 bg-secondary h-8 rounded-full"></div>
+                </div>
+            </div>
+
+            <!-- Speech Metrics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div class="glass-card p-3 rounded-xl">
+                    <span class="text-xs text-text-secondary block">Clarity Score</span>
+                    <span class="font-display text-xl font-bold text-white" id="aClarity">92%</span>
+                </div>
+                <div class="glass-card p-3 rounded-xl">
+                    <span class="text-xs text-text-secondary block">Dominant Sentiment</span>
+                    <span class="font-display text-sm font-bold text-emerald-400" id="aSentiment">Confident</span>
+                </div>
+                <div class="glass-card p-3 rounded-xl">
+                    <span class="text-xs text-text-secondary block">Filler Words</span>
+                    <span class="font-display text-xl font-bold text-white" id="aFillers">3</span>
+                </div>
+                <div class="glass-card p-3 rounded-xl">
+                    <span class="text-xs text-text-secondary block">STAR Method</span>
+                    <span class="font-display text-sm font-bold text-primary">Detected</span>
+                </div>
+            </div>
+
+            <!-- Sentiment Trajectory Graph -->
+            <div class="glass-card p-4 rounded-xl space-y-2">
+                <h4 class="text-xs font-mono text-primary uppercase">Tone & Sentiment Trajectory</h4>
+                <div class="h-44">
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+            </div>
+
+            <!-- AI Vocal Insights -->
+            <div class="glass-card p-4 rounded-xl space-y-2">
+                <h4 class="text-xs font-mono text-primary uppercase flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">auto_awesome</span> Speech & Vocal Insights
+                </h4>
+                <ul class="text-xs text-text-secondary list-disc list-inside space-y-1" id="aInsightsList"></ul>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<script>
+let audioData = [];
+let selectedAudio = null;
+let sentChartObj = null;
+
+async function fetchAudio() {
+    try {
+        const res = await fetch('/api/v1/interview/intelligence/audio');
+        const json = await res.json();
+        if(json.status === 'success' && json.data) {
+            audioData = json.data;
+            renderAudioList(audioData);
+            if(audioData.length > 0) selectAudio(audioData[0].id);
+        }
+    } catch(e) { console.error(e); }
+}
+
+function renderAudioList(list) {
+    const container = document.getElementById('audioListContainer');
+    container.innerHTML = list.map(a => `
+        <div onclick="selectAudio(${a.id})" class="glass-card p-4 rounded-xl hover:border-primary/50 cursor-pointer transition ${selectedAudio && selectedAudio.id === a.id ? 'border-primary bg-primary/10' : ''}">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-semibold text-white">${a.candidate_name}</h3>
+                <span class="px-2 py-0.5 rounded text-xs font-mono bg-emerald-500/20 text-emerald-400">${a.status}</span>
+            </div>
+            <div class="flex items-center justify-between mt-2 text-xs text-text-secondary">
+                <span>${a.duration_minutes}m • ${a.speaking_rate_wpm} WPM</span>
+                <span class="font-mono text-primary font-bold">Score ${a.audio_score}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function selectAudio(id) {
+    selectedAudio = audioData.find(a => a.id === id);
+    if(!selectedAudio) return;
+
+    renderAudioList(audioData);
+
+    document.getElementById('aCandidateName').innerText = selectedAudio.candidate_name;
+    document.getElementById('aMeta').innerText = `${selectedAudio.duration_minutes} Mins • Processed ${selectedAudio.recorded_at}`;
+    document.getElementById('aScore').innerText = selectedAudio.audio_score;
+    document.getElementById('aClarity').innerText = selectedAudio.clarity_score + '%';
+    document.getElementById('aSentiment').innerText = selectedAudio.sentiment;
+    document.getElementById('aFillers').innerText = selectedAudio.filler_word_count;
+
+    document.getElementById('aInsightsList').innerHTML = (selectedAudio.ai_insights || []).map(i => `<li>${i}</li>`).join('');
+
+    renderSentChart();
+}
+
+function renderSentChart() {
+    const ctx = document.getElementById('sentimentChart').getContext('2d');
+    if(sentChartObj) sentChartObj.destroy();
+    sentChartObj = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Q1', 'Q2', 'Q3', 'Q4', 'Q5'],
+            datasets: [
+                { label: 'Positive', data: [75, 80, 85, 88, 92], borderColor: '#00f2fe', tension: 0.3 },
+                { label: 'Neutral', data: [20, 15, 12, 10, 8], borderColor: '#4facfe', tension: 0.3 }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#A1A1AA', font: { size: 10 } } } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#A1A1AA' } },
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#A1A1AA' }, max: 100 }
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', fetchAudio);
+</script>
+</body>
+</html>

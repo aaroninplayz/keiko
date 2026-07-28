@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Resume Intelligence — KEIKO Candidate Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="tailwind-config">
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                "background": "#0a0b10",
+                "surface": "#12151e",
+                "surface-container": "#1a1e2b",
+                "primary": "#00f2fe",
+                "secondary": "#4facfe",
+                "accent": "#7f00ff",
+                "text-primary": "#F4F4F5",
+                "text-secondary": "#A1A1AA",
+                "border-subtle": "rgba(255, 255, 255, 0.08)"
+            }
+        }
+    }
+}
+</script>
+<style>
+body { background-color: #0a0b10; font-family: 'Inter', sans-serif; color: #F4F4F5; }
+.font-display { font-family: 'Space Grotesk', sans-serif; }
+.font-mono { font-family: 'IBM Plex Mono', monospace; }
+.glass-panel { background: rgba(18, 21, 30, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+.glass-card { background: rgba(26, 30, 43, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); }
+.glow-accent { box-shadow: 0 0 25px rgba(0, 242, 254, 0.15); }
+.badge-parsed { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+.badge-analyzing { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
+.badge-flagged { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+.badge-reviewed { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- Top Navigation -->
+<header class="glass-panel sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-border-subtle">
+    <div class="flex items-center gap-4">
+        <a href="dashboard.html" class="flex items-center gap-2 text-primary font-display text-xl font-bold tracking-wider">
+            <span class="material-symbols-outlined text-2xl">description</span> KEIKO INTELLIGENCE
+        </a>
+        <span class="text-text-secondary">/</span>
+        <span class="font-display font-semibold text-text-primary text-lg">Resume Intelligence</span>
+    </div>
+    <div class="flex items-center gap-3">
+        <a href="job-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition">JD Intelligence</a>
+        <a href="video-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition">Video Intelligence</a>
+        <a href="audio-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition">Audio Intelligence</a>
+        <a href="evaluation-engine.html" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-primary/10 text-primary border border-primary/30 rounded-lg hover:bg-primary/20 transition">Central Engine</a>
+        <button onclick="triggerUploadModal()" class="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-black font-semibold rounded-lg shadow-lg hover:opacity-90 transition flex items-center gap-2 text-sm">
+            <span class="material-symbols-outlined text-lg">cloud_upload</span> Upload Resume
+        </button>
+    </div>
+</header>
+
+<!-- Main Container -->
+<main class="flex-1 p-6 space-y-6 max-w-[1600px] mx-auto w-full">
+
+    <!-- Header & Filter Bar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-5 rounded-2xl">
+        <div>
+            <h1 class="font-display text-2xl font-bold tracking-tight text-white flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-3xl">badge</span>
+                Resume Parse & Scoring Intelligence
+            </h1>
+            <p class="text-text-secondary text-sm mt-1">Deep CV parsing, skill extraction, candidate score breakdown, and gap detection.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <select id="filterStatus" onchange="applyFilters()" class="bg-surface-container border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:border-primary">
+                <option value="ALL">All Statuses</option>
+                <option value="Parsed">Parsed</option>
+                <option value="Reviewed">Reviewed</option>
+                <option value="Flagged">Flagged</option>
+            </select>
+            <select id="filterScore" onchange="applyFilters()" class="bg-surface-container border border-border-subtle rounded-lg px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:border-primary">
+                <option value="0">All Scores</option>
+                <option value="90">90+ Exceptional</option>
+                <option value="80">80+ Strong</option>
+                <option value="70">70+ Moderate</option>
+            </select>
+            <button onclick="fetchResumes()" class="p-2 glass-card rounded-lg hover:border-primary transition text-text-secondary hover:text-white">
+                <span class="material-symbols-outlined">refresh</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Metrics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between">
+            <div class="flex items-center justify-between text-text-secondary text-sm">
+                <span>Total Processed</span>
+                <span class="material-symbols-outlined text-primary">folder_shared</span>
+            </div>
+            <div class="mt-3 flex items-baseline justify-between">
+                <span class="font-display text-3xl font-bold text-white" id="metricTotal">1,284</span>
+                <span class="text-emerald-400 text-xs font-mono font-medium">+12.4%</span>
+            </div>
+            <p class="text-xs text-text-secondary mt-2">Across all departments</p>
+        </div>
+
+        <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between">
+            <div class="flex items-center justify-between text-text-secondary text-sm">
+                <span>Average Resume Score</span>
+                <span class="material-symbols-outlined text-secondary">analytics</span>
+            </div>
+            <div class="mt-3 flex items-center justify-between">
+                <span class="font-display text-3xl font-bold text-white" id="metricAvgScore">84.8</span>
+                <div class="w-10 h-10 rounded-full border-2 border-primary border-t-transparent animate-spin-slow flex items-center justify-center text-xs font-mono font-bold text-primary">85</div>
+            </div>
+            <p class="text-xs text-text-secondary mt-2">Scale 0 - 100</p>
+        </div>
+
+        <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between">
+            <div class="flex items-center justify-between text-text-secondary text-sm">
+                <span>Skills Match Rate</span>
+                <span class="material-symbols-outlined text-emerald-400">psychology</span>
+            </div>
+            <div class="mt-3">
+                <span class="font-display text-3xl font-bold text-white" id="metricMatchRate">88.2%</span>
+                <div class="w-full bg-surface-container h-2 rounded-full mt-2 overflow-hidden">
+                    <div class="bg-gradient-to-r from-primary to-emerald-400 h-full rounded-full" style="width: 88%"></div>
+                </div>
+            </div>
+            <p class="text-xs text-text-secondary mt-2">Target JD requirements</p>
+        </div>
+
+        <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between">
+            <div class="flex items-center justify-between text-text-secondary text-sm">
+                <span>Parsing Accuracy</span>
+                <span class="material-symbols-outlined text-purple-400">verified</span>
+            </div>
+            <div class="mt-3">
+                <span class="font-display text-3xl font-bold text-white">99.4%</span>
+                <span class="text-purple-400 text-xs font-mono ml-2">PDF / DOCX</span>
+            </div>
+            <p class="text-xs text-text-secondary mt-2">NLP entity extraction</p>
+        </div>
+
+        <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between">
+            <div class="flex items-center justify-between text-text-secondary text-sm">
+                <span>Pending Review</span>
+                <span class="material-symbols-outlined text-amber-400">pending_actions</span>
+            </div>
+            <div class="mt-3 flex items-baseline justify-between">
+                <span class="font-display text-3xl font-bold text-amber-400">14</span>
+                <span class="text-amber-400 text-xs font-mono">Action needed</span>
+            </div>
+            <p class="text-xs text-text-secondary mt-2">Awaiting recruiter check</p>
+        </div>
+    </div>
+
+    <!-- Main Content Split Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Table Panel (60% -> col-span-7) -->
+        <div class="lg:col-span-7 glass-panel p-5 rounded-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-border-subtle pb-4">
+                <h2 class="font-display font-bold text-lg text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">table_chart</span> Candidate Resume Registry
+                </h2>
+                <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Search candidate or role..." class="bg-surface-container border border-border-subtle rounded-lg px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:border-primary w-64"/>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-text-secondary text-xs uppercase font-mono border-b border-border-subtle">
+                            <th class="py-3 px-3">Candidate</th>
+                            <th class="py-3 px-3">Applied Role</th>
+                            <th class="py-3 px-3 text-center">Score</th>
+                            <th class="py-3 px-3 text-center">Match %</th>
+                            <th class="py-3 px-3">Status</th>
+                            <th class="py-3 px-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resumeTableBody" class="divide-y divide-border-subtle">
+                        <!-- Dynamic Rows -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right Deep-Dive Panel (40% -> col-span-5) -->
+        <div class="lg:col-span-5 glass-panel p-5 rounded-2xl space-y-5" id="deepDiveCard">
+            <div class="flex items-center justify-between border-b border-border-subtle pb-4">
+                <h2 class="font-display font-bold text-lg text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary">analytics</span> Selected Resume Analysis
+                </h2>
+                <span class="text-xs font-mono text-primary bg-primary/10 border border-primary/30 px-2 py-0.5 rounded-full" id="detailStatus">Parsed</span>
+            </div>
+
+            <!-- Profile Header -->
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/30 to-purple-600/30 border border-primary/50 flex items-center justify-center text-primary font-display font-bold text-xl" id="detailAvatar">
+                    SJ
+                </div>
+                <div>
+                    <h3 class="font-display font-bold text-xl text-white" id="detailName">Sarah Jenkins</h3>
+                    <p class="text-sm text-text-secondary" id="detailRole">Senior Full-Stack Engineer</p>
+                    <p class="text-xs text-primary font-mono mt-0.5" id="detailContact">sarah.j@example.com • +1 (555) 234-5678</p>
+                </div>
+            </div>
+
+            <!-- Radar Score Breakdown -->
+            <div class="glass-card p-4 rounded-xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-semibold text-white">Overall Score Breakdown</span>
+                    <span class="font-display font-bold text-2xl text-primary" id="detailScore">88.5</span>
+                </div>
+                <div class="h-48">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Extracted Skills Tags -->
+            <div class="space-y-2">
+                <h4 class="text-xs font-mono uppercase text-text-secondary tracking-wider">Extracted Skill Matrix</h4>
+                <div class="flex flex-wrap gap-1.5" id="detailSkillTags">
+                    <!-- Dynamic Badges -->
+                </div>
+            </div>
+
+            <!-- AI Summary Narrative -->
+            <div class="glass-card p-4 rounded-xl space-y-2">
+                <h4 class="text-xs font-mono uppercase text-primary tracking-wider flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">auto_awesome</span> AI Narrative Assessment
+                </h4>
+                <p class="text-xs text-text-secondary leading-relaxed" id="detailAiSummary">
+                    Candidate displays exceptional proficiency in backend python design, FastAPI async pipelines, and modern frontend frameworks. Strong candidate for technical chamber.
+                </p>
+            </div>
+
+            <!-- Action Toolbar -->
+            <div class="flex items-center gap-3 pt-2">
+                <button class="flex-1 py-2 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-semibold hover:bg-emerald-500/30 transition">
+                    Approve Candidate
+                </button>
+                <button class="flex-1 py-2 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/40 text-xs font-semibold hover:bg-amber-500/30 transition">
+                    Flag for Review
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Analytics Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-panel p-5 rounded-2xl space-y-3">
+            <h3 class="font-display font-semibold text-white text-md flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-sm">bar_chart</span> Score Distribution Across Pool
+            </h3>
+            <div class="h-56">
+                <canvas id="distributionChart"></canvas>
+            </div>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl space-y-3">
+            <h3 class="font-display font-semibold text-white text-md flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary text-sm">psychology</span> Top Extracted Skills
+            </h3>
+            <div class="h-56">
+                <canvas id="skillsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+let resumesData = [];
+let selectedResume = null;
+let radarChartObj = null;
+let distChartObj = null;
+let skillsChartObj = null;
+
+async function fetchResumes() {
+    try {
+        const res = await fetch('/api/v1/interview/intelligence/resumes');
+        const json = await res.json();
+        if(json.status === 'success' && json.data) {
+            resumesData = json.data;
+            renderTable(resumesData);
+            if(resumesData.length > 0) {
+                selectResume(resumesData[0].id);
+            }
+            initAnalyticsCharts();
+        }
+    } catch(err) {
+        console.error('Failed to load resumes:', err);
+    }
+}
+
+function renderTable(data) {
+    const tbody = document.getElementById('resumeTableBody');
+    tbody.innerHTML = data.map(r => `
+        <tr onclick="selectResume(${r.id})" class="hover:bg-surface-container/60 cursor-pointer transition ${selectedResume && selectedResume.id === r.id ? 'bg-primary/10 border-l-2 border-primary' : ''}">
+            <td class="py-3 px-3">
+                <div class="font-semibold text-white">${r.candidate_name}</div>
+                <div class="text-xs text-text-secondary">${r.email || ''}</div>
+            </td>
+            <td class="py-3 px-3 text-text-secondary">${r.role_applied}</td>
+            <td class="py-3 px-3 text-center font-mono font-bold ${r.overall_score >= 85 ? 'text-emerald-400' : 'text-primary'}">${r.overall_score}</td>
+            <td class="py-3 px-3 text-center font-mono text-secondary">${r.skills_match_pct}%</td>
+            <td class="py-3 px-3">
+                <span class="px-2 py-0.5 rounded-full text-xs font-mono badge-${r.status.toLowerCase()}">${r.status}</span>
+            </td>
+            <td class="py-3 px-3 text-right">
+                <button class="text-xs text-primary hover:underline">View Deep Dive</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function selectResume(id) {
+    selectedResume = resumesData.find(r => r.id === id);
+    if(!selectedResume) return;
+
+    renderTable(resumesData);
+
+    document.getElementById('detailName').innerText = selectedResume.candidate_name;
+    document.getElementById('detailRole').innerText = selectedResume.role_applied;
+    document.getElementById('detailContact').innerText = `${selectedResume.email || ''} • ${selectedResume.phone || ''}`;
+    document.getElementById('detailScore').innerText = selectedResume.overall_score;
+    document.getElementById('detailStatus').innerText = selectedResume.status;
+    document.getElementById('detailAiSummary').innerText = selectedResume.ai_summary || 'No summary available.';
+    document.getElementById('detailAvatar').innerText = selectedResume.candidate_name.split(' ').map(n=>n[0]).join('');
+
+    // Skills Tags
+    const tagsContainer = document.getElementById('detailSkillTags');
+    const tags = selectedResume.skills_tags || { strong: [], partial: [], missing: [] };
+    let html = '';
+    (tags.strong || []).forEach(s => html += `<span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded text-xs font-mono">${s}</span>`);
+    (tags.partial || []).forEach(s => html += `<span class="px-2 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded text-xs font-mono">${s}</span>`);
+    (tags.missing || []).forEach(s => html += `<span class="px-2 py-0.5 bg-rose-500/20 text-rose-400 border border-rose-500/30 rounded text-xs font-mono">${s} (missing)</span>`);
+    tagsContainer.innerHTML = html;
+
+    updateRadarChart(selectedResume.score_breakdown);
+}
+
+function updateRadarChart(breakdown) {
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    const dataVals = breakdown ? [
+        breakdown.skills_match || 80,
+        breakdown.experience_relevance || 75,
+        breakdown.education || 85,
+        breakdown.certifications || 70,
+        breakdown.keyword_density || 80,
+        breakdown.format_quality || 90
+    ] : [80, 75, 85, 70, 80, 90];
+
+    if(radarChartObj) radarChartObj.destroy();
+    radarChartObj = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Skills Match', 'Experience', 'Education', 'Certs', 'Keywords', 'Format'],
+            datasets: [{
+                label: 'Score Dimension',
+                data: dataVals,
+                backgroundColor: 'rgba(0, 242, 254, 0.2)',
+                borderColor: '#00f2fe',
+                borderWidth: 2,
+                pointBackgroundColor: '#7f00ff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    angleLines: { color: 'rgba(255,255,255,0.1)' },
+                    grid: { color: 'rgba(255,255,255,0.1)' },
+                    pointLabels: { color: '#A1A1AA', font: { size: 10 } },
+                    ticks: { display: false, max: 100 }
+                }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+function applyFilters() {
+    const status = document.getElementById('filterStatus').value;
+    const minScore = parseFloat(document.getElementById('filterScore').value);
+    const search = document.getElementById('searchInput').value.toLowerCase();
+
+    const filtered = resumesData.filter(r => {
+        const matchesStatus = status === 'ALL' || r.status === status;
+        const matchesScore = r.overall_score >= minScore;
+        const matchesSearch = r.candidate_name.toLowerCase().includes(search) || r.role_applied.toLowerCase().includes(search);
+        return matchesStatus && matchesScore && matchesSearch;
+    });
+    renderTable(filtered);
+}
+
+function initAnalyticsCharts() {
+    // Histogram
+    const ctx1 = document.getElementById('distributionChart').getContext('2d');
+    if(distChartObj) distChartObj.destroy();
+    distChartObj = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['50-60', '60-70', '70-80', '80-90', '90-100'],
+            datasets: [{
+                label: 'Resumes',
+                data: [12, 45, 142, 380, 210],
+                backgroundColor: 'rgba(79, 172, 254, 0.6)',
+                borderColor: '#4facfe',
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#A1A1AA' } },
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#A1A1AA' } }
+            }
+        }
+    });
+
+    // Top Skills Bar
+    const ctx2 = document.getElementById('skillsChart').getContext('2d');
+    if(skillsChartObj) skillsChartObj.destroy();
+    skillsChartObj = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ['Python', 'FastAPI', 'React', 'PyTorch', 'Docker', 'TypeScript'],
+            datasets: [{
+                label: 'Count',
+                data: [420, 310, 290, 240, 380, 270],
+                backgroundColor: 'rgba(127, 0, 255, 0.6)',
+                borderColor: '#7f00ff',
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#A1A1AA' } },
+                y: { grid: { display: false }, ticks: { color: '#A1A1AA' } }
+            }
+        }
+    });
+}
+
+function triggerUploadModal() {
+    alert("Resume Importer: Drop PDF or DOCX file to run Keiko Resume Intelligence Parser.");
+}
+
+document.addEventListener('DOMContentLoaded', fetchResumes);
+</script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Video Intelligence — KEIKO Candidate Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@500;600&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script id="tailwind-config">
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            colors: {
+                "background": "#0a0b10",
+                "surface": "#12151e",
+                "surface-container": "#1a1e2b",
+                "primary": "#00f2fe",
+                "secondary": "#4facfe",
+                "accent": "#7f00ff",
+                "text-primary": "#F4F4F5",
+                "text-secondary": "#A1A1AA",
+                "border-subtle": "rgba(255, 255, 255, 0.08)"
+            }
+        }
+    }
+}
+</script>
+<style>
+body { background-color: #0a0b10; font-family: 'Inter', sans-serif; color: #F4F4F5; }
+.font-display { font-family: 'Space Grotesk', sans-serif; }
+.font-mono { font-family: 'IBM Plex Mono', monospace; }
+.glass-panel { background: rgba(18, 21, 30, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+.glass-card { background: rgba(26, 30, 43, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.06); }
+</style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+<!-- Top Navigation -->
+<header class="glass-panel sticky top-0 z-50 px-6 py-4 flex items-center justify-between border-b border-border-subtle">
+    <div class="flex items-center gap-4">
+        <a href="dashboard.html" class="flex items-center gap-2 text-primary font-display text-xl font-bold tracking-wider">
+            <span class="material-symbols-outlined text-2xl">videocam</span> KEIKO INTELLIGENCE
+        </a>
+        <span class="text-text-secondary">/</span>
+        <span class="font-display font-semibold text-text-primary text-lg">Video Intelligence</span>
+    </div>
+    <div class="flex items-center gap-3">
+        <a href="resume-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition">Resume Intelligence</a>
+        <a href="job-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition">JD Intelligence</a>
+        <a href="audio-intelligence.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-text-secondary hover:text-text-primary transition">Audio Intelligence</a>
+        <a href="evaluation-engine.html" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-primary/10 text-primary border border-primary/30 rounded-lg hover:bg-primary/20 transition">Central Engine</a>
+    </div>
+</header>
+
+<main class="flex-1 p-6 space-y-6 max-w-[1600px] mx-auto w-full">
+
+    <!-- Header Bar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-5 rounded-2xl">
+        <div>
+            <h1 class="font-display text-2xl font-bold tracking-tight text-white flex items-center gap-3">
+                <span class="material-symbols-outlined text-primary text-3xl">videocam</span>
+                Video Telemetry & Visual Gesture Analysis
+            </h1>
+            <p class="text-text-secondary text-sm mt-1">Real-time posture tracking, eye-contact deviation, MediaPipe facial expression blendshapes, and professional composure telemetry.</p>
+        </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Total Videos Analyzed</span>
+            <div class="font-display text-3xl font-bold text-white mt-2" id="vMetricTotal">312</div>
+            <span class="text-xs text-emerald-400 mt-1 block">+18 this week</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Avg Video Score</span>
+            <div class="font-display text-3xl font-bold text-primary mt-2" id="vMetricScore">86.5</div>
+            <span class="text-xs text-text-secondary mt-1 block">Visual presence score</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Avg Interview Duration</span>
+            <div class="font-display text-3xl font-bold text-white mt-2">32 min</div>
+            <span class="text-xs text-text-secondary mt-1 block">10 FPS telemetry</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Engagement Rate</span>
+            <div class="font-display text-3xl font-bold text-emerald-400 mt-2">91.4%</div>
+            <span class="text-xs text-emerald-400 mt-1 block">Gaze + posture match</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl">
+            <span class="text-text-secondary text-sm">Flagged Behaviors</span>
+            <div class="font-display text-3xl font-bold text-emerald-400 mt-2">0</div>
+            <span class="text-xs text-emerald-400 mt-1 block">Clean visual telemetry</span>
+        </div>
+    </div>
+
+    <!-- Video Analysis Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Video Library List -->
+        <div class="lg:col-span-4 glass-panel p-5 rounded-2xl space-y-4">
+            <h2 class="font-display font-bold text-lg text-white border-b border-border-subtle pb-3">Analyzed Video Sessions</h2>
+            <div class="space-y-3" id="videoListContainer">
+                <!-- Dynamic cards -->
+            </div>
+        </div>
+
+        <!-- Right Player & Telemetry Breakdown -->
+        <div class="lg:col-span-8 glass-panel p-5 rounded-2xl space-y-5">
+            <div class="flex items-center justify-between border-b border-border-subtle pb-4">
+                <div>
+                    <h2 class="font-display font-bold text-xl text-white" id="vCandidateName">Sarah Jenkins</h2>
+                    <p class="text-xs text-primary font-mono" id="vInterviewType">Technical Deep Dive • 35 Mins</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs text-text-secondary uppercase font-mono block">Video Score</span>
+                    <span class="font-display text-3xl font-bold text-primary" id="vScore">86.5</span>
+                </div>
+            </div>
+
+            <!-- Video Player Placeholder -->
+            <div class="glass-card rounded-2xl h-64 flex flex-col items-center justify-center border border-primary/30 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-tr from-primary/10 via-transparent to-purple-600/10"></div>
+                <span class="material-symbols-outlined text-6xl text-primary animate-pulse z-10">play_circle</span>
+                <span class="font-mono text-xs text-text-secondary mt-2 z-10">Webcam Stream Telemetry (35 min session recorded)</span>
+            </div>
+
+            <!-- Telemetry Metrics Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="glass-card p-4 rounded-xl space-y-2">
+                    <h4 class="text-xs font-mono text-primary uppercase">Eye Contact & Gaze</h4>
+                    <div class="font-display text-2xl font-bold text-white" id="vEyeContact">88%</div>
+                    <p class="text-xs text-text-secondary">Iris position deviation strictly within 0.05 horizontal threshold.</p>
+                </div>
+                <div class="glass-card p-4 rounded-xl space-y-2">
+                    <h4 class="text-xs font-mono text-secondary uppercase">Posture Alignment</h4>
+                    <div class="font-display text-2xl font-bold text-white" id="vPosture">89%</div>
+                    <p class="text-xs text-text-secondary">Spine angle 158° with zero slouching detected.</p>
+                </div>
+                <div class="glass-card p-4 rounded-xl space-y-2">
+                    <h4 class="text-xs font-mono text-purple-400 uppercase">Facial Expressiveness</h4>
+                    <div class="font-display text-2xl font-bold text-white">92%</div>
+                    <p class="text-xs text-text-secondary">Primary blendshape: Confident & Neutral emotion state.</p>
+                </div>
+            </div>
+
+            <!-- Facial Expression Graph -->
+            <div class="glass-card p-4 rounded-xl space-y-2">
+                <h4 class="text-xs font-mono text-primary uppercase">Facial Expression Timeline (MediaPipe Blendshapes)</h4>
+                <div class="h-44">
+                    <canvas id="expressionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- AI Insights -->
+            <div class="glass-card p-4 rounded-xl space-y-2">
+                <h4 class="text-xs font-mono text-primary uppercase flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">auto_awesome</span> Visual Telemetry Insights
+                </h4>
+                <ul class="text-xs text-text-secondary list-disc list-inside space-y-1" id="vInsightsList"></ul>
+            </div>
+        </div>
+
+    </div>
+
+</main>
+
+<script>
+let videoData = [];
+let selectedVideo = null;
+let expChartObj = null;
+
+async function fetchVideo() {
+    try {
+        const res = await fetch('/api/v1/interview/intelligence/video');
+        const json = await res.json();
+        if(json.status === 'success' && json.data) {
+            videoData = json.data;
+            renderVideoList(videoData);
+            if(videoData.length > 0) selectVideo(videoData[0].id);
+        }
+    } catch(e) { console.error(e); }
+}
+
+function renderVideoList(list) {
+    const container = document.getElementById('videoListContainer');
+    container.innerHTML = list.map(v => `
+        <div onclick="selectVideo(${v.id})" class="glass-card p-4 rounded-xl hover:border-primary/50 cursor-pointer transition ${selectedVideo && selectedVideo.id === v.id ? 'border-primary bg-primary/10' : ''}">
+            <div class="flex items-center justify-between">
+                <h3 class="font-display font-semibold text-white">${v.candidate_name}</h3>
+                <span class="px-2 py-0.5 rounded text-xs font-mono bg-emerald-500/20 text-emerald-400">${v.status}</span>
+            </div>
+            <div class="flex items-center justify-between mt-2 text-xs text-text-secondary">
+                <span>${v.interview_type} • ${v.duration_minutes}m</span>
+                <span class="font-mono text-primary font-bold">Score ${v.video_score}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function selectVideo(id) {
+    selectedVideo = videoData.find(v => v.id === id);
+    if(!selectedVideo) return;
+
+    renderVideoList(videoData);
+
+    document.getElementById('vCandidateName').innerText = selectedVideo.candidate_name;
+    document.getElementById('vInterviewType').innerText = `${selectedVideo.interview_type} • ${selectedVideo.duration_minutes} Mins`;
+    document.getElementById('vScore').innerText = selectedVideo.video_score;
+    document.getElementById('vEyeContact').innerText = selectedVideo.eye_contact_pct + '%';
+    document.getElementById('vPosture').innerText = (selectedVideo.body_language ? selectedVideo.body_language.posture_confidence : 89) + '%';
+
+    document.getElementById('vInsightsList').innerHTML = (selectedVideo.ai_insights || []).map(i => `<li>${i}</li>`).join('');
+
+    renderExpChart();
+}
+
+function renderExpChart() {
+    const ctx = document.getElementById('expressionChart').getContext('2d');
+    if(expChartObj) expChartObj.destroy();
+    expChartObj = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['0m', '5m', '10m', '15m', '20m', '25m', '30m', '35m'],
+            datasets: [
+                { label: 'Confident', data: [80, 85, 90, 88, 92, 94, 91, 95], borderColor: '#00f2fe', tension: 0.3 },
+                { label: 'Neutral', data: [20, 15, 10, 12, 8, 6, 9, 5], borderColor: '#4facfe', tension: 0.3 },
+                { label: 'Nervous', data: [10, 5, 2, 1, 0, 0, 0, 0], borderColor: '#ef4444', tension: 0.3 }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#A1A1AA', font: { size: 10 } } } },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#A1A1AA' } },
+                y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#A1A1AA' }, max: 100 }
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', fetchVideo);
+</script>
+</body>
+</html>

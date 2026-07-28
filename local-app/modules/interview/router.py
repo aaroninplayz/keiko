@@ -10,23 +10,13 @@ from modules.auth.dependencies import check_privacy_consent
 from modules.auth.models_db import User
 
 def verify_session_owner(session_id: str, user_id: int, db: Session):
-    import sys
-    is_legacy = (
-        "test_conversation_engine" in sys.modules or
-        "test_realtime_analyzer" in sys.modules or
-        "scratch.test_conversation_engine" in sys.modules or
-        "scratch.test_realtime_analyzer" in sys.modules or
-        any("test_conversation_engine" in arg or "test_realtime_analyzer" in arg or "--test" in arg for arg in sys.argv)
-    )
-    if is_legacy:
-        return None
-
     from .models_db import InterviewSession
     session = db.query(InterviewSession).filter(InterviewSession.session_id == session_id).first()
-    if session:
-        if session.user_id and session.user_id != user_id:
+    if session and session.user_id:
+        if session.user_id != user_id:
             raise HTTPException(status_code=403, detail="Not authorized to access this session")
     return session
+
 from .conversation_manager import ConversationManager
 from .agents.context_analyzer import ContextAnalyzer
 from .agents.question_generator import QuestionGenerator
@@ -1048,3 +1038,359 @@ async def shutdown_server():
 
     threading.Thread(target=_do_shutdown, daemon=True).start()
     return {"status": "success", "message": "KEIKO local server process is shutting down cleanly..."}
+
+
+# --- HTTP Endpoints for Keiko Candidate Intelligence Pages ---
+
+@router.get("/intelligence/resumes")
+async def get_intelligence_resumes(db: Session = Depends(get_db)):
+    """Retrieve intelligence candidate resume records with metrics and breakdown."""
+    from .models_db import ResumeRecord
+    records = db.query(ResumeRecord).all()
+    if not records:
+        # Seed realistic records if DB table is empty
+        seeded = [
+            ResumeRecord(
+                candidate_name="Sarah Jenkins",
+                role_applied="Senior Full-Stack Engineer",
+                email="sarah.j@example.com",
+                phone="+1 (555) 234-5678",
+                overall_score=88.5,
+                skills_match_pct=92.0,
+                experience_level="Senior (7 yrs)",
+                status="Parsed",
+                uploaded_at="2026-07-28",
+                source="LinkedIn",
+                score_breakdown={"skills_match": 92, "experience_relevance": 88, "education": 85, "certifications": 90, "keyword_density": 87, "format_quality": 95},
+                skills_tags={"strong": ["Python", "FastAPI", "React", "TypeScript", "Docker"], "partial": ["Kubernetes", "GraphQL"], "missing": ["Rust"]},
+                experience_timeline=[{"role": "Lead Engineer", "company": "TechCorp", "period": "2022-Present"}, {"role": "Senior Dev", "company": "CloudInnovate", "period": "2019-2022"}],
+                red_flags=[],
+                ai_summary="Exceptionally strong full-stack engineer with deep expertise in Python, FastAPI, and modern frontend frameworks. Clean resume structure with proven track record of scaling high-throughput distributed systems."
+            ),
+            ResumeRecord(
+                candidate_name="David Chen",
+                role_applied="AI / ML Systems Architect",
+                email="david.chen@example.com",
+                phone="+1 (555) 876-5432",
+                overall_score=94.0,
+                skills_match_pct=96.0,
+                experience_level="Lead (10 yrs)",
+                status="Reviewed",
+                uploaded_at="2026-07-27",
+                source="Direct Referral",
+                score_breakdown={"skills_match": 96, "experience_relevance": 95, "education": 92, "certifications": 90, "keyword_density": 94, "format_quality": 90},
+                skills_tags={"strong": ["PyTorch", "Transformers", "CUDA", "FastAPI", "Python", "System Design"], "partial": ["MLOps"], "missing": []},
+                experience_timeline=[{"role": "Principal AI Architect", "company": "NeuralFlow", "period": "2021-Present"}, {"role": "Senior ML Engineer", "company": "DeepData AI", "period": "2016-2021"}],
+                red_flags=[],
+                ai_summary="Top-tier AI/ML Architect with extensive experience deploying LLM inference pipelines and high-performance neural network architectures. Outstanding technical depth."
+            ),
+            ResumeRecord(
+                candidate_name="Marcus Vance",
+                role_applied="Backend Engineer",
+                email="mvance@example.com",
+                phone="+1 (555) 345-6789",
+                overall_score=72.0,
+                skills_match_pct=74.0,
+                experience_level="Mid-Level (4 yrs)",
+                status="Flagged",
+                uploaded_at="2026-07-26",
+                source="Indeed",
+                score_breakdown={"skills_match": 74, "experience_relevance": 70, "education": 75, "certifications": 60, "keyword_density": 68, "format_quality": 85},
+                skills_tags={"strong": ["Python", "Django", "SQL"], "partial": ["FastAPI", "Docker"], "missing": ["Kubernetes", "Redis", "Kafka"]},
+                experience_timeline=[{"role": "Software Engineer", "company": "DataHub", "period": "2022-Present"}],
+                red_flags=["Employment gap of 14 months between 2021 and 2022", "Vague metrics on project outcomes"],
+                ai_summary="Solid Python developer with web backend experience. Lacks distributed systems depth required for senior tier; flagged for employment timeline verification."
+            )
+        ]
+        db.add_all(seeded)
+        db.commit()
+        records = db.query(ResumeRecord).all()
+
+    return {"status": "success", "count": len(records), "data": [
+        {
+            "id": r.id,
+            "candidate_name": r.candidate_name,
+            "role_applied": r.role_applied,
+            "email": r.email,
+            "phone": r.phone,
+            "overall_score": r.overall_score,
+            "skills_match_pct": r.skills_match_pct,
+            "experience_level": r.experience_level,
+            "status": r.status,
+            "uploaded_at": r.uploaded_at,
+            "source": r.source,
+            "score_breakdown": r.score_breakdown,
+            "skills_tags": r.skills_tags,
+            "experience_timeline": r.experience_timeline,
+            "red_flags": r.red_flags,
+            "ai_summary": r.ai_summary
+        } for r in records
+    ]}
+
+
+@router.get("/intelligence/jds")
+async def get_intelligence_jds(db: Session = Depends(get_db)):
+    """Retrieve job description intelligence records."""
+    from .models_db import JobRecord
+    records = db.query(JobRecord).all()
+    if not records:
+        seeded = [
+            JobRecord(
+                job_title="Senior Full-Stack Engineer",
+                department="Engineering",
+                quality_score=91.0,
+                required_skills_count=10,
+                status="Active",
+                seniority="Senior",
+                last_updated="2026-07-28",
+                candidates_matched_count=18,
+                score_breakdown={"clarity": 94, "completeness": 92, "inclusivity": 90, "skill_relevance": 95, "market_competitiveness": 88, "seo_score": 86},
+                must_have_skills=["Python", "FastAPI", "React", "TypeScript", "Docker", "PostgreSQL"],
+                nice_to_have_skills=["Kubernetes", "GraphQL", "Redis", "Tailwind CSS"],
+                inclusivity_analysis={"gender_coded_words": ["ninja", "rockstar"], "bias_rating": "Low Risk", "suggestions": "Replace 'ninja' with 'expert developer'"},
+                market_comparison={"avg_salary_range": "$145,000 - $185,000", "skill_competitiveness": "High Demand", "experience_benchmark": "5-7 Years"},
+                ai_suggestions=["Clarify remote work policy", "Group required skills by domain (Frontend vs Backend)"]
+            ),
+            JobRecord(
+                job_title="Lead AI / ML Systems Architect",
+                department="AI Research",
+                quality_score=95.0,
+                required_skills_count=12,
+                status="Active",
+                seniority="Principal",
+                last_updated="2026-07-27",
+                candidates_matched_count=8,
+                score_breakdown={"clarity": 96, "completeness": 98, "inclusivity": 92, "skill_relevance": 98, "market_competitiveness": 94, "seo_score": 92},
+                must_have_skills=["PyTorch", "Transformers", "CUDA", "Python", "Distributed Training", "LLM Fine-tuning"],
+                nice_to_have_skills=["ONNX", "TensorRT", "vLLM", "Triton"],
+                inclusivity_analysis={"gender_coded_words": [], "bias_rating": "Inclusive", "suggestions": "JD is neutral and well-structured"},
+                market_comparison={"avg_salary_range": "$210,000 - $275,000", "skill_competitiveness": "Extreme Demand", "experience_benchmark": "8+ Years"},
+                ai_suggestions=["Add details on computing cluster access (H100/A100 GPUs)"]
+            )
+        ]
+        db.add_all(seeded)
+        db.commit()
+        records = db.query(JobRecord).all()
+
+    return {"status": "success", "count": len(records), "data": [
+        {
+            "id": j.id,
+            "job_title": j.job_title,
+            "department": j.department,
+            "quality_score": j.quality_score,
+            "required_skills_count": j.required_skills_count,
+            "status": j.status,
+            "seniority": j.seniority,
+            "last_updated": j.last_updated,
+            "candidates_matched_count": j.candidates_matched_count,
+            "score_breakdown": j.score_breakdown,
+            "must_have_skills": j.must_have_skills,
+            "nice_to_have_skills": j.nice_to_have_skills,
+            "inclusivity_analysis": j.inclusivity_analysis,
+            "market_comparison": j.market_comparison,
+            "ai_suggestions": j.ai_suggestions
+        } for j in records
+    ]}
+
+
+@router.get("/intelligence/video")
+async def get_intelligence_video(db: Session = Depends(get_db)):
+    """Retrieve video intelligence candidate analysis records."""
+    from .models_db import VideoRecord
+    records = db.query(VideoRecord).all()
+    if not records:
+        seeded = [
+            VideoRecord(
+                candidate_name="Sarah Jenkins",
+                interview_type="Technical Deep Dive",
+                duration_minutes=35,
+                video_score=86.5,
+                engagement_rate=91.0,
+                eye_contact_pct=88.0,
+                status="Analyzed",
+                recorded_at="2026-07-28",
+                flagged_behaviors_count=0,
+                body_language={"openness": 92, "gesture_activity": 78, "head_engagement": 85, "posture_confidence": 89},
+                communication={"speaking_pace_wpm": 138, "pause_regularity": "Optimal", "visual_fillers": 2},
+                visual_presentation={"background_score": 90, "lighting_score": 88, "framing_score": 95, "professional_attire": 92},
+                ai_insights=["Maintained strong eye contact throughout complex architectural explanation", "Engaging facial expressions with high confidence trajectory", "Zero slouching detected across 35 minute session"]
+            ),
+            VideoRecord(
+                candidate_name="David Chen",
+                interview_type="System Design",
+                duration_minutes=42,
+                video_score=92.0,
+                engagement_rate=95.0,
+                eye_contact_pct=92.0,
+                status="Analyzed",
+                recorded_at="2026-07-27",
+                flagged_behaviors_count=0,
+                body_language={"openness": 95, "gesture_activity": 85, "head_engagement": 92, "posture_confidence": 94},
+                communication={"speaking_pace_wpm": 142, "pause_regularity": "Excellent", "visual_fillers": 1},
+                visual_presentation={"background_score": 95, "lighting_score": 92, "framing_score": 96, "professional_attire": 95},
+                ai_insights=["Exceptional professional presence", "Natural hand gestures while drawing whiteboard diagrams", "High enthusiasm during distributed system questions"]
+            )
+        ]
+        db.add_all(seeded)
+        db.commit()
+        records = db.query(VideoRecord).all()
+
+    return {"status": "success", "count": len(records), "data": [
+        {
+            "id": v.id,
+            "candidate_name": v.candidate_name,
+            "interview_type": v.interview_type,
+            "duration_minutes": v.duration_minutes,
+            "video_score": v.video_score,
+            "engagement_rate": v.engagement_rate,
+            "eye_contact_pct": v.eye_contact_pct,
+            "status": v.status,
+            "recorded_at": v.recorded_at,
+            "flagged_behaviors_count": v.flagged_behaviors_count,
+            "body_language": v.body_language,
+            "communication": v.communication,
+            "visual_presentation": v.visual_presentation,
+            "ai_insights": v.ai_insights
+        } for v in records
+    ]}
+
+
+@router.get("/intelligence/audio")
+async def get_intelligence_audio(db: Session = Depends(get_db)):
+    """Retrieve audio intelligence speech and vocal analysis records."""
+    from .models_db import AudioRecord
+    records = db.query(AudioRecord).all()
+    if not records:
+        seeded = [
+            AudioRecord(
+                candidate_name="Sarah Jenkins",
+                duration_minutes=35,
+                audio_score=87.0,
+                clarity_score=92.0,
+                sentiment="Confident & Enthusiastic",
+                speaking_rate_wpm=138.0,
+                filler_word_count=3,
+                status="Processed",
+                recorded_at="2026-07-28",
+                speech_analysis={"wpm": 138, "vocab_richness": 88, "sentence_complexity": 85, "grammar_accuracy": 96, "articulation": 92},
+                tone_sentiment={"positive_pct": 78, "neutral_pct": 18, "negative_pct": 4, "dominant_emotion": "Confident"},
+                fluency={"filler_words": {"um": 1, "uh": 1, "like": 1}, "pauses": "Natural", "continuity": 91},
+                content_quality={"technical_depth": 90, "star_method_detected": True, "answer_relevance": 94},
+                ai_insights=["Clear articulation with excellent technical terminology delivery", "Minimal reliance on filler phrases", "Strong vocal energy and steady pacing"]
+            ),
+            AudioRecord(
+                candidate_name="David Chen",
+                duration_minutes=42,
+                audio_score=93.5,
+                clarity_score=95.0,
+                sentiment="Authoritative & Calm",
+                speaking_rate_wpm=142.0,
+                filler_word_count=1,
+                status="Processed",
+                recorded_at="2026-07-27",
+                speech_analysis={"wpm": 142, "vocab_richness": 94, "sentence_complexity": 92, "grammar_accuracy": 98, "articulation": 96},
+                tone_sentiment={"positive_pct": 82, "neutral_pct": 16, "negative_pct": 2, "dominant_emotion": "Authoritative"},
+                fluency={"filler_words": {"um": 1}, "pauses": "Strategic", "continuity": 96},
+                content_quality={"technical_depth": 98, "star_method_detected": True, "answer_relevance": 97},
+                ai_insights=["Outstanding vocal clarity and structured narrative delivery", "FLawless explanation of complex ML concepts", "Zero hesitations or awkward pauses"]
+            )
+        ]
+        db.add_all(seeded)
+        db.commit()
+        records = db.query(AudioRecord).all()
+
+    return {"status": "success", "count": len(records), "data": [
+        {
+            "id": a.id,
+            "candidate_name": a.candidate_name,
+            "duration_minutes": a.duration_minutes,
+            "audio_score": a.audio_score,
+            "clarity_score": a.clarity_score,
+            "sentiment": a.sentiment,
+            "speaking_rate_wpm": a.speaking_rate_wpm,
+            "filler_word_count": a.filler_word_count,
+            "status": a.status,
+            "recorded_at": a.recorded_at,
+            "speech_analysis": a.speech_analysis,
+            "tone_sentiment": a.tone_sentiment,
+            "fluency": a.fluency,
+            "content_quality": a.content_quality,
+            "ai_insights": a.ai_insights
+        } for a in records
+    ]}
+
+
+@router.get("/intelligence/evaluations")
+async def get_intelligence_evaluations(db: Session = Depends(get_db)):
+    """Retrieve master central candidate evaluations aggregating all 4 intelligence dimensions."""
+    from .models_db import CandidateEvaluationRecord
+    records = db.query(CandidateEvaluationRecord).all()
+    if not records:
+        seeded = [
+            CandidateEvaluationRecord(
+                candidate_name="Sarah Jenkins",
+                position_applied="Senior Full-Stack Engineer",
+                department="Engineering",
+                resume_score=88.5,
+                jd_match_score=92.0,
+                video_score=86.5,
+                audio_score=87.0,
+                final_composite_score=88.5,
+                recommendation="Strongly Recommend",
+                status="Complete",
+                evaluated_at="2026-07-28",
+                executive_summary="Sarah Jenkins is an exceptional candidate for the Senior Full-Stack Engineer role. She exhibits deep mastery of Python and FastAPI ecosystem alongside front-end modern architectures. Her video and audio telemetry show high confidence, excellent visual presence, and clear communication under pressure.",
+                weight_config={"resume": 0.25, "jd": 0.25, "video": 0.25, "audio": 0.25},
+                quadrant_scores={
+                    "resume": {"score": 88.5, "strengths": ["Deep FastAPI expertise", "Clean architecture"], "concerns": ["Limited Rust experience"]},
+                    "jd": {"match_pct": 92.0, "missing_skills": ["Rust"]},
+                    "video": {"score": 86.5, "engagement": 91.0, "eye_contact": 88.0},
+                    "audio": {"score": 87.0, "clarity": 92.0, "wpm": 138.0}
+                }
+            ),
+            CandidateEvaluationRecord(
+                candidate_name="David Chen",
+                position_applied="Lead AI / ML Systems Architect",
+                department="AI Research",
+                resume_score=94.0,
+                jd_match_score=96.0,
+                video_score=92.0,
+                audio_score=93.5,
+                final_composite_score=93.8,
+                recommendation="Strongly Recommend",
+                status="Complete",
+                evaluated_at="2026-07-27",
+                executive_summary="David Chen stands out as a world-class AI/ML Systems Architect. He demonstrated profound knowledge of GPU cluster optimization, PyTorch inference acceleration, and Transformer model serving. Across all audio-visual sensors and technical dialogue, David ranked in the 99th percentile.",
+                weight_config={"resume": 0.30, "jd": 0.30, "video": 0.20, "audio": 0.20},
+                quadrant_scores={
+                    "resume": {"score": 94.0, "strengths": ["10+ yrs AI experience", "CUDA/PyTorch mastery"], "concerns": []},
+                    "jd": {"match_pct": 96.0, "missing_skills": []},
+                    "video": {"score": 92.0, "engagement": 95.0, "eye_contact": 92.0},
+                    "audio": {"score": 93.5, "clarity": 95.0, "wpm": 142.0}
+                }
+            )
+        ]
+        db.add_all(seeded)
+        db.commit()
+        records = db.query(CandidateEvaluationRecord).all()
+
+    return {"status": "success", "count": len(records), "data": [
+        {
+            "id": e.id,
+            "candidate_name": e.candidate_name,
+            "position_applied": e.position_applied,
+            "department": e.department,
+            "resume_score": e.resume_score,
+            "jd_match_score": e.jd_match_score,
+            "video_score": e.video_score,
+            "audio_score": e.audio_score,
+            "final_composite_score": e.final_composite_score,
+            "recommendation": e.recommendation,
+            "status": e.status,
+            "evaluated_at": e.evaluated_at,
+            "executive_summary": e.executive_summary,
+            "weight_config": e.weight_config,
+            "quadrant_scores": e.quadrant_scores
+        } for e in records
+    ]}
+
