@@ -217,8 +217,8 @@ keiko/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/aaroninplayz/KEIKO.git
-cd KEIKO/local-app
+git clone https://github.com/aaroninplayz/keiko.git
+cd keiko/local-app
 
 # 2. Create a virtual environment
 python -m venv venv
