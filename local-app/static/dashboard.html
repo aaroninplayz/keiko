@@ -129,15 +129,15 @@
     <div id="bootLogs" class="flex flex-col justify-end space-y-0.5"></div>
   </div>
 
-  <!-- Phase 2: Centered Thin Gradient Loading Bar & Digits Percentage -->
-  <div id="gradientLoaderBox" class="opacity-0 transition-opacity duration-500 absolute inset-0 flex flex-col items-center justify-center space-y-3 pointer-events-none">
-    <div class="flex items-center gap-2 text-xs font-mono text-gray-400">
-      <span class="tracking-widest uppercase text-[10px] font-bold text-gray-300">KEIKO</span>
-      <span id="bootProgressPercent" class="text-primary font-bold text-sm">0%</span>
+  <!-- Phase 2: Centered Gradient Loading Bar & Digits Percentage -->
+  <div id="gradientLoaderBox" class="opacity-0 transition-opacity duration-500 absolute inset-0 flex flex-col items-center justify-center space-y-2 pointer-events-none">
+    <div class="flex items-baseline gap-2.5 font-mono">
+      <span class="tracking-[0.2em] uppercase text-sm sm:text-base font-bold text-white">KEIKO</span>
+      <span id="bootProgressPercent" class="text-primary font-bold text-sm sm:text-base">0%</span>
     </div>
     <!-- Thin single line with signature gradient -->
-    <div class="w-72 sm:w-96 h-[2px] bg-white/10 rounded-full overflow-hidden">
-      <div id="bootProgressBar" class="h-full rounded-full transition-all duration-75 w-0 bg-accent-gradient shadow-[0_0_12px_rgba(124,58,237,0.8)]"></div>
+    <div class="w-72 sm:w-96 h-[1px] bg-white/10 overflow-hidden">
+      <div id="bootProgressBar" class="h-full transition-all duration-75 w-0 bg-accent-gradient shadow-[0_0_12px_rgba(124,58,237,0.8)]"></div>
     </div>
   </div>
 
@@ -1246,7 +1246,25 @@
           gradientLoaderBox.classList.remove('opacity-0');
 
           let progress = 0;
+          let isPaused = false;
+          let hasGlitched = false;
+          const shouldGlitch = Math.random() < 0.10; // 10% chance of random loading stall bug
+          const stallPoint = shouldGlitch ? Math.floor(Math.random() * 60) + 25 : -1; // Random % between 25% and 85%
+
           const progressInterval = setInterval(() => {
+            if (isPaused) return;
+
+            // Trigger randomized loading stall bug
+            if (shouldGlitch && !hasGlitched && progress >= stallPoint) {
+              hasGlitched = true;
+              isPaused = true;
+              // Stall for 2 seconds then continue
+              setTimeout(() => {
+                isPaused = false;
+              }, 2000);
+              return;
+            }
+
             progress += Math.floor(Math.random() * 3) + 1;
             if (progress > 100) progress = 100;
 
